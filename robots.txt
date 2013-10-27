@@ -1,0 +1,8 @@
+User-agent: *
+Disallow:
+
+User-agent: Googlebot 
+Disallow: /rss
+Disallow: /rss/
+
+Sitemap: http://www.setnode.com/sitemap.xml
