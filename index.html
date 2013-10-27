@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/mouse-wheel-events-event-filters-and-qscrollarea/" rel="bookmark" title="Permalink to Mouse wheel events, event filters, and QScrollArea">Mouse wheel events, event filters, and QScrollArea</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Sunday, September 12, 2010 @ 18:21
+	</footer>
+	<div class="body">
+		<p>Let’s say you have a <code>QScrollArea</code> which contains some custom widget. Now, although this widget itself has no use for mouse wheel events, when it’s in your <code>QScrollArea</code> you’d really like for it to grow and shrink in response to the wheel. Or maybe you’d just like to map vertical wheel events to horizontal scrolling, since you know the widget will never need vertical scrollbars.</p>
+<p>The biggest problem here is that <code>QScrollArea</code> accepts wheel events (this isn’t strictly true, as you’ll soon see). Events propagate from the child up to the parent until someone accepts the event, and this means that <code>QScrollArea</code> will prevent wheel events from getting to your own code (again, this isn’t strictly true).</p>
+<p>Reading the documentation it’s clear that you’d either want to subclass <code>QScrollArea</code> or use <a href="http://qt-project.org/doc/qt-4.8/eventsandfilters.html">event filters</a>. Since you don’t need to subclass <code>QScrollArea</code> for any other reason, using event filters sounds like a reasonable approach. You’ll set up an event filter that forces wheel events to be ignored and install it on the <code>QScrollArea</code>. That way, it’ll propagate up to your containing widget.</p>
+<p>So you’d adjust your containing widget like so:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MyWidget</span> <span class="o">:</span> <span class="k">public</span> <span class="n">QObject</span>
+<span class="p">{</span>
+    <span class="nl">public:</span>
+        <span class="c1">// ...</span>
+
+        <span class="kt">bool</span> <span class="n">eventFilter</span><span class="p">(</span><span class="n">QObject</span><span class="o">*</span> <span class="cm">/*obj*/</span><span class="p">,</span> <span class="n">QEvent</span><span class="o">*</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">evt</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">QEvent</span><span class="o">::</span><span class="n">Wheel</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// ignore the event (this effectively </span>
+                <span class="c1">// makes it &quot;skip&quot; one object)</span>
+                <span class="n">evt</span><span class="o">-&gt;</span><span class="n">ignore</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="c1">// return false to continue event propagation</span>
+            <span class="c1">// for all events</span>
+            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+    <span class="nl">protected:</span>
+        <span class="kt">void</span> <span class="n">wheelEvent</span><span class="p">(</span><span class="n">QWheelEvent</span><span class="o">*</span> <span class="n">event</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// your own custom stuff</span>
+            <span class="c1">// ...</span>
+            <span class="c1">// if you handle the event and don&#39;t want it to</span>
+            <span class="c1">// propagate any further, accept it:</span>
+            <span class="n">event</span><span class="o">-&gt;</span><span class="n">accept</span><span class="p">();</span>
+        <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>And then you’d use it like so:</p>
+<div class="codehilite"><pre><span class="n">QScrollArea</span><span class="o">*</span> <span class="n">scrollArea</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QScrollArea</span><span class="p">(</span><span class="n">parent</span><span class="p">);</span>
+<span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">setWidget</span><span class="p">(</span><span class="n">someWidget</span><span class="p">);</span>
+<span class="c1">// assuming that &#39;this&#39; is MyWidget</span>
+<span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">installEventFilter</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</pre></div>
+
+
+<p>This doesn’t work. Instead, what you need to do is <code>installEventFilter()</code> on <code>QScrollArea</code>’s viewport:</p>
+<div class="codehilite"><pre><span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">viewport</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">installEventFilter</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</pre></div>
+
+
+<p>In fact, <code>QScrollArea</code> is not the one that is accepting wheel events. It’s the viewport that is doing all of that. By installing an event filter on the viewport, the wheel events will continue to propagate up the tree.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/logitech-g500-gaming-mouse-impressions/" rel="bookmark" title="Permalink to Logitech G500 Gaming Mouse - Impressions">Logitech G500 Gaming Mouse - Impressions</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, May 22, 2010 @ 16:06
+	</footer>
+	<div class="body">
+		<p>Got a Logitech G500 mouse recently and I thought I'd just quickly note my impressions of the mouse and its associated software. First, some background on my previous (non-throwaway) mice to give an idea of what I've used before:</p>
+<ol>
+<li>Logitech MX1000: a wireless mouse that had little to no lag in my particular environment, in contrast to:</li>
+<li>Logitech MX Revolution: the wireless mouse Logitech sent me as a replacement for the MX1000 above; had <em>two</em> wheels, one of which had a free spinning mode; unfortunately had terrible interference problems for me and was essentially unusable</li>
+<li>Razer DeathAdder: a wired mouse with a great shape, just wish it had more buttons</li>
+<li>Purchased the Logitech G500 because my Razer mouse was double-clicking sporadically and developed a flaky scroll wheel (scrolling down would sometimes scroll up)</li>
+</ol>
+<p>I don't have much to say about the mouse itself that hasn't already been said on the internet -- it feels good in the hand and has plenty of buttons. I'm going to focus on the part I found more interesting, the on-board memory.</p>
+<p>Now, one problem with most of these mice is that while the left, right, middle, and two side buttons (Mouse4 and Mouse5) are supported natively by Windows, any additional buttons on them require the appropriate drivers to be installed. This isn't necessarily bad in itself, but I always liked the idea of a mouse that just works, fully functional, without requiring any drivers. The DeathAdder added on-board memory to avoid this issue, so you could do things like save a macro to Mouse5 and bring it to another computer and have that macro available. Unfortunately, it only had five buttons, all of which already have standard functions, so I never found a good use for this feature. However, the on-board memory did let you save your mouse DPI settings, which was somewhat useful.</p>
+<p>The G500 also has on-board memory, but this time it also has the spare buttons to make it worthwhile. In addition to the five standard buttons, the G500 has one extra side button, two DPI buttons, a left wheel tilt and a right wheel tilt. All of these are programmable and, as long as you stick to commands that can be sent by a keyboard or a mouse (including standard media keys like volume and playback controls), will work on any computer without drivers. It apparently does this by acting as several human interface devices, including a keyboard and a mouse:</p>
+<p><a href="/images/logitech_g500_properties.png"><img src="/images/logitech_g500_properties_thumb.jpg" alt="Logitech G500 Properties Dialog Thumbnail" height="200" width="162" /></a></p>
+<p>It's pretty interesting assigning a keystroke like 'A' to a side button or having your DPI buttons control the system's volume. After setting my bindings up I uninstalled the SetPoint software and still have a fully working mouse. Neat.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/accessing-a-git-repository-with-tortoisehg-on-windows/" rel="bookmark" title="Permalink to Accessing a Git repository with TortoiseHg on Windows">Accessing a Git repository with TortoiseHg on Windows</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 09, 2010 @ 10:31
+	</footer>
+	<div class="body">
+		<p>If you're using Hg and you want to get hold of a Git repository there is an extension, hg-git, that lets you do this.</p>
+<p>On Windows the installation process for this hasn't always been the easiest, as you needed to first install the dulwich Python library (which I always seemed to have trouble doing) and then hg-git. The TortoiseHg guys have made this a lot easier in recent versions of TortoiseHg, as they now include the dulwich libraries.</p>
+<p>So, step by step:</p>
+<ol>
+<li>You'll need <a href="http://tortoisehg.bitbucket.org/‎">TortoiseHg 0.9.3</a> or later. Get the latest version.</li>
+<li>
+<p>Bring up a command line and enter this line to clone the latest hg-git to your desired directory (this is "installing" hg-git). I'll use <code>D:\TortoiseHg\hg-git</code> in this example.</p>
+<div class="codehilite"><pre>&gt; hg clone http://bitbucket.org/durin42/hg-git/ D:\TortoiseHg\hg-git
+</pre></div>
+
+
+</li>
+<li>
+<p>Open up your user-specific <code>Mercurial.ini</code>. The location of this file may change occasionally, read the <a href="http://www.selenic.com/mercurial/hgrc.5.html">Mercurial docs</a> if you have trouble finding it.<br />
+    On Windows Vista and Windows 7 this file is typically located at:</p>
+<div class="codehilite"><pre>C:\Users\YourUsername\Mercurial.ini
+</pre></div>
+
+
+<p>while on Windows XP you'll find it at:</p>
+<div class="codehilite"><pre>C:\Documents and Settings\YourUsername\Mercurial.ini
+</pre></div>
+
+
+<p>Alternatively, bring up the Windows "Run" dialog and enter:</p>
+<div class="codehilite"><pre>%USERPROFILE%\Mercurial.ini
+</pre></div>
+
+
+<p>which will work on all recent Windows platforms.</p>
+</li>
+<li>
+<p>Navigate down to the <code>[extensions]</code> section and add this line to that section:</p>
+<div class="codehilite"><pre>hggit = D:\TortoiseHg\hg-git
+</pre></div>
+
+
+<p>Where <code>D:\TortoiseHg\hg-git</code> is the directory you cloned hg-git to earlier. This line may already exist or may be commented out with a semicolon, in that case just remove the semicolon and update the directory.</p>
+</li>
+<li>
+<p>Now you can clone a Git repository like so:</p>
+<div class="codehilite"><pre>&gt; hg clone git://github.com/richhickey/clojure.git D:\TargetDirectory
+</pre></div>
+
+
+</li>
+<li>
+<p>The result is you'll have a Mercurial enabled repository at <code>D:\TargetDirectory</code>. You can <code>push</code>, <code>pull</code>, and generally treat it as an Hg repository. Try</p>
+<div class="codehilite"><pre>&gt; hg help hggit
+</pre></div>
+
+
+</li>
+</ol>
+<p>for additional help and information, or check the <a href="http://mercurial.selenic.com/wiki/HgGit">HgGit page</a> on the Mercurial wiki.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/great-boost-documentation/" rel="bookmark" title="Permalink to Great Boost Documentation">Great Boost Documentation</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, April 03, 2010 @ 18:20
+	</footer>
+	<div class="body">
+		<p>I found out from the <a href="http://sandfly.net.nz/blog/2010/04/a-better-boost-book/">Life of Andrew</a> blog that there is a new source for <a href="http://en.highscore.de/cpp/boost/">Boost information</a> available. It's a Creative Commons licensed book covering a wide range of Boost libraries, some of which are usually under-represented documentation-wise (looking at you, ASIO). It was originally written in German by <a href="http://www.highscore.de/">Boris Schäling</a>, but <a href="http://www.andreasmasur.com/">Andreas Masur</a> has translated it into English for those of us who aren't so culturally adapted.</p>
+<p>A brief skim of the book gives an extremely promising impression and I think it'll be one of the first resources I point newcomers to Boost to in the future.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/" rel="bookmark" title="Permalink to Simplify signals and slots connections with unique connections in Qt 4.6">Simplify signals and slots connections with unique connections in Qt 4.6</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, January 12, 2010 @ 14:43
+	</footer>
+	<div class="body">
+		<p>Somehow there's absolutely no mention of this in the <a href="http://doc.trolltech.com/4.6/qt4-6-intro.html">What's New in Qt 4.6</a> summary, but one of my favorite new features in Qt 4.6 is a surprisingly simple one: the <a href="http://doc.trolltech.com/4.6/qt.html#ConnectionType-enum"><code>Qt::UniqueConnection</code></a> connection type.</p>
+<p>The default connection type for <a href="http://doc.trolltech.com/4.6/qobject.html#connect"><code>connect()</code></a> is <code>Qt::AutoConnection</code>, which sets up either a direct or queued connection depending on whether the signaling object and receiving slot are in the same thread or not. This connection type allows you to connect a particular signal/slot pair multiple times (so emitting a signal once could call a slot twice) which has caught me on a number of occasions.</p>
+<p>This is really simple to work around: you can add some bookkeeping to keep track of that particular connection or you can use <code>disconnect()</code> where appropriate to maintain 0 or 1 connections. The new <code>Qt::UniqueConnection</code> connection type, on the other hand, lets you be sure that a connection is made only once. It's not something you always need, but when you do, it lets you keep your code a bit cleaner.</p>
+<p>One caveat is that <code>Qt::UniqueConnection</code> makes a unique <code>Qt::AutoConnection</code>, meaning you don't have the ability to explicitly specify a unique queued connection, for example. In a case like that you will have to keep track of the connections yourself, as before.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/" rel="bookmark" title="Permalink to Qt 4.6 has prebuilt binaries for Visual Studio">Qt 4.6 has prebuilt binaries for Visual Studio</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, December 02, 2009 @ 12:42
+	</footer>
+	<div class="body">
+		<p>I've just found out that Qt 4.6 actually includes prebuilt LGPL binaries for Visual Studio 2008, so there's little reason to spend time building Qt unless you need to use some other version of Visual Studio.</p>
+<p>The <a href="http://qt.nokia.com/downloads/windows-cpp-vs2008">prebuilt binaries are downloadable from here</a>. Alternatively, you can visit the <a href="http://qt.nokia.com/downloads">Qt download page</a>, choose LGPL, and look on the right hand side of the page for the download link.</p>
+<p>I highly recommend using the prebuilt libraries, as you will save a tremendous amount of time (it takes hours to build Qt). After you finish downloading and installing the libraries, install the <a href="http://qt.nokia.com/downloads/visual-studio-add-in">Visual Studio add-in</a> to make it easier to handle the custom build steps for moc and ui files.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-46-is-out-compiling-it-with-msvc/" rel="bookmark" title="Permalink to Qt 4.6 is out, compiling it with MSVC">Qt 4.6 is out, compiling it with MSVC</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, December 02, 2009 @ 01:39
+	</footer>
+	<div class="body">
+		<p>Qt 4.6 has been released (with some <a href="http://doc.trolltech.com/4.6/qt4-6-intro.html">new features</a>) so I've taken the opportunity to make sure my <a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/">instructions on how to compile Qt with Visual Studio</a> are still accurate. The additional steps on how to take advantage of your multi-core processor (using <code>jom</code>) still work, as well.</p>
+<p><em>[Edit: Qt 4.6 actually has <a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/">prebuilt binaries/libraries</a> for Visual Studio 2008, which is preferable to spending hours building Qt]</em></p>
+<p>I've made a note in the article but I'll repeat it here because it's a major time-saver: you should delete, from your Qt folder, these instances of <code>mocinclude.tmp</code>:</p>
+<div class="codehilite"><pre>\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+</pre></div>
+
+
+<p>Deleting the first two <code>mocinclude.tmp</code> files will prevent a <code>LNK2019</code> error while building Webkit, while deleting the last two (which are new in Qt 4.6, as far as I can tell) will prevent an <code>Error: Unknown interface</code> while trying to build <code>qscriptextensionplugin.h</code>.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/" rel="bookmark" title="Permalink to An update on building Boost with MSVC (still with dual/quad/multi-core action)">An update on building Boost with MSVC (still with dual/quad/multi-core action)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, November 19, 2009 @ 02:05
+	</footer>
+	<div class="body">
+		<p>I've noticed that in recent versions of Boost (1.39.0 and newer) there is a way to do a <a href="http://www.boost.org/doc/libs/release/more/getting_started/windows.html#or-simplified-build-from-source">"Simplified Build from Source"</a> if you're using Microsoft Visual Studio. Here are the steps as I like to write them:</p>
+<ol>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost and extract it to some location (we'll assume <code>D:\Boost\</code>), making sure to maintain the directory structure.</p>
+</li>
+<li>
+<p>In a command prompt, navigate to your Boost library folder (<code>D:\Boost\boost_1_41_0\</code>) and then use this command, which builds your very own copy of Boost Jam (a build system):</p>
+<div class="codehilite"><pre>&gt; bootstrap
+</pre></div>
+
+
+</li>
+<li>
+<p>Now, in the same command prompt, enter this command, where N is the number of processors/cores you have available for compiling (for example, <code>-j4</code> if you have a quad-core processor):</p>
+<div class="codehilite"><pre>&gt; bjam.exe -jN
+</pre></div>
+
+
+</li>
+<li>
+<p>Wait.</p>
+</li>
+<li>
+<p>After the build completes you will have a <code>stage</code> subdirectory (<code>D:\Boost\boost_1_41_0\stage\</code>) which will contain a <code>lib</code> subdirectory, containing the compiled libraries.</p>
+</li>
+</ol>
+<p>This simplified process removes the need to get a copy of Boost Jam, which, as trivial as it sounds, really does make a big difference to the friendliness of the entire procedure. It also reduces the number of necessary arguments to zero (or one, if you consider multi-core a necessity), although there are some situations where you may still need the older arguments (in which case I refer you to my previous <a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/">entry on the subject</a>).</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/stevestreetingcoms-great-series-of-articles-about-distributed-version-control-systems/" rel="bookmark" title="Permalink to SteveStreeting.com's great series of articles about distributed version control systems">SteveStreeting.com's great series of articles about distributed version control systems</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, November 07, 2009 @ 00:43
+	</footer>
+	<div class="body">
+		<p>Steve Streeting (the man behind <a href="http://www.ogre3d.org">OGRE</a>, a 3D graphics engine) has been writing about his experiments with distributed version control systems, particularly <a href="http://en.wikipedia.org/wiki/Mercurial">Mercurial</a> and <a href="http://en.wikipedia.org/wiki/Git_(software)">Git</a>. In particular, his <a href="http://www.stevestreeting.com/2009/11/06/dvcs-score-card/">latest blog post</a> contains a summary of his experiences with the two version control systems and is probably the most in-depth article I've read on the topic. </p>
+<p>The most interesting portions of the article (and <a href="http://www.stevestreeting.com/tag/dvcs/">his prior posts</a>) are the ones which talk directly about managing the OGRE source within each of the two <abbr title="distributed version control systems">DVCSs</abbr>. OGRE is not a small project and it's very illuminating to read about what parts of a (distributed) version control system are important to a larger project, as this is stuff you may not personally experience until it's too late to change your mind.</p>
+<p>For my own personal projects I use <a href="http://en.wikipedia.org/wiki/Subversion_(software)">Subversion</a> (<a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> is a great piece of software) and I'm not in any particular rush to switch over to a <abbr title="distributed version control system">DVCS</abbr> just yet. It's simple, straightforward and fits well with my workflow. For larger projects, especially ones where you're collaborating with people across the Internet, I'd give some serious thought to using a <abbr title="distributed version control system">DVCS</abbr> and reading about other people's experiences is extremely helpful.</p>
+<p><em>[Edit: I ended up switching about a year after this post to Mercurial for my personal projects.]</em></p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/windows-sidebar-gadgets/" rel="bookmark" title="Permalink to Windows Sidebar Gadgets">Windows Sidebar Gadgets</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, October 12, 2009 @ 11:57
+	</footer>
+	<div class="body">
+		<p>Windows Vista and Windows 7 provides what they call Windows (Sidebar) Gadgets (the Sidebar moniker is removed in Windows 7). These gadgets do the same thing as similar products from Yahoo (formerly known as Konfabulator) and Apple (the Dashboard), providing small amounts of functionality and information within easy reach.</p>
+<p>The Windows Live Gallery is a perfect example of how not to make a download center. If you take a look at the Sidebar gadgets category, most are of rather poor quality, and a fair number of the good ones use plagiarized skins and/or code.</p>
+<p>There's no community presence on a site like that, and without a community to help deter poor behavior I think the free-for-all atmosphere makes it hard for the good submissions to float to the top. <a href="http://www.deviantart.com/">deviantART</a> is a great example of a site that does the right stuff; their Sidebar gadgets section is cleaner and easier to use.</p>
+<p>Anyway, I bring this up because there are some gadgets on <del>The Hobby Lounge</del> which you won't find on deviantART and unfortunately exist in a plagiarized state on the Windows Live Gallery. I was in the process of updating some of my older gadgets from this site and it took me a surprisingly long time to find the website again, even though I knew exactly what I was looking for. My google-fu is usually pretty decent so I figure I'll make a note of it here for myself and maybe help them get noticed a bit more.</p>
+<p><em>[Edit: The Hobby Lounge is now unfortunately defunct.]</em></p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/" rel="bookmark" title="Permalink to Optimization switches and Visual Studio 2008">Optimization switches and Visual Studio 2008</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, October 02, 2009 @ 15:29
+	</footer>
+	<div class="body">
+		<p>In a <a href="http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/">previous</a> entry I noted that you generally do not need to micromanage your optimization switches. </p>
+<p>However, in Visual Studio 2008 (both with and without SP1) there is a bug where the default optimization switch, <code>/O2</code>, is <em>not applied</em> even when shown in the IDE under <code>Configuration Properties-&gt;C/C++-&gt;Optimization</code>.</p>
+<p>This happens when you select <code>&lt;inherit from parent or project defaults&gt;</code>. Instead, you want to explicitly set <code>Maximize Speed (/O2)</code> (it will show up in bold when explicitly set). You should also verify that the <code>/O2</code> flag is being applied by viewing the command line (<code>Configuration Properties-&gt;C/C++-&gt;Command Line</code>).</p>
+<p>There is more about this bug on <a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=383764">Microsoft Connect</a>, where it's also noted that this bug will be fixed in Visual Studio 2010.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/right-click-context-menus-with-qt/" rel="bookmark" title="Permalink to Right-click context menus with Qt">Right-click context menus with Qt</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, July 23, 2009 @ 20:47
+	</footer>
+	<div class="body">
+		<p>Getting right-clicks to popup a context menu is pretty straightforward in Qt. There are just a couple of things to watch out for...</p>
+<p>First, there are several ways to tell Qt you want a context menu. One approach is to subclass the widget and override the <code>QWidget::contextMenuEvent()</code> event handler. However, I think the easiest approach is to call <code>setContextMenuPolicy(Qt::CustomContextMenu)</code> on the widget you want, and then connect the <code>customContextMenuRequested()</code> signal to the appropriate slot:</p>
+<div class="codehilite"><pre><span class="c1">// myWidget is any QWidget-derived class</span>
+<span class="n">myWidget</span><span class="o">-&gt;</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">::</span><span class="n">CustomContextMenu</span><span class="p">);</span>
+<span class="n">connect</span><span class="p">(</span><span class="n">myWidget</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="n">customContextMenuRequested</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span><span class="p">)),</span>
+    <span class="k">this</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="n">ShowContextMenu</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span><span class="p">)));</span>
+</pre></div>
+
+
+<p>Next, note that the <code>const QPoint&amp; pos</code> parameter in the <code>customContextMenuRequested()</code> signal is <a href="http://doc.trolltech.com/4.5/qwidget.html#customContextMenuRequested">normally in widget coordinates</a>. However, also note that classes which inherit from <code>QAbstractScrollArea</code><sup id="fnref:viewportclasses"><a class="footnote-ref" href="#fn:viewportclasses" rel="footnote">1</a></sup> instead use the coordinates of their <code>viewport()</code>. Either way, you will need to map these coordinates to global coordinates using <code>mapToGlobal()</code>.</p>
+<p>Finally, simply either <code>popup()</code> or <code>exec()</code> your <code>QMenu</code>. Remember that <code>popup()</code> is non-blocking, so if you wish to use that, make sure your <code>QMenu</code> is created on the heap (or some other way of guaranteeing that the QMenu's lifetime outlasts the scope of the function)!</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">ShowContextMenu</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span> <span class="n">pos</span><span class="p">)</span> <span class="c1">// this is a slot</span>
+<span class="p">{</span>
+    <span class="c1">// for most widgets</span>
+    <span class="n">QPoint</span> <span class="n">globalPos</span> <span class="o">=</span> <span class="n">myWidget</span><span class="o">-&gt;</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">pos</span><span class="p">);</span>
+    <span class="c1">// for QAbstractScrollArea and derived classes you would use:</span>
+    <span class="c1">// QPoint globalPos = myWidget-&gt;viewport()-&gt;mapToGlobal(pos);</span>
+
+    <span class="n">QMenu</span> <span class="n">myMenu</span><span class="p">;</span>
+    <span class="n">myMenu</span><span class="p">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&quot;Menu Item 1&quot;</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+
+    <span class="n">QAction</span><span class="o">*</span> <span class="n">selectedItem</span> <span class="o">=</span> <span class="n">myMenu</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="n">globalPos</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">selectedItem</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// something was chosen, do stuff</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="c1">// nothing was chosen</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:viewportclasses">
+<p>Examples include <code>QTreeWidget</code>, <code>QTreeView</code>, <code>QListWidget</code>, <code>QListView</code>, <code>QTableWidget</code>, <code>QTableView</code>, <code>QTextEdit</code>, <code>QPlainTextEdit</code>, and <code>QMdiArea</code>.&#160;<a class="footnote-backref" href="#fnref:viewportclasses" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/consolas-is-a-poor-choice-for-web-use/" rel="bookmark" title="Permalink to Consolas is a poor choice for web use">Consolas is a poor choice for web use</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, July 06, 2009 @ 15:22
+	</footer>
+	<div class="body">
+		<p><a href="http://en.wikipedia.org/wiki/Consolas">Consolas</a>, with <a href="http://en.wikipedia.org/wiki/ClearType">ClearType</a> enabled, is a gorgeous font, and is my preferred monospaced font. However, take a look at it without ClearType (there's a sample image on the linked Wikipedia article)---those jaggies hurt.</p>
+<p>That's why you shouldn't define Consolas in your style sheets. You can't know/assume that everyone who views your webpage will have ClearType on (or at least some form of font-smoothing), and those who don't have it enabled will suffer through text that looks as though it were drawn freehand with a mouse.</p>
+<p>Instead, unless you are going for a specific effect such as trying to mimic old <a href="http://en.wikipedia.org/wiki/Terminal_(font)">terminals</a>, keep your <code>font-family</code> for <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> elements short and to the point. I personally use</p>
+<div class="codehilite"><pre><span class="nt">font-family</span><span class="o">:</span> <span class="s2">&quot;Lucida Console&quot;</span><span class="o">,</span> <span class="s2">&quot;Monaco&quot;</span><span class="o">,</span> <span class="s2">&quot;DejaVu Sans Mono&quot;</span><span class="o">,</span> <span class="nt">monospace</span><span class="o">;</span>
+</pre></div>
+
+
+<p>which is usually enough to keep Courier (+ New) out of the way. If someone is missing all of these fonts they'll likely have a decent enough substitute.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/" rel="bookmark" title="Permalink to Compile Qt 4.5 for Visual Studio, using your multi-core processor">Compile Qt 4.5 for Visual Studio, using your multi-core processor</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, June 25, 2009 @ 20:28
+	</footer>
+	<div class="body">
+		<p>If you want to use Qt 4.5 with Visual Studio you'll need to compile it yourself. The instructions are simple, and fairly well documented on <a href="http://www.google.com/search?hl=en&amp;q=compile+qt+visual+studio">various blogs and websites</a>. Essentially: <em>(read steps 7 and on for multi-threading information)</em></p>
+<p><em>[Edit: These steps still apply for Qt 4.6, but Qt 4.6 actually has <a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/">prebuilt binaries/libraries</a> for Visual Studio 2008 which I highly suggest looking at instead]</em></p>
+<ol>
+<li>
+<p><strong>This step is important.</strong> You will potentially save some time by deleting these <code>mocinclude.tmp</code> files:</p>
+<div class="codehilite"><pre>\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+</pre></div>
+
+
+<p>Deleting the first two <code>mocinclude.tmp</code> files will prevent a LNK2019 error from building Webkit, while deleting the last two (which are present in Qt 4.6) will prevent <code>Error: Unknown interface</code> from occurring while trying to build <code>qscriptextensionplugin.h</code>. If you're missing any of them don't fret, it's actually a good thing.</p>
+</li>
+<li>
+<p>Using a <em>Visual Studio Command Prompt</em>, navigate to your Qt folder (I'll use <code>D:\Coding\Qt\2009.05</code> in this example).</p>
+</li>
+<li>
+<p>Go to the Qt folder inside there (e.g. <code>D:\Coding\Qt\2009.05\qt</code>). It's the one that contains <code>configure.exe</code>.</p>
+</li>
+<li>
+<p>Enter the following command, changing <code>win32-msvc2008</code> to <code>win32-msvc2005</code> if necessary.</p>
+<div class="codehilite"><pre>&gt; configure -opensource -shared -ltcg -no-qt3support -platform win32-msvc2008
+</pre></div>
+
+
+</li>
+<li>
+<p>What this does is fairly self explanatory. The <code>-shared</code> switch will make sure that Qt is configured for dynamic linking (even though that's usually the default option there's no guarantee). We need to specify the <code>-ltcg</code> switch to turn on <em>Link Time Code Generation</em>. LTCG is off by default since, in combination with a statically built Qt, it will make linking very slow for any projects that use Qt. However, if we configure Qt for dynamic linking this won't be an issue.</p>
+</li>
+<li>
+<p>You can add or remove switches as desired (try <code>configure help</code>) but I find most of the defaults suitable. Sure, you may not need OpenGL (or SQL or Phonon or...) support right now, but it's a separate module anyway and you're already compiling the rest of Qt.</p>
+</li>
+<li>
+<p><strong>All you need to do now is run <code>nmake</code>...<em>but wait</em>.</strong></p>
+</li>
+<li>
+<p>Do you have a dual-core or quad-core processor or can take advantage of multi-threaded compilation? Get the <code>jom</code> tool instead. There's some info about <code>jom</code> in this <a href="http://labs.trolltech.com/blogs/2009/03/27/speeding-up-visual-c-qt-builds/">Qt Labs Blogs article</a>. You can download the latest version of <code>jom</code> from <a href="ftp://ftp.qt.nokia.com/jom/">ftp://ftp.qt.nokia.com/jom/</a> (<code>jom.zip</code> should be just fine).</p>
+</li>
+<li>
+<p>Use <code>jom</code> by simply unzipping and running it in the same directory as <code>configure</code> (which is still the same as before, <code>D:\Coding\Qt\2009.05\qt</code>).</p>
+<div class="codehilite"><pre>&gt; jom
+</pre></div>
+
+
+</li>
+<li>
+<p>Happily build Qt much faster. For example, on my machine (a Core 2 Quad) it took an hour for the build to complete.</p>
+</li>
+<li>
+<p>Unless you really enjoy manually handling custom build steps, don't forget to get the <a href="http://www.qtsoftware.com/downloads/visual-studio-add-in">Qt Visual Studio Add-In</a>. After installing it make sure that it's aware of the location of your Qt installation (<code>Qt-&gt;Qt Options</code>) and then use <code>File-&gt;New-&gt;Project...</code> and select one of the Qt templates to get started.</p>
+</li>
+</ol>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/include-guidelines/" rel="bookmark" title="Permalink to #include Guidelines">#include Guidelines</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, June 22, 2009 @ 19:20
+	</footer>
+	<div class="body">
+		<p>This is mostly for my own reference, but here are some of the guidelines I like to follow when it comes to <code>#include</code>s in C++. Given <code>foo.cpp</code> and <code>foo.h</code>:</p>
+<ul>
+<li>
+<p><code>foo.h</code> should include everything it mentions and no more. For example, if you use <code>boost::random</code> in the implementation, don't <code>#include &lt;boost/random.hpp&gt;</code> in <code>foo.h</code>.</p>
+</li>
+<li>
+<p><code>foo.cpp</code> should also include everything it mentions and no more.</p>
+</li>
+<li>
+<p><code>foo.cpp</code>'s first include should be <code>#include "foo.h"</code>.</p>
+</li>
+<li>
+<p>Precompiled headers, if used, should be specified in <code>foo.cpp</code> only and will need to be the first <code>#include</code> (<code>#include "foo.h"</code> will then be the second).</p>
+</li>
+<li>
+<p>Except for the above two exceptions, the order I like to follow for <code>#include</code>s is:</p>
+<ol>
+<li>Headers from your own project (generally of the form <code>#include "baz.h"</code>)</li>
+<li>Headers from non-standard libraries (such as Qt)</li>
+<li>Standard libraries (I include Boost in here because I use it so pervasively)</li>
+<li>Platform headers (like <code>#include &lt;windows.h&gt;</code>)</li>
+</ol>
+</li>
+<li>
+<p>Within each of the above groups try to alphabetically order the <code>#include</code>s if at all possible.</p>
+</li>
+<li>
+<p>Forward declare whenever you can get away with it.</p>
+</li>
+</ul>
+	</div>
+</section>
+
+	<p class="prev_link">
+		<a href="/page/2/">&laquo; Older</a>
+	</p>
+</section>
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

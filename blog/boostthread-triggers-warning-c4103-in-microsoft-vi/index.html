@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/boostthread-triggers-warning-c4103-in-microsoft-vi/" rel="bookmark" title="Permalink to Boost.Thread triggers warning C4103 in Microsoft Visual Studio">Boost.Thread triggers warning C4103 in Microsoft Visual Studio</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 02, 2009 @ 17:28
+	</footer>
+	<div class="body">
+		<p>Got a whole mess of warnings when I moved some of my includes around, particularly this one: <code>#include &lt;boost/thread.hpp&gt;</code></p>
+<div class="codehilite"><pre>abi_prefix.hpp(19) : warning C4103: 
+&#39;d:\\boost\\boost_1_38_0\\boost\\config\\abi_prefix.hpp&#39; : 
+alignment changed after including header, may be due to missing 
+#pragma pack(pop)
+</pre></div>
+
+
+<p>Some experimentation reveals that including <code>thread.hpp</code> before <code>winsock2.h</code> triggers all these warnings. The simple solution is to just move <code>#include &lt;boost/thread.hpp&gt;</code> down below <code>#include &lt;winsock2.h&gt;</code>.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

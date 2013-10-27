@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/consolas-is-a-poor-choice-for-web-use/" rel="bookmark" title="Permalink to Consolas is a poor choice for web use">Consolas is a poor choice for web use</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, July 06, 2009 @ 15:22
+	</footer>
+	<div class="body">
+		<p><a href="http://en.wikipedia.org/wiki/Consolas">Consolas</a>, with <a href="http://en.wikipedia.org/wiki/ClearType">ClearType</a> enabled, is a gorgeous font, and is my preferred monospaced font. However, take a look at it without ClearType (there's a sample image on the linked Wikipedia article)---those jaggies hurt.</p>
+<p>That's why you shouldn't define Consolas in your style sheets. You can't know/assume that everyone who views your webpage will have ClearType on (or at least some form of font-smoothing), and those who don't have it enabled will suffer through text that looks as though it were drawn freehand with a mouse.</p>
+<p>Instead, unless you are going for a specific effect such as trying to mimic old <a href="http://en.wikipedia.org/wiki/Terminal_(font)">terminals</a>, keep your <code>font-family</code> for <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> elements short and to the point. I personally use</p>
+<div class="codehilite"><pre><span class="nt">font-family</span><span class="o">:</span> <span class="s2">&quot;Lucida Console&quot;</span><span class="o">,</span> <span class="s2">&quot;Monaco&quot;</span><span class="o">,</span> <span class="s2">&quot;DejaVu Sans Mono&quot;</span><span class="o">,</span> <span class="nt">monospace</span><span class="o">;</span>
+</pre></div>
+
+
+<p>which is usually enough to keep Courier (+ New) out of the way. If someone is missing all of these fonts they'll likely have a decent enough substitute.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

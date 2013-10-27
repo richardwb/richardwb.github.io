@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/std-map-access-violation-or-not/" rel="bookmark" title="Permalink to std::map access violation (or not)">std::map access violation (or not)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, October 11, 2008 @ 18:42
+	</footer>
+	<div class="body">
+		<p>I just spent some time tracking down this fun little bug:</p>
+<p>I use a mix of <tt class="docutils literal"><span class="pre">std::map</span></tt> and <tt class="docutils literal">Boost.Function</tt> to reduce the ugliness of the Windows message loop. Everything is working just fine, until I make a couple of changes and all of a sudden one of my <tt class="docutils literal"><span class="pre">std::map</span></tt>s is throwing an exception in the destructor:</p>
+<div class="highlight"><pre>Access violation reading location 0xccccccd4.
+</pre></div>
+<p>In this code in <tt class="docutils literal">xtree</tt>:</p>
+<div class="highlight"><pre><span class="cp">#if _HAS_ITERATOR_DEBUGGING</span>
+    <span class="kt">void</span> <span class="nf">_Orphan_ptr</span><span class="p">(</span><span class="n">_Myt</span><span class="o">&amp;</span> <span class="n">_Cont</span><span class="p">,</span> <span class="n">_Nodeptr</span> <span class="n">_Ptr</span><span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>       <span class="c1">// orphan iterators with specified node pointers</span>
+        <span class="n">_Lockit</span> <span class="n">_Lock</span><span class="p">(</span><span class="n">_LOCK_DEBUG</span><span class="p">);</span>
+        <span class="n">const_iterator</span> <span class="o">**</span><span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">_Cont</span><span class="p">.</span><span class="n">_Myfirstiter</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">((</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Ptr</span> <span class="o">==</span> <span class="n">_Myhead</span>
+<span class="hll">                <span class="o">||</span> <span class="n">_Ptr</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Ptr</span> <span class="o">!=</span> <span class="n">_Ptr</span><span class="p">)</span>
+</span>            <span class="p">{</span>
+                <span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mynextiter</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>       <span class="c1">// orphan the iterator</span>
+                <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mycont</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="o">*</span><span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">*</span><span class="p">)(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mynextiter</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="cp">#endif </span><span class="cm">/* _HAS_ITERATOR_DEBUGGING */</span><span class="cp"></span>
+</pre></div>
+<p>Of course, that is suspiciously close to <tt class="docutils literal">0xcccccccc</tt>, which is used by the debugging runtimes to mark uninitalized stack. (This will be important later.) In any case I go through the usual debugging motions, making sure I'm not putting anything funny into my map container and that values inside the container are what they should be.</p>
+<p>So, what was the cause of this bug? It was a result of the change I was making earlier; this is the original code:</p>
+<div class="highlight"><pre><span class="n">LVITEM</span> <span class="n">itemText</span><span class="p">;</span>
+<span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">itemText</span><span class="p">));</span>
+<span class="n">itemText</span><span class="p">.</span><span class="n">cchTextMax</span> <span class="o">=</span> <span class="n">MAX_PATH</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">];</span>
+<span class="n">itemText</span><span class="p">.</span><span class="n">pszText</span> <span class="o">=</span> <span class="n">buff</span><span class="p">;</span>
+<span class="n">SendMessage</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">LVM_GETITEMTEXT</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">LPARAM</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>And I changed it to use the <tt class="docutils literal">ListView_GetItemText</tt> macro, which is far more succinct:</p>
+<div class="highlight"><pre><span class="kt">char</span> <span class="n">itemText</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">];</span>
+<span class="n">ListView_GetItemText</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">itemText</span><span class="p">,</span> <span class="n">_countof</span><span class="p">(</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>No problem yet, right? Ready for the punchline?</p>
+<p><em>I left this line in at the bottom:</em></p>
+<div class="highlight"><pre><span class="n">SendMessage</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">LVM_GETITEMTEXT</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">LPARAM</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>For those lucky folks who aren't familiar with all the wonderful intricacies of Windows programming:</p>
+<p><tt class="docutils literal">SendMessage()</tt> is a magical &quot;do all&quot; function that sends a message to a particular window, with <tt class="docutils literal">WPARAM</tt> and <tt class="docutils literal">LPARAM</tt> values tagging along. In this case, we're sending a message of <tt class="docutils literal">LVM_GETITEMTEXT</tt> to the control denoted by <tt class="docutils literal">listViewHandle</tt>. The MSDN documentation for <tt class="docutils literal">LVM_GETITEMTEXT</tt> states that it wants <tt class="docutils literal">WPARAM</tt> and <tt class="docutils literal">LPARAM</tt> to be:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">WPARAM : iItem - Index of the list-view item</div>
+<div class="line"><strong>LPARAM : pitem - Pointer to an LVITEM structure.</strong></div>
+</div>
+</blockquote>
+<p>My <tt class="docutils literal">LPARAM</tt>, <tt class="docutils literal">itemText</tt>, is no longer an <tt class="docutils literal">LVITEM</tt> structure (it is now a char array of size <tt class="docutils literal">MAX_PATH</tt>). There is absolutely no way that the <tt class="docutils literal">LVM_GETITEMTEXT</tt> code can know that I've made a colossal (yet tiny!) mistake, so I assume that it dutifully casts <tt class="docutils literal">itemText</tt> into an <tt class="docutils literal">LVITEM</tt> structure and does the right stuff with horrendously wrong data. Tada, stack corrupted.</p>
+<p>Notice that the source of this bug appears nowhere near an <tt class="docutils literal"><span class="pre">std::map</span></tt>. It is, in fact, in a different function (and a different class and a different file...) entirely! This is why memory corruption errors are one of the most feared bugs around.</p>
+<p>Conclusion: if <tt class="docutils literal"><span class="pre">std::map</span></tt> is dying in <tt class="docutils literal">clear()</tt> (or ever, frankly), you may very well be doing something bad, memory wise.</p>
+
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

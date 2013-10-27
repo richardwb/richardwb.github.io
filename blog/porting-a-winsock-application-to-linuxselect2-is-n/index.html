@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/porting-a-winsock-application-to-linuxselect2-is-n/" rel="bookmark" title="Permalink to Porting a Winsock application to Linux...select(2) is not as simple as MSDN makes it seem">Porting a Winsock application to Linux...select(2) is not as simple as MSDN makes it seem</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 10, 2009 @ 17:54
+	</footer>
+	<div class="body">
+		<p>I'm in the middle of porting bits of a Winsock application to Linux. Luckily when I first wrote the networking bits I had made an effort to write it in a somewhat cross platform manner. As a result, I stuck to <code>select()</code>, <code>send()</code>, <code>recv()</code>, and all the other function calls that Winsock provides that are close to the <a href="http://en.wikipedia.org/wiki/Berkeley_sockets">Berkeley socket interface</a>. Things go pretty smoothly, although for some reason there's this really weird pause when connecting that didn't exist before...</p>
+<p>Finally I hit a point where, for some reason, I couldn't establish a connection to the server and it just times out. That's really strange, so I threw good old debug statements all over the place and find out that this <code>select()</code> call is not doing much of a select:</p>
+<div class="codehilite"><pre>if (select(0, &amp;rdset, &amp;wtset, &amp;errset, &amp;tv) &gt; 0)
+</pre></div>
+
+
+<p>Notice the 0? <a href="http://msdn.microsoft.com/en-us/library/ms740141(VS.85).aspx">MSDN</a> states that it is:</p>
+<blockquote>
+<p><code>nfds</code><br />
+Ignored. The nfds parameter is included only for compatibility with Berkeley sockets.</p>
+</blockquote>
+<p>Then I check the <a href="http://linux.die.net/man/2/select">equivalent docs</a> on the Linux side of things:</p>
+<blockquote>
+<p><code>nfds</code> is the highest-numbered file descriptor in any of the three sets, plus 1.</p>
+</blockquote>
+<p>Well, if I set <code>nfds</code> to 0, <code>select()</code> won't be doing very much selecting! Windows has <code>FD_SETSIZE</code> at 64 by default, and it ignores <code>nfds</code> and just checks whatever descriptors are in the <code>fd_set</code>s that you pass to it. Linux considers sockets and files the same thing, and thus has a much higher <code>FD_SETSIZE</code> (1024 and 4096 seem to be common). You don't want <code>select()</code> checking 4096 descriptors, so you set nfds to the highest file descriptor you want it to check, plus one. (As an aside, setting nfds to <code>FD_SETSIZE</code> is a bad idea.)</p>
+<div class="codehilite"><pre>if (select(my_socket + 1, &amp;rdset, &amp;wtset, &amp;errset, &amp;tv) &gt; 0)
+</pre></div>
+
+
+<p>Where <code>my_socket</code> is an appropriate file descriptor (such as the one returned by <code>socket()</code>). This works just fine in Windows too, since it ignores the <code>nfds</code> parameter.</p>
+<p>Armed with this newfound knowledge, I go and fix all the other <code>select()</code> statements in my code, which ends up fixing the weird pause as well. Effectively, without a proper <code>nfds</code> value, <code>select()</code> just acts as a timer and blocks until the specified amount of time has elapsed.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

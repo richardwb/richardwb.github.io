@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/captchas-shouldnt-be-the-default-defense-against-b/" rel="bookmark" title="Permalink to Captchas shouldn't be the default defense against bots">Captchas shouldn't be the default defense against bots</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, May 21, 2009 @ 15:17
+	</footer>
+	<div class="body">
+		<p><a href="http://en.wikipedia.org/wiki/Captcha">Captchas</a> are useful to prevent bots or similarly automated activities from occurring. However, they're not perfect and many of them can be broken with a targeted attack. In a sort of arms race fashion, captchas get more and more intricate, but some take this a bit too far and aren't really even human solvable.</p>
+<p>In any case, large sites have to have some way to separate bots from humans, and captchas may be the only solution. It's still an arms race, but at least the large sites have the resources to throw at it.</p>
+<p>What about the small sites? Your blog about your cat? Your forum for fellow gum-chewers? Do you really need (or want) a captcha for these types of sites? Unfortunately, what happens is a crawler stumbles upon your site, notices it uses some popular blog or forum application it knows about, and attempts to register so it can subsequently flood your site with spam. If you use a popular application, such as <a href="http://www.phpbb.com/">phpBB3</a> (for the sake of argument), once the generic, built-in captcha gets broken, all non-customized phpBB3 sites are vulnerable. So a spammer just needs to try to break this one particular captcha and suddenly they've unlocked the ability to spam millions of forums. It provides the volume that spammers need to make spam work.</p>
+<p>What I suggest instead is that the default mode of operation for a forum (or any application, really) should be to ask a simple question upon registration, with both the answer and question provided by the person who is running the site:</p>
+<blockquote>
+<p>Q: What is my cat's name?<br />
+A: Fluffy  </p>
+<p>Q: Which of the following is a brand of gum? Oreos, Jellybeans, Trident, Snickers<br />
+A: Trident  </p>
+</blockquote>
+<p>Incidentally, yes/no type questions should be disallowed, as the answers ('yes' and 'no') would be common enough to automate.</p>
+<p>Now, spamming your forum requires actual human intervention. Obviously this sort of approach will fail if you have a large or popular site, but if you own such a site you already know you have to take more steps to protect your site.</p>
+<p>One potential problem is I could see lists of questions/answers being hand-generated and passed around, but this could be mitigated by expiring questions/answers after some time. If you're feeling particularly clever you could even flag the old answer as being a 'bot-answer', which might work well in concert with an <a href="http://en.wikipedia.org/wiki/Akismet">Akismet</a> type service:</p>
+<blockquote>
+<p>Q: How old is my cat?<br />
+A: Fluffy <em>(hello, bot!)</em>  </p>
+</blockquote>
+<p>Anyway, I feel that captchas are a bit of dead end in terms of anti-spam measures for small sites. Small sites are not typical targets for spammers, as the reward is not worth the effort. However, if all these small sites are protected by the same captcha, breaking that captcha gives that spammer access to <em>(small-sites &#215; millions)</em>, which <em>is</em> worth the effort.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

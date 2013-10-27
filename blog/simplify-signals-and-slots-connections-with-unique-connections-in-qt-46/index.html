@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/" rel="bookmark" title="Permalink to Simplify signals and slots connections with unique connections in Qt 4.6">Simplify signals and slots connections with unique connections in Qt 4.6</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, January 12, 2010 @ 14:43
+	</footer>
+	<div class="body">
+		<p>Somehow there's absolutely no mention of this in the <a href="http://doc.trolltech.com/4.6/qt4-6-intro.html">What's New in Qt 4.6</a> summary, but one of my favorite new features in Qt 4.6 is a surprisingly simple one: the <a href="http://doc.trolltech.com/4.6/qt.html#ConnectionType-enum"><code>Qt::UniqueConnection</code></a> connection type.</p>
+<p>The default connection type for <a href="http://doc.trolltech.com/4.6/qobject.html#connect"><code>connect()</code></a> is <code>Qt::AutoConnection</code>, which sets up either a direct or queued connection depending on whether the signaling object and receiving slot are in the same thread or not. This connection type allows you to connect a particular signal/slot pair multiple times (so emitting a signal once could call a slot twice) which has caught me on a number of occasions.</p>
+<p>This is really simple to work around: you can add some bookkeeping to keep track of that particular connection or you can use <code>disconnect()</code> where appropriate to maintain 0 or 1 connections. The new <code>Qt::UniqueConnection</code> connection type, on the other hand, lets you be sure that a connection is made only once. It's not something you always need, but when you do, it lets you keep your code a bit cleaner.</p>
+<p>One caveat is that <code>Qt::UniqueConnection</code> makes a unique <code>Qt::AutoConnection</code>, meaning you don't have the ability to explicitly specify a unique queued connection, for example. In a case like that you will have to keep track of the connections yourself, as before.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

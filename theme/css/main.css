@@ -1,0 +1,427 @@
+@import url("pygment.css");
+
+a {
+	color: #0068a1;
+	text-decoration: none;
+}
+
+a:link { }
+
+a:visited { }
+
+a:hover {
+	color: #08B;
+}
+
+a:active { }
+
+a img {
+	border: none;
+}
+
+acronym, abbr {
+	border-bottom: 1px dashed #333;
+	cursor: help;
+	font-size: 90%;
+	font-variant: small-caps;
+	letter-spacing: .09em;
+}
+
+body {
+	background-color: #fdfdfd;
+	color: #000;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", "Lucida", sans-serif;
+	font-size: 98%;
+	padding: 5px 70px 10px 20px;
+}
+
+cite {
+	font-size: 90%;
+}
+
+h1 {
+	margin-left: 0;
+}
+
+h2 {
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 130%;
+	font-weight: normal;
+	letter-spacing: 0.03em;
+}
+
+h3 {
+	font-weight: normal;
+	font-size: 105%;
+}
+
+input, textarea {
+	background-color: #fff;
+	border: 1px solid #ababab;
+}
+
+code {
+	font-size: 90%;
+	font-family: "Lucida Console", "Monaco", "DejaVu Sans Mono", monospace;
+	line-height: 1em;
+	padding: 1px;
+	padding-top: 2px;
+	background: #fffff5;
+	border: 1px dashed #eee;
+}
+
+pre {
+	font-size: 85%;
+	font-family: "Lucida Console", "Monaco", "DejaVu Sans Mono", monospace;
+	line-height: 1.18em;	
+	border: 1px dashed #eee;
+	background: #fbfbfb;
+	padding: 5px;
+	overflow: auto;
+}
+
+span.highlight {
+	margin-bottom: -1em;
+	display: block;
+	background: #ffe1e1;
+}
+
+.post {
+	clear: left;
+	margin-bottom: 3em;
+}
+
+.post a:hover {
+	text-decoration: underline;
+}
+
+.post .title { }
+
+.post .title a:hover {
+	text-decoration: none;
+}
+
+.post .meta {
+	margin: 0;
+	font-size: 78%;
+	color: #717e95;
+}
+
+.post .body {
+	margin-top: -0.5em;
+	padding-left: 0.8em;
+	font-size: 91%;
+	line-height: 1.70em;
+}
+
+.post .body p {
+	margin-top: 1.3em;
+}
+
+.post .body table {
+	background-color: #f2f2f2;
+}
+
+.post .body table td {
+	padding: 0.2em;
+	background-color: #fdfdfd;
+}
+
+.post .body hr {
+	border: 1px solid #f0f0f0;
+	height: 1px;
+}
+
+.post .body:hover a, .post .body.sfhover a, .post .body:hover a code {
+	text-decoration: underline;
+}
+
+.post .body a:visited {
+	color: #0049A3;
+}
+
+.post .body a:hover {
+	color: #08B;
+	text-decoration: underline;
+}
+
+.post .body .footnotes {
+	font-size: 80%;
+}
+
+.post .invite_comment {
+	font-size: 78%;
+	padding-left: 0.5em;;
+}
+
+.comment {
+	padding-bottom: 1em;
+	margin-left: -1.5em;
+	width: 80%;
+	font-size: 75%;
+}
+
+.comment.alternate {
+	background-color: #f9f9f9;
+}
+
+.comment.authorized {
+	background-color: #e0f5ff;
+}
+
+.comment .meta {
+	color: #676767;
+	margin-top: 0.7em;
+	font-size: 100%;
+}
+
+.comment .meta cite {
+	color: #333333;
+	font-size: 120%;
+	font-style: italic;
+}
+
+.comment .body {
+	margin-left: 0em;
+	font-size: 110%;
+}
+
+.comment .body p {
+	line-height: 1.8em;
+}
+
+.comments_error {
+	font-size: 91%;
+	background-color: #ffa;
+	font-style: normal;
+}
+
+p.comments_error, ul.comments_error {
+	width: 70%;
+	border: 1px solid #ccc;
+	padding : 0.3em;
+	list-style-type: square;
+	list-style-position: inside;	
+}
+
+.next_link {
+	font-size: 91%;
+	margin-bottom: 1em;
+	float: right;
+}
+
+.prev_link {
+	font-size: 91%;
+	margin-bottom: 1em;
+	float: left;
+}
+
+.archive_month {
+	padding-bottom: 1em;
+}
+
+.archive_item {
+	color: #717e95;
+	padding-left: 9.0em;
+	padding-bottom: 0.2em;
+	text-indent: -4em;
+}
+
+.archive_item .date {
+	display: -moz-inline-block;
+	display: inline-block;
+	width: 0em;
+}
+
+.archive_item .title {
+	margin-left: 1em;
+}
+
+.archive_item .comments_count {
+	padding-left: 1em;
+	font-size: 70%;
+}
+
+#mega {
+	padding: 0;
+	max-width: 700px;
+	margin: 0px auto;
+	padding-bottom: 2px;
+	padding: 2px;
+}
+
+#header {
+	height: 5.45em;
+	letter-spacing: 0.2em;
+	padding: 0.9em 1em 0.9em 0em;
+	margin-bottom: 2px;
+}
+
+#header h1 {
+	color: #214380;
+	display: inline;
+	font-weight: normal;
+	font-size: 180%;
+	margin: 0;
+}
+
+#header #subtitle {
+	color: #999;
+    font-size: 150%;
+}
+
+#menu {
+	float: right;
+	position: relative;
+	left: 50px;
+	margin-top: -2em;
+	margin-left: -1.2em;
+	margin-bottom: 0.7em;
+	padding: 0em 0.5em 0 0.5em;
+	width: 8.5em;
+	line-height: 1.1em;
+	font-weight: normal;
+	font-size: 110%;
+	border-left: 1px solid #eee;
+}
+
+#menu a:hover {
+	text-decoration: underline;
+}
+
+#menu p {
+	font-size: 79%;
+	margin-bottom: 1em;
+}
+
+#menu ul {
+	color: #666;
+	list-style-type: none;
+	margin: 0;
+	padding-left: 0.18em;
+}
+
+#menu ul li {
+	letter-spacing: 0.1em;
+	margin-top: 0.6em;
+}
+
+#menu ul ul {
+	/*list-style-type: none;*/
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+
+#menu ul ul li {
+	line-height: 1.15em;
+	font-size: 90%;
+	letter-spacing: 0;
+	margin-top: 0;
+	padding: 0;
+	padding-left: 0.3em;
+}
+
+#menu fieldset {
+	border: 0;
+	padding: 0;
+}
+
+#content {
+	padding-left: 1.2em;
+	padding-right: 1.2em;
+	padding-top: 2em;
+	padding-bottom: 1em;
+}
+
+#crumbs {
+	font-size: 91%;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	margin-bottom: 1em;
+	line-height: 1px;
+	position: relative;
+	bottom: 0.9em;
+}
+
+#crumbs li {
+	display: inline;
+}
+
+#comments {
+	margin-top: 3em;
+}
+
+#comments h3 {
+	color: #736250;
+}
+
+#comment_input fieldset {
+	padding-bottom: 0;
+	padding-top: 0;
+	border: 0;
+	border-top: 1px solid #ccc;
+	width: 80%;
+	margin-bottom: 1.5em;
+	font-size: 91%;
+}
+
+#comment_input fieldset legend {
+	color: #736250;
+	font-size: 110%;
+}
+
+#comment_input p {
+	font-size: 75%;
+	margin: 0;
+}
+
+#comment_input p abbr {
+	letter-spacing: 0;
+}
+
+#comment_input table {
+	padding-bottom: 0.3em;
+	padding-top: 0.3em;
+	border: 0;
+}
+
+#comment_input td {
+	border: 0;
+	vertical-align: top;
+	padding-left: 1em;
+	font-size: inherit;
+}
+
+#comment_input input {
+	width: 175px;
+	font-family: 'Tahoma', 'Arial', 'Helvetica', sans-serif;
+}
+
+#comment_input textarea {
+	font-family: 'Tahoma', 'Arial', 'Helvetica', sans-serif;
+	font-size: inherit;
+	width: 350px;
+	height: 150px;
+}
+
+#comment_input #comment_submit {
+	width: auto;
+}
+
+#footer {
+	overflow: hidden;
+	height: 1.45em;
+	clear: both;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+
+#footer .credit {
+	font-size: 70%;
+	color: #555;
+	margin: 0;
+	line-height: 2em;
+}

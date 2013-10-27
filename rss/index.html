@@ -1,0 +1,1027 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>setnode.com</title><link>http://www.setnode.com/</link><description></description><atom:link href="http://www.setnode.com/rss/index.html" rel="self"></atom:link><lastBuildDate>Sun, 12 Sep 2010 18:21:00 -0700</lastBuildDate><item><title>Mouse wheel events, event filters, and QScrollArea</title><link>http://www.setnode.com/blog/mouse-wheel-events-event-filters-and-qscrollarea/</link><description>&lt;p&gt;Let’s say you have a &lt;code&gt;QScrollArea&lt;/code&gt; which contains some custom widget. Now, although this widget itself has no use for mouse wheel events, when it’s in your &lt;code&gt;QScrollArea&lt;/code&gt; you’d really like for it to grow and shrink in response to the wheel. Or maybe you’d just like to map vertical wheel events to horizontal scrolling, since you know the widget will never need vertical scrollbars.&lt;/p&gt;
+&lt;p&gt;The biggest problem here is that &lt;code&gt;QScrollArea&lt;/code&gt; accepts wheel events (this isn’t strictly true, as you’ll soon see). Events propagate from the child up to the parent until someone accepts the event, and this means that &lt;code&gt;QScrollArea&lt;/code&gt; will prevent wheel events from getting to your own code (again, this isn’t strictly true).&lt;/p&gt;
+&lt;p&gt;Reading the documentation it’s clear that you’d either want to subclass &lt;code&gt;QScrollArea&lt;/code&gt; or use &lt;a href="http://qt-project.org/doc/qt-4.8/eventsandfilters.html"&gt;event filters&lt;/a&gt;. Since you don’t need to subclass &lt;code&gt;QScrollArea&lt;/code&gt; for any other reason, using event filters sounds like a reasonable approach. You’ll set up an event filter that forces wheel events to be ignored and install it on the &lt;code&gt;QScrollArea&lt;/code&gt;. That way, it’ll propagate up to your containing widget.&lt;/p&gt;
+&lt;p&gt;So you’d adjust your containing widget like so:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyWidget&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nl"&gt;public:&lt;/span&gt;
+        &lt;span class="c1"&gt;// ...&lt;/span&gt;
+
+        &lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="n"&gt;eventFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="cm"&gt;/*obj*/&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QEvent&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;QEvent&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Wheel&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="c1"&gt;// ignore the event (this effectively &lt;/span&gt;
+                &lt;span class="c1"&gt;// makes it &amp;quot;skip&amp;quot; one object)&lt;/span&gt;
+                &lt;span class="n"&gt;evt&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;ignore&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="c1"&gt;// return false to continue event propagation&lt;/span&gt;
+            &lt;span class="c1"&gt;// for all events&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="nl"&gt;protected:&lt;/span&gt;
+        &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;wheelEvent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QWheelEvent&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;event&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="c1"&gt;// your own custom stuff&lt;/span&gt;
+            &lt;span class="c1"&gt;// ...&lt;/span&gt;
+            &lt;span class="c1"&gt;// if you handle the event and don&amp;#39;t want it to&lt;/span&gt;
+            &lt;span class="c1"&gt;// propagate any further, accept it:&lt;/span&gt;
+            &lt;span class="n"&gt;event&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;accept&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then you’d use it like so:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;QScrollArea&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;scrollArea&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;QScrollArea&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;scrollArea&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;setWidget&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;someWidget&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;// assuming that &amp;#39;this&amp;#39; is MyWidget&lt;/span&gt;
+&lt;span class="n"&gt;scrollArea&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;installEventFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This doesn’t work. Instead, what you need to do is &lt;code&gt;installEventFilter()&lt;/code&gt; on &lt;code&gt;QScrollArea&lt;/code&gt;’s viewport:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;scrollArea&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;viewport&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;installEventFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In fact, &lt;code&gt;QScrollArea&lt;/code&gt; is not the one that is accepting wheel events. It’s the viewport that is doing all of that. By installing an event filter on the viewport, the wheel events will continue to propagate up the tree.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sun, 12 Sep 2010 18:21:00 -0700</pubDate><guid>tag:www.setnode.com,2010-09-12:blog/mouse-wheel-events-event-filters-and-qscrollarea/</guid></item><item><title>Logitech G500 Gaming Mouse - Impressions</title><link>http://www.setnode.com/blog/logitech-g500-gaming-mouse-impressions/</link><description>&lt;p&gt;Got a Logitech G500 mouse recently and I thought I'd just quickly note my impressions of the mouse and its associated software. First, some background on my previous (non-throwaway) mice to give an idea of what I've used before:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Logitech MX1000: a wireless mouse that had little to no lag in my particular environment, in contrast to:&lt;/li&gt;
+&lt;li&gt;Logitech MX Revolution: the wireless mouse Logitech sent me as a replacement for the MX1000 above; had &lt;em&gt;two&lt;/em&gt; wheels, one of which had a free spinning mode; unfortunately had terrible interference problems for me and was essentially unusable&lt;/li&gt;
+&lt;li&gt;Razer DeathAdder: a wired mouse with a great shape, just wish it had more buttons&lt;/li&gt;
+&lt;li&gt;Purchased the Logitech G500 because my Razer mouse was double-clicking sporadically and developed a flaky scroll wheel (scrolling down would sometimes scroll up)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I don't have much to say about the mouse itself that hasn't already been said on the internet -- it feels good in the hand and has plenty of buttons. I'm going to focus on the part I found more interesting, the on-board memory.&lt;/p&gt;
+&lt;p&gt;Now, one problem with most of these mice is that while the left, right, middle, and two side buttons (Mouse4 and Mouse5) are supported natively by Windows, any additional buttons on them require the appropriate drivers to be installed. This isn't necessarily bad in itself, but I always liked the idea of a mouse that just works, fully functional, without requiring any drivers. The DeathAdder added on-board memory to avoid this issue, so you could do things like save a macro to Mouse5 and bring it to another computer and have that macro available. Unfortunately, it only had five buttons, all of which already have standard functions, so I never found a good use for this feature. However, the on-board memory did let you save your mouse DPI settings, which was somewhat useful.&lt;/p&gt;
+&lt;p&gt;The G500 also has on-board memory, but this time it also has the spare buttons to make it worthwhile. In addition to the five standard buttons, the G500 has one extra side button, two DPI buttons, a left wheel tilt and a right wheel tilt. All of these are programmable and, as long as you stick to commands that can be sent by a keyboard or a mouse (including standard media keys like volume and playback controls), will work on any computer without drivers. It apparently does this by acting as several human interface devices, including a keyboard and a mouse:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/images/logitech_g500_properties.png"&gt;&lt;img src="/images/logitech_g500_properties_thumb.jpg" alt="Logitech G500 Properties Dialog Thumbnail" height="200" width="162" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;It's pretty interesting assigning a keystroke like 'A' to a side button or having your DPI buttons control the system's volume. After setting my bindings up I uninstalled the SetPoint software and still have a fully working mouse. Neat.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 22 May 2010 16:06:00 -0700</pubDate><guid>tag:www.setnode.com,2010-05-22:blog/logitech-g500-gaming-mouse-impressions/</guid></item><item><title>Accessing a Git repository with TortoiseHg on Windows</title><link>http://www.setnode.com/blog/accessing-a-git-repository-with-tortoisehg-on-windows/</link><description>&lt;p&gt;If you're using Hg and you want to get hold of a Git repository there is an extension, hg-git, that lets you do this.&lt;/p&gt;
+&lt;p&gt;On Windows the installation process for this hasn't always been the easiest, as you needed to first install the dulwich Python library (which I always seemed to have trouble doing) and then hg-git. The TortoiseHg guys have made this a lot easier in recent versions of TortoiseHg, as they now include the dulwich libraries.&lt;/p&gt;
+&lt;p&gt;So, step by step:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;You'll need &lt;a href="http://tortoisehg.bitbucket.org/‎"&gt;TortoiseHg 0.9.3&lt;/a&gt; or later. Get the latest version.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bring up a command line and enter this line to clone the latest hg-git to your desired directory (this is "installing" hg-git). I'll use &lt;code&gt;D:\TortoiseHg\hg-git&lt;/code&gt; in this example.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; hg clone http://bitbucket.org/durin42/hg-git/ D:\TortoiseHg\hg-git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Open up your user-specific &lt;code&gt;Mercurial.ini&lt;/code&gt;. The location of this file may change occasionally, read the &lt;a href="http://www.selenic.com/mercurial/hgrc.5.html"&gt;Mercurial docs&lt;/a&gt; if you have trouble finding it.&lt;br /&gt;
+    On Windows Vista and Windows 7 this file is typically located at:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;C:\Users\YourUsername\Mercurial.ini
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;while on Windows XP you'll find it at:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;C:\Documents and Settings\YourUsername\Mercurial.ini
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Alternatively, bring up the Windows "Run" dialog and enter:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;%USERPROFILE%\Mercurial.ini
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which will work on all recent Windows platforms.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Navigate down to the &lt;code&gt;[extensions]&lt;/code&gt; section and add this line to that section:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;hggit = D:\TortoiseHg\hg-git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Where &lt;code&gt;D:\TortoiseHg\hg-git&lt;/code&gt; is the directory you cloned hg-git to earlier. This line may already exist or may be commented out with a semicolon, in that case just remove the semicolon and update the directory.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Now you can clone a Git repository like so:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; hg clone git://github.com/richhickey/clojure.git D:\TargetDirectory
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The result is you'll have a Mercurial enabled repository at &lt;code&gt;D:\TargetDirectory&lt;/code&gt;. You can &lt;code&gt;push&lt;/code&gt;, &lt;code&gt;pull&lt;/code&gt;, and generally treat it as an Hg repository. Try&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; hg help hggit
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;for additional help and information, or check the &lt;a href="http://mercurial.selenic.com/wiki/HgGit"&gt;HgGit page&lt;/a&gt; on the Mercurial wiki.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 09 Apr 2010 10:31:00 -0700</pubDate><guid>tag:www.setnode.com,2010-04-09:blog/accessing-a-git-repository-with-tortoisehg-on-windows/</guid></item><item><title>Great Boost Documentation</title><link>http://www.setnode.com/blog/great-boost-documentation/</link><description>&lt;p&gt;I found out from the &lt;a href="http://sandfly.net.nz/blog/2010/04/a-better-boost-book/"&gt;Life of Andrew&lt;/a&gt; blog that there is a new source for &lt;a href="http://en.highscore.de/cpp/boost/"&gt;Boost information&lt;/a&gt; available. It's a Creative Commons licensed book covering a wide range of Boost libraries, some of which are usually under-represented documentation-wise (looking at you, ASIO). It was originally written in German by &lt;a href="http://www.highscore.de/"&gt;Boris Schäling&lt;/a&gt;, but &lt;a href="http://www.andreasmasur.com/"&gt;Andreas Masur&lt;/a&gt; has translated it into English for those of us who aren't so culturally adapted.&lt;/p&gt;
+&lt;p&gt;A brief skim of the book gives an extremely promising impression and I think it'll be one of the first resources I point newcomers to Boost to in the future.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 03 Apr 2010 18:20:00 -0700</pubDate><guid>tag:www.setnode.com,2010-04-03:blog/great-boost-documentation/</guid></item><item><title>Simplify signals and slots connections with unique connections in Qt 4.6</title><link>http://www.setnode.com/blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/</link><description>&lt;p&gt;Somehow there's absolutely no mention of this in the &lt;a href="http://doc.trolltech.com/4.6/qt4-6-intro.html"&gt;What's New in Qt 4.6&lt;/a&gt; summary, but one of my favorite new features in Qt 4.6 is a surprisingly simple one: the &lt;a href="http://doc.trolltech.com/4.6/qt.html#ConnectionType-enum"&gt;&lt;code&gt;Qt::UniqueConnection&lt;/code&gt;&lt;/a&gt; connection type.&lt;/p&gt;
+&lt;p&gt;The default connection type for &lt;a href="http://doc.trolltech.com/4.6/qobject.html#connect"&gt;&lt;code&gt;connect()&lt;/code&gt;&lt;/a&gt; is &lt;code&gt;Qt::AutoConnection&lt;/code&gt;, which sets up either a direct or queued connection depending on whether the signaling object and receiving slot are in the same thread or not. This connection type allows you to connect a particular signal/slot pair multiple times (so emitting a signal once could call a slot twice) which has caught me on a number of occasions.&lt;/p&gt;
+&lt;p&gt;This is really simple to work around: you can add some bookkeeping to keep track of that particular connection or you can use &lt;code&gt;disconnect()&lt;/code&gt; where appropriate to maintain 0 or 1 connections. The new &lt;code&gt;Qt::UniqueConnection&lt;/code&gt; connection type, on the other hand, lets you be sure that a connection is made only once. It's not something you always need, but when you do, it lets you keep your code a bit cleaner.&lt;/p&gt;
+&lt;p&gt;One caveat is that &lt;code&gt;Qt::UniqueConnection&lt;/code&gt; makes a unique &lt;code&gt;Qt::AutoConnection&lt;/code&gt;, meaning you don't have the ability to explicitly specify a unique queued connection, for example. In a case like that you will have to keep track of the connections yourself, as before.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Tue, 12 Jan 2010 14:43:00 -0800</pubDate><guid>tag:www.setnode.com,2010-01-12:blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/</guid></item><item><title>Qt 4.6 has prebuilt binaries for Visual Studio</title><link>http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/</link><description>&lt;p&gt;I've just found out that Qt 4.6 actually includes prebuilt LGPL binaries for Visual Studio 2008, so there's little reason to spend time building Qt unless you need to use some other version of Visual Studio.&lt;/p&gt;
+&lt;p&gt;The &lt;a href="http://qt.nokia.com/downloads/windows-cpp-vs2008"&gt;prebuilt binaries are downloadable from here&lt;/a&gt;. Alternatively, you can visit the &lt;a href="http://qt.nokia.com/downloads"&gt;Qt download page&lt;/a&gt;, choose LGPL, and look on the right hand side of the page for the download link.&lt;/p&gt;
+&lt;p&gt;I highly recommend using the prebuilt libraries, as you will save a tremendous amount of time (it takes hours to build Qt). After you finish downloading and installing the libraries, install the &lt;a href="http://qt.nokia.com/downloads/visual-studio-add-in"&gt;Visual Studio add-in&lt;/a&gt; to make it easier to handle the custom build steps for moc and ui files.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 02 Dec 2009 12:42:00 -0800</pubDate><guid>tag:www.setnode.com,2009-12-02:blog/qt-46-has-prebuilt-binaries-for-visual-studio/</guid></item><item><title>Qt 4.6 is out, compiling it with MSVC</title><link>http://www.setnode.com/blog/qt-46-is-out-compiling-it-with-msvc/</link><description>&lt;p&gt;Qt 4.6 has been released (with some &lt;a href="http://doc.trolltech.com/4.6/qt4-6-intro.html"&gt;new features&lt;/a&gt;) so I've taken the opportunity to make sure my &lt;a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/"&gt;instructions on how to compile Qt with Visual Studio&lt;/a&gt; are still accurate. The additional steps on how to take advantage of your multi-core processor (using &lt;code&gt;jom&lt;/code&gt;) still work, as well.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;[Edit: Qt 4.6 actually has &lt;a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/"&gt;prebuilt binaries/libraries&lt;/a&gt; for Visual Studio 2008, which is preferable to spending hours building Qt]&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;I've made a note in the article but I'll repeat it here because it's a major time-saver: you should delete, from your Qt folder, these instances of &lt;code&gt;mocinclude.tmp&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Deleting the first two &lt;code&gt;mocinclude.tmp&lt;/code&gt; files will prevent a &lt;code&gt;LNK2019&lt;/code&gt; error while building Webkit, while deleting the last two (which are new in Qt 4.6, as far as I can tell) will prevent an &lt;code&gt;Error: Unknown interface&lt;/code&gt; while trying to build &lt;code&gt;qscriptextensionplugin.h&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 02 Dec 2009 01:39:00 -0800</pubDate><guid>tag:www.setnode.com,2009-12-02:blog/qt-46-is-out-compiling-it-with-msvc/</guid></item><item><title>An update on building Boost with MSVC (still with dual/quad/multi-core action)</title><link>http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/</link><description>&lt;p&gt;I've noticed that in recent versions of Boost (1.39.0 and newer) there is a way to do a &lt;a href="http://www.boost.org/doc/libs/release/more/getting_started/windows.html#or-simplified-build-from-source"&gt;"Simplified Build from Source"&lt;/a&gt; if you're using Microsoft Visual Studio. Here are the steps as I like to write them:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://www.boost.org/users/download/"&gt;Download&lt;/a&gt; the latest version of Boost and extract it to some location (we'll assume &lt;code&gt;D:\Boost\&lt;/code&gt;), making sure to maintain the directory structure.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In a command prompt, navigate to your Boost library folder (&lt;code&gt;D:\Boost\boost_1_41_0\&lt;/code&gt;) and then use this command, which builds your very own copy of Boost Jam (a build system):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; bootstrap
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Now, in the same command prompt, enter this command, where N is the number of processors/cores you have available for compiling (for example, &lt;code&gt;-j4&lt;/code&gt; if you have a quad-core processor):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; bjam.exe -jN
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Wait.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;After the build completes you will have a &lt;code&gt;stage&lt;/code&gt; subdirectory (&lt;code&gt;D:\Boost\boost_1_41_0\stage\&lt;/code&gt;) which will contain a &lt;code&gt;lib&lt;/code&gt; subdirectory, containing the compiled libraries.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This simplified process removes the need to get a copy of Boost Jam, which, as trivial as it sounds, really does make a big difference to the friendliness of the entire procedure. It also reduces the number of necessary arguments to zero (or one, if you consider multi-core a necessity), although there are some situations where you may still need the older arguments (in which case I refer you to my previous &lt;a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/"&gt;entry on the subject&lt;/a&gt;).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 19 Nov 2009 02:05:00 -0800</pubDate><guid>tag:www.setnode.com,2009-11-19:blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/</guid></item><item><title>SteveStreeting.com's great series of articles about distributed version control systems</title><link>http://www.setnode.com/blog/stevestreetingcoms-great-series-of-articles-about-distributed-version-control-systems/</link><description>&lt;p&gt;Steve Streeting (the man behind &lt;a href="http://www.ogre3d.org"&gt;OGRE&lt;/a&gt;, a 3D graphics engine) has been writing about his experiments with distributed version control systems, particularly &lt;a href="http://en.wikipedia.org/wiki/Mercurial"&gt;Mercurial&lt;/a&gt; and &lt;a href="http://en.wikipedia.org/wiki/Git_(software)"&gt;Git&lt;/a&gt;. In particular, his &lt;a href="http://www.stevestreeting.com/2009/11/06/dvcs-score-card/"&gt;latest blog post&lt;/a&gt; contains a summary of his experiences with the two version control systems and is probably the most in-depth article I've read on the topic. &lt;/p&gt;
+&lt;p&gt;The most interesting portions of the article (and &lt;a href="http://www.stevestreeting.com/tag/dvcs/"&gt;his prior posts&lt;/a&gt;) are the ones which talk directly about managing the OGRE source within each of the two &lt;abbr title="distributed version control systems"&gt;DVCSs&lt;/abbr&gt;. OGRE is not a small project and it's very illuminating to read about what parts of a (distributed) version control system are important to a larger project, as this is stuff you may not personally experience until it's too late to change your mind.&lt;/p&gt;
+&lt;p&gt;For my own personal projects I use &lt;a href="http://en.wikipedia.org/wiki/Subversion_(software)"&gt;Subversion&lt;/a&gt; (&lt;a href="http://tortoisesvn.tigris.org/"&gt;TortoiseSVN&lt;/a&gt; is a great piece of software) and I'm not in any particular rush to switch over to a &lt;abbr title="distributed version control system"&gt;DVCS&lt;/abbr&gt; just yet. It's simple, straightforward and fits well with my workflow. For larger projects, especially ones where you're collaborating with people across the Internet, I'd give some serious thought to using a &lt;abbr title="distributed version control system"&gt;DVCS&lt;/abbr&gt; and reading about other people's experiences is extremely helpful.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;[Edit: I ended up switching about a year after this post to Mercurial for my personal projects.]&lt;/em&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 07 Nov 2009 00:43:00 -0800</pubDate><guid>tag:www.setnode.com,2009-11-07:blog/stevestreetingcoms-great-series-of-articles-about-distributed-version-control-systems/</guid></item><item><title>Windows Sidebar Gadgets</title><link>http://www.setnode.com/blog/windows-sidebar-gadgets/</link><description>&lt;p&gt;Windows Vista and Windows 7 provides what they call Windows (Sidebar) Gadgets (the Sidebar moniker is removed in Windows 7). These gadgets do the same thing as similar products from Yahoo (formerly known as Konfabulator) and Apple (the Dashboard), providing small amounts of functionality and information within easy reach.&lt;/p&gt;
+&lt;p&gt;The Windows Live Gallery is a perfect example of how not to make a download center. If you take a look at the Sidebar gadgets category, most are of rather poor quality, and a fair number of the good ones use plagiarized skins and/or code.&lt;/p&gt;
+&lt;p&gt;There's no community presence on a site like that, and without a community to help deter poor behavior I think the free-for-all atmosphere makes it hard for the good submissions to float to the top. &lt;a href="http://www.deviantart.com/"&gt;deviantART&lt;/a&gt; is a great example of a site that does the right stuff; their Sidebar gadgets section is cleaner and easier to use.&lt;/p&gt;
+&lt;p&gt;Anyway, I bring this up because there are some gadgets on &lt;del&gt;The Hobby Lounge&lt;/del&gt; which you won't find on deviantART and unfortunately exist in a plagiarized state on the Windows Live Gallery. I was in the process of updating some of my older gadgets from this site and it took me a surprisingly long time to find the website again, even though I knew exactly what I was looking for. My google-fu is usually pretty decent so I figure I'll make a note of it here for myself and maybe help them get noticed a bit more.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;[Edit: The Hobby Lounge is now unfortunately defunct.]&lt;/em&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 12 Oct 2009 11:57:00 -0700</pubDate><guid>tag:www.setnode.com,2009-10-12:blog/windows-sidebar-gadgets/</guid></item><item><title>Optimization switches and Visual Studio 2008</title><link>http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/</link><description>&lt;p&gt;In a &lt;a href="http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/"&gt;previous&lt;/a&gt; entry I noted that you generally do not need to micromanage your optimization switches. &lt;/p&gt;
+&lt;p&gt;However, in Visual Studio 2008 (both with and without SP1) there is a bug where the default optimization switch, &lt;code&gt;/O2&lt;/code&gt;, is &lt;em&gt;not applied&lt;/em&gt; even when shown in the IDE under &lt;code&gt;Configuration Properties-&amp;gt;C/C++-&amp;gt;Optimization&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This happens when you select &lt;code&gt;&amp;lt;inherit from parent or project defaults&amp;gt;&lt;/code&gt;. Instead, you want to explicitly set &lt;code&gt;Maximize Speed (/O2)&lt;/code&gt; (it will show up in bold when explicitly set). You should also verify that the &lt;code&gt;/O2&lt;/code&gt; flag is being applied by viewing the command line (&lt;code&gt;Configuration Properties-&amp;gt;C/C++-&amp;gt;Command Line&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;There is more about this bug on &lt;a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=383764"&gt;Microsoft Connect&lt;/a&gt;, where it's also noted that this bug will be fixed in Visual Studio 2010.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 02 Oct 2009 15:29:00 -0700</pubDate><guid>tag:www.setnode.com,2009-10-02:blog/optimization-switches-and-visual-studio-2008/</guid></item><item><title>Right-click context menus with Qt</title><link>http://www.setnode.com/blog/right-click-context-menus-with-qt/</link><description>&lt;p&gt;Getting right-clicks to popup a context menu is pretty straightforward in Qt. There are just a couple of things to watch out for...&lt;/p&gt;
+&lt;p&gt;First, there are several ways to tell Qt you want a context menu. One approach is to subclass the widget and override the &lt;code&gt;QWidget::contextMenuEvent()&lt;/code&gt; event handler. However, I think the easiest approach is to call &lt;code&gt;setContextMenuPolicy(Qt::CustomContextMenu)&lt;/code&gt; on the widget you want, and then connect the &lt;code&gt;customContextMenuRequested()&lt;/code&gt; signal to the appropriate slot:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// myWidget is any QWidget-derived class&lt;/span&gt;
+&lt;span class="n"&gt;myWidget&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;setContextMenuPolicy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Qt&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;CustomContextMenu&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;myWidget&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SIGNAL&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;customContextMenuRequested&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;QPoint&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SLOT&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ShowContextMenu&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;QPoint&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="p"&gt;)));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, note that the &lt;code&gt;const QPoint&amp;amp; pos&lt;/code&gt; parameter in the &lt;code&gt;customContextMenuRequested()&lt;/code&gt; signal is &lt;a href="http://doc.trolltech.com/4.5/qwidget.html#customContextMenuRequested"&gt;normally in widget coordinates&lt;/a&gt;. However, also note that classes which inherit from &lt;code&gt;QAbstractScrollArea&lt;/code&gt;&lt;sup id="fnref:viewportclasses"&gt;&lt;a class="footnote-ref" href="#fn:viewportclasses" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt; instead use the coordinates of their &lt;code&gt;viewport()&lt;/code&gt;. Either way, you will need to map these coordinates to global coordinates using &lt;code&gt;mapToGlobal()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, simply either &lt;code&gt;popup()&lt;/code&gt; or &lt;code&gt;exec()&lt;/code&gt; your &lt;code&gt;QMenu&lt;/code&gt;. Remember that &lt;code&gt;popup()&lt;/code&gt; is non-blocking, so if you wish to use that, make sure your &lt;code&gt;QMenu&lt;/code&gt; is created on the heap (or some other way of guaranteeing that the QMenu's lifetime outlasts the scope of the function)!&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="n"&gt;MyClass&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;ShowContextMenu&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;QPoint&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;pos&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// this is a slot&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// for most widgets&lt;/span&gt;
+    &lt;span class="n"&gt;QPoint&lt;/span&gt; &lt;span class="n"&gt;globalPos&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;myWidget&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;mapToGlobal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pos&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="c1"&gt;// for QAbstractScrollArea and derived classes you would use:&lt;/span&gt;
+    &lt;span class="c1"&gt;// QPoint globalPos = myWidget-&amp;gt;viewport()-&amp;gt;mapToGlobal(pos);&lt;/span&gt;
+
+    &lt;span class="n"&gt;QMenu&lt;/span&gt; &lt;span class="n"&gt;myMenu&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;myMenu&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;addAction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Menu Item 1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="c1"&gt;// ...&lt;/span&gt;
+
+    &lt;span class="n"&gt;QAction&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;selectedItem&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;myMenu&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;globalPos&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;selectedItem&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// something was chosen, do stuff&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// nothing was chosen&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="footnote"&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id="fn:viewportclasses"&gt;
+&lt;p&gt;Examples include &lt;code&gt;QTreeWidget&lt;/code&gt;, &lt;code&gt;QTreeView&lt;/code&gt;, &lt;code&gt;QListWidget&lt;/code&gt;, &lt;code&gt;QListView&lt;/code&gt;, &lt;code&gt;QTableWidget&lt;/code&gt;, &lt;code&gt;QTableView&lt;/code&gt;, &lt;code&gt;QTextEdit&lt;/code&gt;, &lt;code&gt;QPlainTextEdit&lt;/code&gt;, and &lt;code&gt;QMdiArea&lt;/code&gt;.&amp;#160;&lt;a class="footnote-backref" href="#fnref:viewportclasses" rev="footnote" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 23 Jul 2009 20:47:00 -0700</pubDate><guid>tag:www.setnode.com,2009-07-23:blog/right-click-context-menus-with-qt/</guid></item><item><title>Consolas is a poor choice for web use</title><link>http://www.setnode.com/blog/consolas-is-a-poor-choice-for-web-use/</link><description>&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Consolas"&gt;Consolas&lt;/a&gt;, with &lt;a href="http://en.wikipedia.org/wiki/ClearType"&gt;ClearType&lt;/a&gt; enabled, is a gorgeous font, and is my preferred monospaced font. However, take a look at it without ClearType (there's a sample image on the linked Wikipedia article)---those jaggies hurt.&lt;/p&gt;
+&lt;p&gt;That's why you shouldn't define Consolas in your style sheets. You can't know/assume that everyone who views your webpage will have ClearType on (or at least some form of font-smoothing), and those who don't have it enabled will suffer through text that looks as though it were drawn freehand with a mouse.&lt;/p&gt;
+&lt;p&gt;Instead, unless you are going for a specific effect such as trying to mimic old &lt;a href="http://en.wikipedia.org/wiki/Terminal_(font)"&gt;terminals&lt;/a&gt;, keep your &lt;code&gt;font-family&lt;/code&gt; for &lt;code&gt;&amp;lt;pre&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;code&amp;gt;&lt;/code&gt; elements short and to the point. I personally use&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;font-family&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Lucida Console&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Monaco&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DejaVu Sans Mono&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nt"&gt;monospace&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which is usually enough to keep Courier (+ New) out of the way. If someone is missing all of these fonts they'll likely have a decent enough substitute.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 06 Jul 2009 15:22:00 -0700</pubDate><guid>tag:www.setnode.com,2009-07-06:blog/consolas-is-a-poor-choice-for-web-use/</guid></item><item><title>Compile Qt 4.5 for Visual Studio, using your multi-core processor</title><link>http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/</link><description>&lt;p&gt;If you want to use Qt 4.5 with Visual Studio you'll need to compile it yourself. The instructions are simple, and fairly well documented on &lt;a href="http://www.google.com/search?hl=en&amp;amp;q=compile+qt+visual+studio"&gt;various blogs and websites&lt;/a&gt;. Essentially: &lt;em&gt;(read steps 7 and on for multi-threading information)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;[Edit: These steps still apply for Qt 4.6, but Qt 4.6 actually has &lt;a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/"&gt;prebuilt binaries/libraries&lt;/a&gt; for Visual Studio 2008 which I highly suggest looking at instead]&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;This step is important.&lt;/strong&gt; You will potentially save some time by deleting these &lt;code&gt;mocinclude.tmp&lt;/code&gt; files:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Deleting the first two &lt;code&gt;mocinclude.tmp&lt;/code&gt; files will prevent a LNK2019 error from building Webkit, while deleting the last two (which are present in Qt 4.6) will prevent &lt;code&gt;Error: Unknown interface&lt;/code&gt; from occurring while trying to build &lt;code&gt;qscriptextensionplugin.h&lt;/code&gt;. If you're missing any of them don't fret, it's actually a good thing.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Using a &lt;em&gt;Visual Studio Command Prompt&lt;/em&gt;, navigate to your Qt folder (I'll use &lt;code&gt;D:\Coding\Qt\2009.05&lt;/code&gt; in this example).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Go to the Qt folder inside there (e.g. &lt;code&gt;D:\Coding\Qt\2009.05\qt&lt;/code&gt;). It's the one that contains &lt;code&gt;configure.exe&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Enter the following command, changing &lt;code&gt;win32-msvc2008&lt;/code&gt; to &lt;code&gt;win32-msvc2005&lt;/code&gt; if necessary.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; configure -opensource -shared -ltcg -no-qt3support -platform win32-msvc2008
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;What this does is fairly self explanatory. The &lt;code&gt;-shared&lt;/code&gt; switch will make sure that Qt is configured for dynamic linking (even though that's usually the default option there's no guarantee). We need to specify the &lt;code&gt;-ltcg&lt;/code&gt; switch to turn on &lt;em&gt;Link Time Code Generation&lt;/em&gt;. LTCG is off by default since, in combination with a statically built Qt, it will make linking very slow for any projects that use Qt. However, if we configure Qt for dynamic linking this won't be an issue.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can add or remove switches as desired (try &lt;code&gt;configure help&lt;/code&gt;) but I find most of the defaults suitable. Sure, you may not need OpenGL (or SQL or Phonon or...) support right now, but it's a separate module anyway and you're already compiling the rest of Qt.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;All you need to do now is run &lt;code&gt;nmake&lt;/code&gt;...&lt;em&gt;but wait&lt;/em&gt;.&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Do you have a dual-core or quad-core processor or can take advantage of multi-threaded compilation? Get the &lt;code&gt;jom&lt;/code&gt; tool instead. There's some info about &lt;code&gt;jom&lt;/code&gt; in this &lt;a href="http://labs.trolltech.com/blogs/2009/03/27/speeding-up-visual-c-qt-builds/"&gt;Qt Labs Blogs article&lt;/a&gt;. You can download the latest version of &lt;code&gt;jom&lt;/code&gt; from &lt;a href="ftp://ftp.qt.nokia.com/jom/"&gt;ftp://ftp.qt.nokia.com/jom/&lt;/a&gt; (&lt;code&gt;jom.zip&lt;/code&gt; should be just fine).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;code&gt;jom&lt;/code&gt; by simply unzipping and running it in the same directory as &lt;code&gt;configure&lt;/code&gt; (which is still the same as before, &lt;code&gt;D:\Coding\Qt\2009.05\qt&lt;/code&gt;).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; jom
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Happily build Qt much faster. For example, on my machine (a Core 2 Quad) it took an hour for the build to complete.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Unless you really enjoy manually handling custom build steps, don't forget to get the &lt;a href="http://www.qtsoftware.com/downloads/visual-studio-add-in"&gt;Qt Visual Studio Add-In&lt;/a&gt;. After installing it make sure that it's aware of the location of your Qt installation (&lt;code&gt;Qt-&amp;gt;Qt Options&lt;/code&gt;) and then use &lt;code&gt;File-&amp;gt;New-&amp;gt;Project...&lt;/code&gt; and select one of the Qt templates to get started.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 25 Jun 2009 20:28:00 -0700</pubDate><guid>tag:www.setnode.com,2009-06-25:blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/</guid></item><item><title>#include Guidelines</title><link>http://www.setnode.com/blog/include-guidelines/</link><description>&lt;p&gt;This is mostly for my own reference, but here are some of the guidelines I like to follow when it comes to &lt;code&gt;#include&lt;/code&gt;s in C++. Given &lt;code&gt;foo.cpp&lt;/code&gt; and &lt;code&gt;foo.h&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;foo.h&lt;/code&gt; should include everything it mentions and no more. For example, if you use &lt;code&gt;boost::random&lt;/code&gt; in the implementation, don't &lt;code&gt;#include &amp;lt;boost/random.hpp&amp;gt;&lt;/code&gt; in &lt;code&gt;foo.h&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;foo.cpp&lt;/code&gt; should also include everything it mentions and no more.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;foo.cpp&lt;/code&gt;'s first include should be &lt;code&gt;#include "foo.h"&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Precompiled headers, if used, should be specified in &lt;code&gt;foo.cpp&lt;/code&gt; only and will need to be the first &lt;code&gt;#include&lt;/code&gt; (&lt;code&gt;#include "foo.h"&lt;/code&gt; will then be the second).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Except for the above two exceptions, the order I like to follow for &lt;code&gt;#include&lt;/code&gt;s is:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Headers from your own project (generally of the form &lt;code&gt;#include "baz.h"&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Headers from non-standard libraries (such as Qt)&lt;/li&gt;
+&lt;li&gt;Standard libraries (I include Boost in here because I use it so pervasively)&lt;/li&gt;
+&lt;li&gt;Platform headers (like &lt;code&gt;#include &amp;lt;windows.h&amp;gt;&lt;/code&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Within each of the above groups try to alphabetically order the &lt;code&gt;#include&lt;/code&gt;s if at all possible.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Forward declare whenever you can get away with it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 22 Jun 2009 19:20:00 -0700</pubDate><guid>tag:www.setnode.com,2009-06-22:blog/include-guidelines/</guid></item><item><title>The difference between Qt::Key_Enter and Qt::Key_Return</title><link>http://www.setnode.com/blog/the-difference-between-qt-key-enter-and-qt-key-r/</link><description>&lt;p&gt;It's specified in the &lt;a href="http://doc.trolltech.com/4.5/qt.html#Key-enum"&gt;documentation&lt;/a&gt;, though in a slightly subtle manner. Essentially, &lt;code&gt;Qt::Key_Enter&lt;/code&gt; is the keypad Enter, while &lt;code&gt;Qt::Key_Return&lt;/code&gt; is the "regular" Enter, the one which you normally use while typing.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 10 Jun 2009 10:48:00 -0700</pubDate><guid>tag:www.setnode.com,2009-06-10:blog/the-difference-between-qt-key-enter-and-qt-key-r/</guid></item><item><title>Visual Studio 2010 sounds pretty neat so far</title><link>http://www.setnode.com/blog/visual-studio-2010-sounds-pretty-neat-so-far/</link><description>&lt;p&gt;I'm a very big fan of the Visual Studio IDE (I think it's the best around, for any platform). However, Microsoft has historically put less of a emphasis on the C++ portion and the past couple of versions have had only minor bullet points on the C++ side.&lt;/p&gt;
+&lt;p&gt;I think they've wizened up a bit and the next Visual C++, 2010, has some notable improvements in store (C++0x support, for one). They've also put a lot of work into completely reworking their C++ IntelliSense engine. There's not much for me to say, really, as they have a great &lt;a href="http://blogs.msdn.com/vcblog/default.aspx"&gt;blog&lt;/a&gt;. I'll just highlight some of the articles I found the most interesting, which coincidentally all focus on IntelliSense:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/vcblog/archive/2009/01/27/dev10-is-just-the-beginning.aspx"&gt;A bit of history about the current IntelliSense engine, FEACP&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/vcblog/archive/2009/03/10/testing-vc-compiler-and-intellisense.aspx"&gt;Just how do they test it anyway?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/vcblog/archive/2009/05/27/rebuilding-intellisense.aspx"&gt;Details about the upcoming engine&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/vcblog/archive/2009/06/01/c-gets-squiggles.aspx"&gt;Squiggles.&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Tue, 09 Jun 2009 10:04:00 -0700</pubDate><guid>tag:www.setnode.com,2009-06-09:blog/visual-studio-2010-sounds-pretty-neat-so-far/</guid></item><item><title>Qt: staticMetaObject is not a member of...</title><link>http://www.setnode.com/blog/qt-staticmetaobject-is-not-a-member-of/</link><description>&lt;p&gt;Just got this error message while compiling a tiny class that derives from &lt;code&gt;QTreeWidgetItem&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;error C2039: &amp;#39;staticMetaObject&amp;#39; : is not a member of &amp;#39;QTreeWidgetItem&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What this is saying is that &lt;code&gt;QTreeWidgetItem&lt;/code&gt; does not inherit from &lt;code&gt;QObject&lt;/code&gt;, meaning that your own, singly-inherited class also does not inherit from &lt;code&gt;QObject&lt;/code&gt;. Inheriting from &lt;code&gt;QObject&lt;/code&gt; is &lt;a href="http://doc.trolltech.com/qobject.html#Q_OBJECT"&gt;one of the prerequisites&lt;/a&gt; to using the &lt;code&gt;Q_OBJECT&lt;/code&gt; macro, which, if you're anything like me, you automatically insert into any Qt GUI related class.&lt;/p&gt;
+&lt;p&gt;If you're not using any of the meta object stuff in your subclass, such as signals/slots or properties, just take out the &lt;code&gt;Q_OBJECT&lt;/code&gt; macro. If you need to use signals and slots, you'll need to make your subclass multiply-inherit from &lt;code&gt;QObject&lt;/code&gt; as well. If you take this route, remember that "&lt;a href="http://doc.trolltech.com/4.5/moc.html"&gt;Multiple Inheritance Requires QObject to Be First&lt;/a&gt;", otherwise you'll get either the same error as above, or something along the lines of "&lt;code&gt;YourClass&lt;/code&gt; inherits from two QObject subclasses" from the moc.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 29 May 2009 21:11:00 -0700</pubDate><guid>tag:www.setnode.com,2009-05-29:blog/qt-staticmetaobject-is-not-a-member-of/</guid></item><item><title>Captchas shouldn't be the default defense against bots</title><link>http://www.setnode.com/blog/captchas-shouldnt-be-the-default-defense-against-b/</link><description>&lt;p&gt;&lt;a href="http://en.wikipedia.org/wiki/Captcha"&gt;Captchas&lt;/a&gt; are useful to prevent bots or similarly automated activities from occurring. However, they're not perfect and many of them can be broken with a targeted attack. In a sort of arms race fashion, captchas get more and more intricate, but some take this a bit too far and aren't really even human solvable.&lt;/p&gt;
+&lt;p&gt;In any case, large sites have to have some way to separate bots from humans, and captchas may be the only solution. It's still an arms race, but at least the large sites have the resources to throw at it.&lt;/p&gt;
+&lt;p&gt;What about the small sites? Your blog about your cat? Your forum for fellow gum-chewers? Do you really need (or want) a captcha for these types of sites? Unfortunately, what happens is a crawler stumbles upon your site, notices it uses some popular blog or forum application it knows about, and attempts to register so it can subsequently flood your site with spam. If you use a popular application, such as &lt;a href="http://www.phpbb.com/"&gt;phpBB3&lt;/a&gt; (for the sake of argument), once the generic, built-in captcha gets broken, all non-customized phpBB3 sites are vulnerable. So a spammer just needs to try to break this one particular captcha and suddenly they've unlocked the ability to spam millions of forums. It provides the volume that spammers need to make spam work.&lt;/p&gt;
+&lt;p&gt;What I suggest instead is that the default mode of operation for a forum (or any application, really) should be to ask a simple question upon registration, with both the answer and question provided by the person who is running the site:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Q: What is my cat's name?&lt;br /&gt;
+A: Fluffy  &lt;/p&gt;
+&lt;p&gt;Q: Which of the following is a brand of gum? Oreos, Jellybeans, Trident, Snickers&lt;br /&gt;
+A: Trident  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Incidentally, yes/no type questions should be disallowed, as the answers ('yes' and 'no') would be common enough to automate.&lt;/p&gt;
+&lt;p&gt;Now, spamming your forum requires actual human intervention. Obviously this sort of approach will fail if you have a large or popular site, but if you own such a site you already know you have to take more steps to protect your site.&lt;/p&gt;
+&lt;p&gt;One potential problem is I could see lists of questions/answers being hand-generated and passed around, but this could be mitigated by expiring questions/answers after some time. If you're feeling particularly clever you could even flag the old answer as being a 'bot-answer', which might work well in concert with an &lt;a href="http://en.wikipedia.org/wiki/Akismet"&gt;Akismet&lt;/a&gt; type service:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Q: How old is my cat?&lt;br /&gt;
+A: Fluffy &lt;em&gt;(hello, bot!)&lt;/em&gt;  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Anyway, I feel that captchas are a bit of dead end in terms of anti-spam measures for small sites. Small sites are not typical targets for spammers, as the reward is not worth the effort. However, if all these small sites are protected by the same captcha, breaking that captcha gives that spammer access to &lt;em&gt;(small-sites &amp;#215; millions)&lt;/em&gt;, which &lt;em&gt;is&lt;/em&gt; worth the effort.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 21 May 2009 15:17:00 -0700</pubDate><guid>tag:www.setnode.com,2009-05-21:blog/captchas-shouldnt-be-the-default-defense-against-b/</guid></item><item><title>More thoughts on Qt 4.5</title><link>http://www.setnode.com/blog/more-thoughts-on-qt-45/</link><description>&lt;p&gt;I've been using Qt 4.5 for a couple more weeks now and I've had a few more thoughts on the framework.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I don't know if I could handle using the plain Win32 API for GUI ever again&lt;/li&gt;
+&lt;li&gt;Even with Qt's "parent handles the deletion of its children" memory management system it's still easier to use (and reason about) &lt;code&gt;shared_ptr&lt;/code&gt; or another smart pointer, as long as you're not working with widgets or similar GUI elements. If you're working with GUI elements, Qt's memory management works perfectly and makes sense.&lt;/li&gt;
+&lt;li&gt;You can assume that any &lt;code&gt;addWidget()&lt;/code&gt;-like function will take ownership unless explicitly stated otherwise. I still wish they would just say straight out that "this function takes ownership".&lt;/li&gt;
+&lt;li&gt;In my opinion the documentation would be much improved for newcomers if they had a "Qt Best Practices" section. You can get a sense of how things should be structured if you look at their sample programs, but there's a lot to go through.&lt;/li&gt;
+&lt;li&gt;Other than those two nitpicks, the documentation is consistently quite good.&lt;/li&gt;
+&lt;li&gt;I would suggest that you avoid using the &lt;a href="http://doc.qtsoftware.com/4.5/containers.html"&gt;Qt containers&lt;/a&gt; and instead favor the standard C++ containers whenever possible. There's less to learn, and most C++ programmers will have a firm grasp of the containers in the &lt;code&gt;std&lt;/code&gt; namespace. Some Qt functions do return &lt;a href="http://doc.trolltech.com/4.5/qstringlist.html"&gt;&lt;code&gt;QStringList&lt;/code&gt;&lt;/a&gt; or some other Qt container, in which case you may as well just leave it in the container you get it in.&lt;/li&gt;
+&lt;li&gt;On the other hand, if you're going to use Qt, you may as well use &lt;a href="http://doc.trolltech.com/4.5/qstring.html"&gt;&lt;code&gt;QString&lt;/code&gt;&lt;/a&gt; everywhere. It's used extensively through the Qt framework, so you won't be able to avoid it. It's a pretty decent string library anyway, with plenty of useful functions, and it handles Unicode cleanly in my experience.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://doc.trolltech.com/4.5/qtextedit.html"&gt;&lt;code&gt;QTextEdit&lt;/code&gt;&lt;/a&gt; isn't particularly performant, particularly when you resize it and it has to perform lots of word wrap calculations. Use &lt;a href="http://doc.trolltech.com/4.5/qplaintextedit.html"&gt;&lt;code&gt;QPlainTextEdit&lt;/code&gt;&lt;/a&gt; if you can.&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 07 May 2009 16:35:00 -0700</pubDate><guid>tag:www.setnode.com,2009-05-07:blog/more-thoughts-on-qt-45/</guid></item><item><title>A really quick boost::random guide</title><link>http://www.setnode.com/blog/a-really-quick-boost-random-guide/</link><description>&lt;p&gt;This is a really short and quick guide on how to use &lt;code&gt;boost::random&lt;/code&gt;. The best place to start is, as always, the &lt;a href="http://www.boost.org/doc/libs/release/libs/random/index.html"&gt;documentation&lt;/a&gt;, but Boost also provides a &lt;a href="http://www.boost.org/doc/libs/release/libs/random/random_demo.cpp"&gt;simple sample program&lt;/a&gt; that covers the library in a good "how to get started" fashion.&lt;/p&gt;
+&lt;p&gt;What I'm about to write here is even shorter and less detailed -- it's just the basic code needed to generate some random numbers.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Initialize a random number generator.&lt;/span&gt;
+&lt;span class="c1"&gt;// Boost provides a bunch of these, note that some of them are not meant&lt;/span&gt;
+&lt;span class="c1"&gt;// for direct user usage and you should instead use a specialization (for &lt;/span&gt;
+&lt;span class="c1"&gt;// example, don&amp;#39;t use linear_congruential and use minstd_rand or &lt;/span&gt;
+&lt;span class="c1"&gt;// minstd_rand0 instead)&lt;/span&gt;
+
+&lt;span class="c1"&gt;// This constructor seeds the generator with the current time.&lt;/span&gt;
+&lt;span class="c1"&gt;// As mentioned in Boost&amp;#39;s sample program, time(0) is not a great seed,&lt;/span&gt;
+&lt;span class="c1"&gt;// but you can probably get away with it for most situations.&lt;/span&gt;
+&lt;span class="c1"&gt;// Consider using more precise timers such as gettimeofday on *nix or&lt;/span&gt;
+&lt;span class="c1"&gt;// GetTickCount/timeGetTime/QueryPerformanceCounter on Windows.&lt;/span&gt;
+&lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;mt19937&lt;/span&gt; &lt;span class="n"&gt;randGen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Now we set up a distribution. Boost provides a bunch of these as well.&lt;/span&gt;
+&lt;span class="c1"&gt;// This is the preferred way to generate numbers in a certain range.&lt;/span&gt;
+&lt;span class="c1"&gt;// In this example we initialize a uniform distribution between 0 and the max&lt;/span&gt;
+&lt;span class="c1"&gt;// value that an unsigned char can hold (255 for most architectures)&lt;/span&gt;
+&lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;uniform_int&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;uInt8Dist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;numeric_limits&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;::&lt;/span&gt;&lt;span class="n"&gt;max&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Finally, declare a variate_generator which maps the random number&lt;/span&gt;
+&lt;span class="c1"&gt;// generator and the distribution together. This variate_generator&lt;/span&gt;
+&lt;span class="c1"&gt;// is usable like a function call.&lt;/span&gt;
+&lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;variate_generator&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;mt19937&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;uniform_int&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; 
+    &lt;span class="n"&gt;GetRand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;randGen&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;uInt8Dist&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Generate a random number&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;aRandomNumber&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;GetRand&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 06 May 2009 20:03:00 -0700</pubDate><guid>tag:www.setnode.com,2009-05-06:blog/a-really-quick-boost-random-guide/</guid></item><item><title>Namespaces are one honking great idea</title><link>http://www.setnode.com/blog/namespaces-are-one-honking-great-idea/</link><description>&lt;p&gt;The title of this post comes from the last line of &lt;em&gt;&lt;a href="http://www.python.org/dev/peps/pep-0020/"&gt;The Zen of Python&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;It applies to C++ too: namespaces are great. Namespaces let the &lt;a href="http://www.boost.org/"&gt;Boost&lt;/a&gt; folks contain all sorts of widely varying libraries without having to worry about naming collisions in user code. Namespaces let you mix multiple libraries easily and safely. Namespaces let you group sets of related free functions together, without needing a class. Namespaces also let you work around one thing I've always found a bit unusual with enums: the way they don't have their own scope.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;enum&lt;/span&gt; &lt;span class="n"&gt;ValidValues&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;Value1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;Value2&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This ends up declaring &lt;code&gt;Value1&lt;/code&gt; and &lt;code&gt;Value2&lt;/code&gt; in the underlying scope. What I like to do is wrap the enum in a namespace:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="n"&gt;ValidValues&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;enum&lt;/span&gt; &lt;span class="n"&gt;Enum&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;Value1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;Value2&lt;/span&gt;
+    &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This sticks &lt;code&gt;Value1&lt;/code&gt; and &lt;code&gt;Value2&lt;/code&gt; in the &lt;code&gt;ValidValues&lt;/code&gt; namespace. The only disadvantage is declaring a variable of this enum type gets a bit silly and inconsistent. For example:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;ValidValues&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Value1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// error, ValidValues is a namespace, Value1 is undefined&lt;/span&gt;
+&lt;span class="n"&gt;ValidValues&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Enum&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Value1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// error, Value1 is undefined&lt;/span&gt;
+&lt;span class="n"&gt;ValidValues&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Enum&lt;/span&gt; &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ValidValues&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Value1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// okay&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is yet another area where C++0x will offer its own solution, in this case, &lt;a href="http://en.wikipedia.org/wiki/C%2B%2B0x#Strongly_typed_enumerations"&gt;strongly typed enumerations&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 29 Apr 2009 09:17:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-29:blog/namespaces-are-one-honking-great-idea/</guid></item><item><title>Right aligning a button in a QToolBar</title><link>http://www.setnode.com/blog/right-aligning-a-button-in-a-qtoolbar/</link><description>&lt;p&gt;Sometimes you will want to add a right-aligned button to a &lt;code&gt;QToolBar&lt;/code&gt;. The first thing that probably comes to mind is to add a &lt;code&gt;QSpacerItem&lt;/code&gt; to the toolbar, but that won't work as &lt;code&gt;QSpacerItem&lt;/code&gt; is not a child of &lt;code&gt;QWidget&lt;/code&gt;, so you can't use the &lt;code&gt;addWidget()&lt;/code&gt; member of &lt;code&gt;QToolBar&lt;/code&gt;. Instead, make a basic &lt;code&gt;QWidget&lt;/code&gt;, set its &lt;code&gt;sizePolicy&lt;/code&gt; to &lt;code&gt;Expanding&lt;/code&gt;, and add that widget to your &lt;code&gt;QToolBar&lt;/code&gt;. For example:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;QWidget&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;spacer&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;QWidget&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="n"&gt;spacer&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;setSizePolicy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QSizePolicy&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Expanding&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QSizePolicy&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;Expanding&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;// toolBar is a pointer to an existing toolbar&lt;/span&gt;
+&lt;span class="n"&gt;toolBar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;addWidget&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;spacer&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;toolBar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;addAction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Right-aligned button&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you end up using a lot of these spacers you could even create a subclass.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 23 Apr 2009 08:32:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-23:blog/right-aligning-a-button-in-a-qtoolbar/</guid></item><item><title>Qt 4.5</title><link>http://www.setnode.com/blog/qt-45/</link><description>&lt;p&gt;&lt;a href="http://www.qtsoftware.com/products/"&gt;Qt&lt;/a&gt; is a well known cross platform framework. It's probably most well known as the framework on which &lt;a href="http://www.kde.org/"&gt;KDE&lt;/a&gt; is written.&lt;/p&gt;
+&lt;p&gt;Anyway, over the weekend I experimented with it a bit, and in terms of C++ GUI development it's a breath of fresh air. It approaches the ease of use of the .net GUI facilities, which is great for a language with no built in introspection abilities. The "moc" preprocessor that Qt requires (that lets them do things such as signals and slots) you to run on your source files is still a bit weird, but it's really not as bad as it seems.&lt;/p&gt;
+&lt;p&gt;The Qt framework is also impressively comprehensive, making it very easy to code applications directly against Qt, instead of coding against a particular OS or a particular compiler.&lt;/p&gt;
+&lt;p&gt;The style of the framework itself is more traditional than the common notion of modern C++, having more of an emphasis on subclassing and overriding virtual functions than on generic algorithms. The memory management system is definitely foreign: they encourage you to allocate on the heap, yet there are very few &lt;code&gt;delete&lt;/code&gt; statements. The way it works is that &lt;code&gt;QObject&lt;/code&gt;s (Qt's base class) accept a pointer to a parent in their constructor, which makes that particular &lt;code&gt;QObject&lt;/code&gt; a child of the parent. When the parent is deleted, it takes care of deleting all its children. It's a change from RAII, for sure.&lt;/p&gt;
+&lt;p&gt;It also takes a couple of hours to compile Visual Studio compatible versions of the various components, so don't do it as a last minute thing.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 20 Apr 2009 09:16:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-20:blog/qt-45/</guid></item><item><title>Porting a Winsock application to Linux...select(2) is not as simple as MSDN makes it seem</title><link>http://www.setnode.com/blog/porting-a-winsock-application-to-linuxselect2-is-n/</link><description>&lt;p&gt;I'm in the middle of porting bits of a Winsock application to Linux. Luckily when I first wrote the networking bits I had made an effort to write it in a somewhat cross platform manner. As a result, I stuck to &lt;code&gt;select()&lt;/code&gt;, &lt;code&gt;send()&lt;/code&gt;, &lt;code&gt;recv()&lt;/code&gt;, and all the other function calls that Winsock provides that are close to the &lt;a href="http://en.wikipedia.org/wiki/Berkeley_sockets"&gt;Berkeley socket interface&lt;/a&gt;. Things go pretty smoothly, although for some reason there's this really weird pause when connecting that didn't exist before...&lt;/p&gt;
+&lt;p&gt;Finally I hit a point where, for some reason, I couldn't establish a connection to the server and it just times out. That's really strange, so I threw good old debug statements all over the place and find out that this &lt;code&gt;select()&lt;/code&gt; call is not doing much of a select:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;if (select(0, &amp;amp;rdset, &amp;amp;wtset, &amp;amp;errset, &amp;amp;tv) &amp;gt; 0)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Notice the 0? &lt;a href="http://msdn.microsoft.com/en-us/library/ms740141(VS.85).aspx"&gt;MSDN&lt;/a&gt; states that it is:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;nfds&lt;/code&gt;&lt;br /&gt;
+Ignored. The nfds parameter is included only for compatibility with Berkeley sockets.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Then I check the &lt;a href="http://linux.die.net/man/2/select"&gt;equivalent docs&lt;/a&gt; on the Linux side of things:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;nfds&lt;/code&gt; is the highest-numbered file descriptor in any of the three sets, plus 1.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Well, if I set &lt;code&gt;nfds&lt;/code&gt; to 0, &lt;code&gt;select()&lt;/code&gt; won't be doing very much selecting! Windows has &lt;code&gt;FD_SETSIZE&lt;/code&gt; at 64 by default, and it ignores &lt;code&gt;nfds&lt;/code&gt; and just checks whatever descriptors are in the &lt;code&gt;fd_set&lt;/code&gt;s that you pass to it. Linux considers sockets and files the same thing, and thus has a much higher &lt;code&gt;FD_SETSIZE&lt;/code&gt; (1024 and 4096 seem to be common). You don't want &lt;code&gt;select()&lt;/code&gt; checking 4096 descriptors, so you set nfds to the highest file descriptor you want it to check, plus one. (As an aside, setting nfds to &lt;code&gt;FD_SETSIZE&lt;/code&gt; is a bad idea.)&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;if (select(my_socket + 1, &amp;amp;rdset, &amp;amp;wtset, &amp;amp;errset, &amp;amp;tv) &amp;gt; 0)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Where &lt;code&gt;my_socket&lt;/code&gt; is an appropriate file descriptor (such as the one returned by &lt;code&gt;socket()&lt;/code&gt;). This works just fine in Windows too, since it ignores the &lt;code&gt;nfds&lt;/code&gt; parameter.&lt;/p&gt;
+&lt;p&gt;Armed with this newfound knowledge, I go and fix all the other &lt;code&gt;select()&lt;/code&gt; statements in my code, which ends up fixing the weird pause as well. Effectively, without a proper &lt;code&gt;nfds&lt;/code&gt; value, &lt;code&gt;select()&lt;/code&gt; just acts as a timer and blocks until the specified amount of time has elapsed.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 10 Apr 2009 17:54:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-10:blog/porting-a-winsock-application-to-linuxselect2-is-n/</guid></item><item><title>All AJAX sites need a fancy indeterminate progress indicator...</title><link>http://www.setnode.com/blog/all-ajax-sites-need-a-fancy-indeterminate-progress/</link><description>&lt;p&gt;&lt;a href="http://www.ajaxload.info/"&gt;Ajaxload&lt;/a&gt; is a neat little site that generates those throbbers/spinning wheels that are in vogue nowadays. Your website/application won't be complete without one, after all.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sun, 05 Apr 2009 20:22:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-05:blog/all-ajax-sites-need-a-fancy-indeterminate-progress/</guid></item><item><title>PNG has a well designed magic number (or FourCC)</title><link>http://www.setnode.com/blog/png-has-a-well-designed-magic-number-or-fourcc/</link><description>&lt;p&gt;Even with all the XML floating around, binary formats still have their place. It's good practice to place an identifier at the beginning of the binary file, so that the file type can be determined even in the absence of a proper file extension.&lt;/p&gt;
+&lt;p&gt;The simplest route to take is to just stuff some plain text there:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[M Y F I L E][rest of file]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;However, consider following the design of the PNG magic number, described in detail in &lt;a href="http://www.libpng.org/pub/png/book/chapter08.html"&gt;the PNG book&lt;/a&gt;. With some really neat design they are able to quickly detect some common forms of corruption caused by an incompatible transfer mechanism. In that case your identifier may look like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[\211 M Y F I L E \r \n \032 \n][rest of file]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With an identifier like this many common forms of transfer corruption can be quickly identified, and you can spit out a simple "corrupt file" message instead of trying to read a broken file.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 03 Apr 2009 17:20:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-03:blog/png-has-a-well-designed-magic-number-or-fourcc/</guid></item><item><title>Don't forget about copy constructors and the copy assignment operator</title><link>http://www.setnode.com/blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/</link><description>&lt;p&gt;Something that I've always found handy to do is to decide, right away, what the copy semantics of a particular class are. Generally it turns out that it makes no sense (or is a lot of work) to allow copying, in which case the standard approach is to define the copy constructor and assignment operator as &lt;code&gt;private&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;An alternative approach and one that I think is a bit more self-documenting, is to inherit from &lt;a href="http://www.boost.org/doc/libs/1_38_0/libs/utility/utility.htm#Class_noncopyable"&gt;&lt;code&gt;boost::noncopyable&lt;/code&gt;&lt;/a&gt;. This achieves the same effect and makes it immediately obvious that the class will not allow copying.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;noncopyable&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The most correct way to use &lt;code&gt;boost::noncopyable&lt;/code&gt; is to inherit it privately, since inheriting it publicly could let people do really funny stuff like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;stuff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;noncopyable&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;a href="http://groups.google.com/group/comp.lang.c++/browse_thread/thread/830d8840c2b86114"&gt;(more details here)&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 03 Apr 2009 12:30:00 -0700</pubDate><guid>tag:www.setnode.com,2009-04-03:blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/</guid></item><item><title>A RapidXML gotcha</title><link>http://www.setnode.com/blog/a-rapidxml-gotcha/</link><description>&lt;p&gt;I just spent a couple of hours trying to track down why I was seemingly losing data values while modifying nodes in the DOM. It's spelled out in the documentation, but it definitely threw me for a loop (I would consider this behavior surprising). Basically, RapidXML gives you the ability to assign/modify the value of a node and it also likes to create data nodes when you parse a document. When printing, the data node takes precedence over the value.&lt;/p&gt;
+&lt;p&gt;When you create a document from scratch this likely won't bite you, but when you parse an existing document and neglect to supply the &lt;code&gt;parse_no_data_nodes&lt;/code&gt; flag, the parser creates data nodes. If you try to update your values with the &lt;code&gt;value()&lt;/code&gt; function, it works just fine (and you can even pull it back out without any problems), but when you use the &lt;code&gt;print()&lt;/code&gt; function, the data node (which you haven't updated) will show up instead.&lt;/p&gt;
+&lt;p&gt;What made this even more difficult to track down was how &lt;code&gt;value()&lt;/code&gt; will return the first data node it finds if there isn't a value yet, so it really does seem like you have a value already. I've updated my &lt;a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/"&gt;prior RapidXML entry&lt;/a&gt; to include the &lt;code&gt;parse_no_data_nodes&lt;/code&gt; flag, which may save someone some time down the road.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 26 Mar 2009 13:00:00 -0700</pubDate><guid>tag:www.setnode.com,2009-03-26:blog/a-rapidxml-gotcha/</guid></item><item><title>shared_ptr is great...but sometimes auto_ptr is actually better!</title><link>http://www.setnode.com/blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/</link><description>&lt;p&gt;Modern C++ programming benefits greatly from smart pointers. Smart pointers automate the error-prone process of making sure you have a matching number of &lt;code&gt;new&lt;/code&gt; and &lt;code&gt;delete&lt;/code&gt; statements. There's even one included in the C++ standard library: &lt;code&gt;std::auto_ptr&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;It's not a true general purpose smart pointer, however. For one, it has somewhat unusual transfer-of-ownership semantics:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;auto_ptr&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;MyClass&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;auto_ptr&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;MyClass&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="c1"&gt;// a now points to nothing!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This also makes it dangerous to use in containers, as described in &lt;a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"&gt;&lt;em&gt;Using auto_ptr Effectively&lt;/em&gt;&lt;/a&gt;. On the other hand, &lt;code&gt;shared_ptr&lt;/code&gt; (which will be available in the next C++ standard, C++0x, and is now available in the &lt;a href="http://www.boost.org/doc/libs/release/libs/smart_ptr/shared_ptr.htm"&gt;Boost libraries&lt;/a&gt;) is a reference counting smart pointer. It keeps track of the number of references to a particular object, and when there are no more references, it deletes the object. This is safe to use in containers. In fact, you can use &lt;code&gt;shared_ptr&lt;/code&gt; pretty much everywhere and you will never have to worry about manually releasing memory again (cycles and threading are pretty much the only major problems).&lt;/p&gt;
+&lt;p&gt;However, while &lt;code&gt;shared_ptr&lt;/code&gt; is a great general purpose smart pointer, &lt;code&gt;auto_ptr&lt;/code&gt; has its uses. If you have a function that involves transfer-of-ownership semantics (whether receiving or giving), why not use the smart pointer that perfectly captures those requirements? The 'sources' (creates and then gives away ownership) and 'sinks' (takes ownership) described in the &lt;a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"&gt;&lt;em&gt;Using auto_ptr Effectively&lt;/em&gt;&lt;/a&gt; article is a prime example of this. Instead of using comments to specify that the caller of a function must manage the lifetime of the returned object, &lt;code&gt;auto_ptr&lt;/code&gt; forces them to manage it (and if they don't, it'll clean itself up anyway). &lt;code&gt;shared_ptr&lt;/code&gt; will likely work just as well, but it doesn't capture the semantics.&lt;/p&gt;
+&lt;p&gt;Another noteworthy reason to use &lt;code&gt;auto_ptr&lt;/code&gt; when the semantics are suitable is that while &lt;code&gt;auto_ptr&lt;/code&gt; can give away ownership to &lt;code&gt;shared_ptr&lt;/code&gt;, &lt;code&gt;shared_ptr&lt;/code&gt; cannot give away ownership to &lt;code&gt;auto_ptr&lt;/code&gt; or another smart pointer (there is no &lt;code&gt;release()&lt;/code&gt; function in &lt;code&gt;shared_ptr&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;auto_ptr&lt;/code&gt; is &lt;a href="http://www.informit.com/guides/content.aspx?g=cplusplus&amp;amp;seqNum=400"&gt;on its way to deprecation&lt;/a&gt;, but we haven't even seen C++0x yet, so I wouldn't worry too much about it. Its replacement, &lt;code&gt;unique_ptr&lt;/code&gt;, will have the same transfer-of-ownership semantics, just implemented in a much safer way, so it'd be worth the effort to get used to using the right smart pointer for the job.&lt;/p&gt;
+&lt;p&gt;Speaking of which, do you know what &lt;code&gt;scoped_ptr&lt;/code&gt; is?&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 21 Mar 2009 18:04:00 -0700</pubDate><guid>tag:www.setnode.com,2009-03-21:blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/</guid></item><item><title>Don't spend time micromanaging optimization options in Visual C++</title><link>http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/</link><description>&lt;p&gt;It's surprisingly common to see people ask what the best Visual C++ optimization options are for their C++ code.&lt;/p&gt;
+&lt;p&gt;The best answer is to profile and benchmark.&lt;/p&gt;
+&lt;p&gt;Failing that, it's pretty simple. Use &lt;code&gt;/O2&lt;/code&gt; to optimize for speed, and &lt;code&gt;/O1&lt;/code&gt; to optimize for size. That's (almost) it. If you have a large program you will probably benefit more from optimizing for size:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Generally speaking, small applications should be compiled with /O2, and large applications should be compiled with /O1 because very large applications can end up putting a lot of stress on the instruction cache of the processor, and this can lead to worse performance. To minimize this, use /O1 to reduce the amount of "code bloat" introduced by the optimizer from certain transformations such a loop unrolling or selection of larger, faster sequences of code. [&lt;a href="http://msdn.microsoft.com/en-us/library/aa290055.aspx"&gt;MSDN&lt;/a&gt;]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;But what about &lt;em&gt;Enable Intrinsic Functions&lt;/em&gt; (&lt;code&gt;/Oi&lt;/code&gt;), &lt;em&gt;Omit Frame Pointers&lt;/em&gt; (&lt;code&gt;/Oy&lt;/code&gt;), etc.?&lt;/p&gt;
+&lt;p&gt;Check out the &lt;a href="http://msdn.microsoft.com/en-us/library/8f8h5cxt.aspx"&gt;documentation&lt;/a&gt; for &lt;code&gt;/O2&lt;/code&gt; and &lt;code&gt;/O1&lt;/code&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;/O1&lt;/code&gt; (Minimize Size) : Equivalent to /Og /Os /Oy /Ob2 /Gs /GF /Gy&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/O2&lt;/code&gt; (Maximize Speed) : Equivalent to /Og /Oi /Ot /Oy /Ob2 /Gs /GF /Gy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;They are already all specified. Yes, the property pages say &lt;em&gt;Disabled&lt;/em&gt; or &lt;em&gt;No&lt;/em&gt;, but what they really mean is &lt;em&gt;Default&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The only general optimization I'm aware of that doesn't fall in this category is &lt;em&gt;Whole Program Optimization&lt;/em&gt; (&lt;code&gt;/GL&lt;/code&gt;), which also requires &lt;em&gt;Link Time Code Generation&lt;/em&gt; (&lt;code&gt;/LTCG&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Finally, what about &lt;em&gt;Full Optimization&lt;/em&gt; (&lt;code&gt;/Ox&lt;/code&gt;)? &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In general, /O2 should be preferred over /Ox and /O1 over /Oxs. [&lt;a href="http://msdn.microsoft.com/en-us/library/59a3b321.aspx"&gt;MSDN&lt;/a&gt;]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;[Edit: Note that there is an IDE bug in Visual Studio 2008 which may affect whether or not optimizations are applied. &lt;a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/"&gt;I write more about it here.&lt;/a&gt;]&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 14 Mar 2009 14:37:00 -0700</pubDate><guid>tag:www.setnode.com,2009-03-14:blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/</guid></item><item><title>Several compilation options I use with C++ projects in Visual Studio</title><link>http://www.setnode.com/blog/several-compilation-options-i-use-with-c-project/</link><description>&lt;p&gt;These are compilation options that I typically enable for any C++ projects in Visual Studio. They should go in the project's property settings, under &lt;em&gt;Configuration Properties&lt;/em&gt;-&amp;gt;&lt;em&gt;C/C++&lt;/em&gt;-&amp;gt;&lt;em&gt;Command Line&lt;/em&gt;, in the &lt;em&gt;Additional options&lt;/em&gt; textbox. They are listed here exactly as they should be entered in that box (equal signs and all).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;/MP&lt;/code&gt; : This enables multi-process compilation, which can provide a significant speed boost on the multi-core processor you likely have in your development (or build) machine. As the MSDN documentation states, it is not compatible with the &lt;em&gt;Enable Minimal Rebuild&lt;/em&gt; option, which, depending on the situation, may negate any performance advantage this switch has. Disabling minimal rebuild is not as bad as it sounds&lt;sup id="fnref:minimalrebuild"&gt;&lt;a class="footnote-ref" href="#fn:minimalrebuild" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt; and in my projects I've found that using &lt;code&gt;/MP&lt;/code&gt; confers a significant improvement in compilation time. You definitely want to enable it for &lt;em&gt;Release&lt;/em&gt; builds, at least. &lt;a href="http://msdn.microsoft.com/en-us/library/bb385193.aspx"&gt;Reference&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/D_CRT_SECURE_NO_WARNINGS&lt;/code&gt; : This switch disables the warnings that Visual Studio spits out if you use any of the &lt;strong&gt;C&lt;/strong&gt; &lt;strong&gt;R&lt;/strong&gt;un&lt;strong&gt;T&lt;/strong&gt;ime functions that Microsoft has provided secure replacements for (such as &lt;code&gt;strncpy&lt;/code&gt;). This isn't necessarily a bad idea, but their safe functions are not part of the standard and are thus non-portable. &lt;a href="http://msdn.microsoft.com/en-us/library/8ef0s5kh.aspx"&gt;Reference&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/D_SCL_SECURE_NO_WARNINGS&lt;/code&gt; : Just like the switch above, only for the &lt;strong&gt;S&lt;/strong&gt;tandard &lt;strong&gt;C&lt;/strong&gt;++ &lt;strong&gt;L&lt;/strong&gt;ibrary (anything in the &lt;code&gt;std&lt;/code&gt; namespace). &lt;a href="http://msdn.microsoft.com/en-us/library/aa985974.aspx"&gt;Reference&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/D_SECURE_SCL=0&lt;/code&gt; : Disables checked iterators. Disabling this feature can improve performance when using iterators, at the expense of less protection against unsafe iterator use. Generally there isn't too much of a performance difference (a Visual C++ lead states that they measured about a 6% difference in &lt;a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=105752"&gt;this feedback / bug page&lt;/a&gt;) so it may be worth leaving it on most of the time. &lt;a href="http://msdn.microsoft.com/en-us/library/aa985896.aspx"&gt;Reference&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that &lt;code&gt;/D_CRT_SECURE_NO_&lt;em&gt;WARNINGS&lt;/em&gt;&lt;/code&gt; and &lt;code&gt;/D_SCL_SECURE_NO_&lt;em&gt;WARNINGS&lt;/em&gt;&lt;/code&gt; are &lt;code&gt;/D_CRT_SECURE_NO_&lt;em&gt;DEPRECATE&lt;/em&gt;&lt;/code&gt; and &lt;code&gt;/D_SCL_SECURE_NO_&lt;em&gt;DEPRECATE&lt;/em&gt;&lt;/code&gt;, respectively, in versions prior to Visual Studio 2008.&lt;/p&gt;
+&lt;div class="footnote"&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id="fn:minimalrebuild"&gt;
+&lt;p&gt;Disabling Minimal Rebuild does not mean that the whole project gets rebuilt every time, just that Visual Studio uses a "was this .cpp/.h modified?" approach instead of trying to determine if the exact changes you made warrant a recompile.&amp;#160;&lt;a class="footnote-backref" href="#fnref:minimalrebuild" rev="footnote" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Thu, 12 Mar 2009 16:39:00 -0700</pubDate><guid>tag:www.setnode.com,2009-03-12:blog/several-compilation-options-i-use-with-c-project/</guid></item><item><title>Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)</title><link>http://www.setnode.com/blog/stop-wasting-time-stepping-into-functions-you-dont/</link><description>&lt;p&gt;The Visual Studio debugger is amazingly useful. However, you soon learn to sigh the moment you come into contact with something like this:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;boost&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;scoped_ptr&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Startup&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;dlg&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Startup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;settings&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;GetWindowPosition&lt;/span&gt;&lt;span class="p"&gt;()));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You want to step into the &lt;code&gt;Startup&lt;/code&gt; constructor, but there is a lot of stuff in your way. &lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;First you will step into &lt;code&gt;shared_ptr::operator-&amp;gt;&lt;/code&gt; (did I mention that &lt;code&gt;settings&lt;/code&gt; was a &lt;code&gt;shared_ptr&lt;/code&gt;?).&lt;/li&gt;
+&lt;li&gt;Then you will step into &lt;code&gt;GetWindowPosition()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Then into &lt;code&gt;operator new&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;And then into your &lt;code&gt;Startup&lt;/code&gt; constructor. Yes!&lt;/li&gt;
+&lt;li&gt;And finally you'll finish with the &lt;code&gt;scoped_ptr&lt;/code&gt; constructor if you so choose.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you've done this a lot you've probably gotten really good at the &lt;em&gt;Step Out&lt;/em&gt; shortcut (Shift-F11).&lt;/p&gt;
+&lt;p&gt;Well, here are two alternatives!&lt;/p&gt;
+&lt;p&gt;First, while program execution is paused, right-click anywhere in the source window and look for the &lt;em&gt;Step Into Specific&lt;/em&gt; item. You can select any of these functions to instantly step inside.&lt;/p&gt;
+&lt;p&gt;Alternatively, there is a special undocumented (and unsupported) registry key that you can use to specify functions that you always want to skip. Navigate to &lt;code&gt;HKLM\SOFTWARE\Microsoft\VisualStudio\9.0\NativeDE\StepOver&lt;/code&gt; (users of a 64-bit variant of Windows will want to check &lt;code&gt;HKLM\SOFTWARE\Wow6432Node\Microsoft\...&lt;/code&gt; instead) and add some string values like this example:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Name: 50 (priority, higher values have greater priority)&lt;br /&gt;
+Value: &lt;code&gt;std\:\:.*=NoStepInto&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Name: 60&lt;br /&gt;
+Value: &lt;code&gt;operator new=NoStepInto&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Name: 70&lt;br /&gt;
+Value: &lt;code&gt;boost\:\:.*=NoStepInto&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The backslashes are necessary because &lt;code&gt;:&lt;/code&gt; (colon) is a special character in &lt;a href="http://msdn.microsoft.com/en-us/library/2k3te2cs(VS.80).aspx"&gt;Visual Studio regex&lt;/a&gt;. You sometimes see two backslashes used in other examples, this is only necessary if you are directly editing a &lt;code&gt;.reg&lt;/code&gt; file (which I don't recommend). These rules will adjust the behaviour of the &lt;em&gt;Step-Into&lt;/em&gt; command and make it skip anything from the &lt;code&gt;std&lt;/code&gt; or &lt;code&gt;boost&lt;/code&gt; namespaces, as well as the basic &lt;code&gt;operator new&lt;/code&gt;. It will still step into an overloaded &lt;code&gt;operator new&lt;/code&gt;, so don't fear. There are more details on &lt;a href="http://blogs.msdn.com/andypennell/archive/2004/02/06/69004.aspx"&gt;this blog post&lt;/a&gt;, as well as &lt;a href="http://groups.google.com/group/microsoft.public.vsnet.debugging/msg/26addb1b539883e8"&gt;microsoft.public.vsnet.debugging&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;One more thing: you can combine these two approaches. Say that you've added a skip for the entire &lt;code&gt;boost&lt;/code&gt; namespace, but you decide you really want to take a peek inside one particular line and see exactly what is happening to your parameters. Pause execution on that line, and then right-click and use &lt;em&gt;Step Into Specific&lt;/em&gt;. This is still the same list as before and it works the same as before, regardless of any NoStepInto rules.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 09 Mar 2009 17:58:00 -0700</pubDate><guid>tag:www.setnode.com,2009-03-09:blog/stop-wasting-time-stepping-into-functions-you-dont/</guid></item><item><title>Boost.Thread triggers warning C4103 in Microsoft Visual Studio</title><link>http://www.setnode.com/blog/boostthread-triggers-warning-c4103-in-microsoft-vi/</link><description>&lt;p&gt;Got a whole mess of warnings when I moved some of my includes around, particularly this one: &lt;code&gt;#include &amp;lt;boost/thread.hpp&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;abi_prefix.hpp(19) : warning C4103: 
+&amp;#39;d:\\boost\\boost_1_38_0\\boost\\config\\abi_prefix.hpp&amp;#39; : 
+alignment changed after including header, may be due to missing 
+#pragma pack(pop)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Some experimentation reveals that including &lt;code&gt;thread.hpp&lt;/code&gt; before &lt;code&gt;winsock2.h&lt;/code&gt; triggers all these warnings. The simple solution is to just move &lt;code&gt;#include &amp;lt;boost/thread.hpp&amp;gt;&lt;/code&gt; down below &lt;code&gt;#include &amp;lt;winsock2.h&amp;gt;&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 02 Mar 2009 17:28:00 -0800</pubDate><guid>tag:www.setnode.com,2009-03-02:blog/boostthread-triggers-warning-c4103-in-microsoft-vi/</guid></item><item><title>Building Boost (now with dual/quad/multi-core action!)</title><link>http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/</link><description>&lt;p&gt;&lt;em&gt;Update: More recent versions of Boost (1.39.0 and later) have a simpler build process, which I've &lt;a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/"&gt;written about here&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Steps to build the non-header-only Boost libraries on Windows, such as &lt;code&gt;Boost.Thread&lt;/code&gt; and &lt;code&gt;Boost.Regex&lt;/code&gt;, using Microsoft Visual Studio:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://www.boost.org/users/download/"&gt;Download&lt;/a&gt; the latest version of Boost and extract it to some location, say, &lt;code&gt;D:\Boost\&lt;/code&gt;, making sure to maintain the directory structure&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://www.boost.org/users/download/"&gt;Download&lt;/a&gt; the latest version of Boost Jam (you want the ntx86 binaries) and extract it to some location (probably the same as above), again making sure to maintain the directory structure&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Your directory structure should now consist of &lt;code&gt;D:\Boost\boost_1_38_0\&lt;/code&gt; and &lt;code&gt;D:\Boost\boost-jam-3.1.17-1-ntx86\&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Make sure you have lots of hard drive space (at least 5GB)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In a command prompt, navigate to your Boost library folder (&lt;code&gt;D:\Boost\boost_1_38_0\&lt;/code&gt;) and then use this command (read further down if you want details about what these arguments are doing):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; ..\boost-jam-3.1.17-1-ntx86\bjam.exe --toolset=msvc --build-type=complete stage
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you have a dual/quad/many-core processor or can otherwise take advantage of parallel jobs, also add the &lt;code&gt;-jN&lt;/code&gt; switch, where &lt;code&gt;N&lt;/code&gt; is the number of jobs to run at a time (e.g. &lt;code&gt;bjam.exe -j4 --toolset=msvc&lt;/code&gt;).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;And wait. This will take a very long time.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;After it completes you will have a &lt;code&gt;stage&lt;/code&gt; subdirectory (&lt;code&gt;D:\Boost\boost_1_38_0\stage\&lt;/code&gt;) which will contain a &lt;code&gt;lib&lt;/code&gt; subdirectory, containing the compiled libraries. You may move these anywhere you wish.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You will also have a &lt;code&gt;bin.v2&lt;/code&gt; subdirectory which was used for temporary files. You may delete this folder to reclaim some hard drive space.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;More details:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;--toolset=msvc&lt;/code&gt; : tells Boost Jam to compile with Microsoft Visual Studio.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;--build-type=complete&lt;/code&gt; : notes that you want every possible combination built (Debug/Release, Multi/Single threaded, Static/Shared).&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;stage&lt;/code&gt; : a build target which builds the compiled libraries to the stage directory (which you can set with &lt;code&gt;--stagedir=&amp;lt;STAGEDIR&amp;gt;&lt;/code&gt;). Contrast this with the &lt;code&gt;install&lt;/code&gt; target, which builds the compiled libraries, but &lt;em&gt;also&lt;/em&gt; copies the header-only libraries to a particular location. This is generally an unnecessary step since you've already extracted the Boost headers somewhere already. Look inside the &lt;code&gt;Jamroot&lt;/code&gt; file inside your Boost folder for more details.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 02 Mar 2009 16:27:00 -0800</pubDate><guid>tag:www.setnode.com,2009-03-02:blog/building-boost-now-with-dual-quad-multi-core-action/</guid></item><item><title>Quick notes on how to use RapidXML</title><link>http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/</link><description>&lt;p&gt;There's a C++ XML library called &lt;a href="http://rapidxml.sourceforge.net/"&gt;RapidXML&lt;/a&gt; which is perfect for most non-enterprise uses of XML. I wouldn't call this a tutorial, but I hope this ends up helping someone. The documentation isn't very explicit on how to output an XML declaration, for example.&lt;/p&gt;
+&lt;p&gt;How to create your XML from scratch and then output this XML into a string, with an XML declaration:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;utf-8&amp;quot;?&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;rootnode&lt;/span&gt; &lt;span class="na"&gt;version=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;example&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;childnode/&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/rootnode&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;using&lt;/span&gt; &lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="n"&gt;rapidxml&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;xml_document&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// xml declaration&lt;/span&gt;
+&lt;span class="n"&gt;xml_node&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;*&lt;/span&gt; &lt;span class="n"&gt;decl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node_declaration&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;decl&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;append_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="n"&gt;decl&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;append_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;encoding&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;utf-8&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;decl&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// root node&lt;/span&gt;
+&lt;span class="n"&gt;xml_node&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;*&lt;/span&gt; &lt;span class="n"&gt;root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node_element&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rootnode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;append_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;append_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;example&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;// child node&lt;/span&gt;
+&lt;span class="n"&gt;xml_node&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;*&lt;/span&gt; &lt;span class="n"&gt;child&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allocate_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;node_element&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;childnode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;append_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;child&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;xml_as_string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="c1"&gt;// watch for name collisions here, print() is a very common function name!&lt;/span&gt;
+&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;back_inserter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;xml_as_string&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;// xml_as_string now contains the XML in string form, indented&lt;/span&gt;
+&lt;span class="c1"&gt;// (in all its angle bracket glory)&lt;/span&gt;
+
+&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;xml_no_indent&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="c1"&gt;// print_no_indenting is the only flag that print() knows about&lt;/span&gt;
+&lt;span class="n"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;back_inserter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;xml_no_indent&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;print_no_indenting&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;// xml_no_indent now contains non-indented XML&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;
+Parsing and traversing an XML document like this one:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;utf-8&amp;quot;?&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;rootnode&lt;/span&gt; &lt;span class="na"&gt;version=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;type=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;example&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;childnode&lt;/span&gt; &lt;span class="na"&gt;entry=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;1&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;evendeepernode&lt;/span&gt; &lt;span class="na"&gt;attr1=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;cat&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;attr2=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dog&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;evendeepernode&lt;/span&gt; &lt;span class="na"&gt;attr1=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;lion&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;attr2=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;wolf&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/childnode&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;childnode&lt;/span&gt; &lt;span class="na"&gt;entry=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;2&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/childnode&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/rootnode&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;traverse_xml&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;input_xml&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// (input_xml contains the above XML)&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// make a safe-to-modify copy of input_xml&lt;/span&gt;
+    &lt;span class="c1"&gt;// (you should never modify the contents of an std::string directly)&lt;/span&gt;
+    &lt;span class="n"&gt;vector&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;xml_copy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;input_xml&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;input_xml&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+    &lt;span class="n"&gt;xml_copy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;push_back&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sc"&gt;&amp;#39;\0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// only use xml_copy from here on!&lt;/span&gt;
+    &lt;span class="n"&gt;xml_document&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;// we are choosing to parse the XML declaration&lt;/span&gt;
+    &lt;span class="c1"&gt;// parse_no_data_nodes prevents RapidXML from using the somewhat surprising&lt;/span&gt;
+    &lt;span class="c1"&gt;// behavior of having both values and data nodes, and having data nodes take&lt;/span&gt;
+    &lt;span class="c1"&gt;// precedence over values when printing&lt;/span&gt;
+    &lt;span class="c1"&gt;// &amp;gt;&amp;gt;&amp;gt; note that this will skip parsing of CDATA nodes &amp;lt;&amp;lt;&amp;lt;&lt;/span&gt;
+    &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;parse_declaration_node&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;parse_no_data_nodes&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;xml_copy&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// alternatively, use one of the two commented lines below to parse CDATA nodes, &lt;/span&gt;
+    &lt;span class="c1"&gt;// but please note the above caveat about surprising interactions between &lt;/span&gt;
+    &lt;span class="c1"&gt;// values and data nodes (also read http://www.setnode.com/blog/a-rapidxml-gotcha/)&lt;/span&gt;
+    &lt;span class="c1"&gt;// if you use one of these two declarations try to use data nodes exclusively and&lt;/span&gt;
+    &lt;span class="c1"&gt;// avoid using value()&lt;/span&gt;
+    &lt;span class="c1"&gt;//doc.parse&amp;lt;parse_declaration_node&amp;gt;(&amp;amp;xml_copy[0]); // just get the XML declaration&lt;/span&gt;
+    &lt;span class="c1"&gt;//doc.parse&amp;lt;parse_full&amp;gt;(&amp;amp;xml_copy[0]); // parses everything (slowest)&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// since we have parsed the XML declaration, it is the first node&lt;/span&gt;
+    &lt;span class="c1"&gt;// (otherwise the first node would be our root node)&lt;/span&gt;
+    &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;encoding&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;first_node&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;encoding&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="c1"&gt;// encoding == &amp;quot;utf-8&amp;quot;&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// we didn&amp;#39;t keep track of our previous traversal, so let&amp;#39;s start again&lt;/span&gt;
+    &lt;span class="c1"&gt;// we can match nodes by name, skipping the xml declaration entirely&lt;/span&gt;
+    &lt;span class="n"&gt;xml_node&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&amp;gt;*&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;first_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;rootnode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;rootnode_type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="c1"&gt;// rootnode_type == &amp;quot;example&amp;quot;&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// go straight to the first evendeepernode&lt;/span&gt;
+    &lt;span class="n"&gt;cur_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;childnode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_node&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;evendeepernode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;attr2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;attr2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="c1"&gt;// attr2 == &amp;quot;dog&amp;quot;&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// and then to the second evendeepernode&lt;/span&gt;
+    &lt;span class="n"&gt;cur_node&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;next_sibling&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;evendeepernode&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;attr2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cur_node&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;first_attribute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;attr2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="c1"&gt;// now attr2 == &amp;quot;wolf&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;[Edit: Thanks to Michele Tavella for catching a silly bug on my part!]&lt;br /&gt;
+[Edit: Thanks to Wei for noting that &lt;code&gt;parse_no_data_nodes&lt;/code&gt; will skip over CDATA nodes]&lt;br /&gt;
+[Edit: Thanks to remo for catching a typo]&lt;/p&gt;
+&lt;p&gt;Thanks for the comments everyone! I'm glad to help out where I can, but please do note that I check this blog rather infrequently at this point in time and will often not respond for days, if not weeks. If you have a question to which you need an answer within a reasonable time frame, I'd recommend using Stack Overflow. On the other hand, if you have corrections and/or suggestions, please continue to leave them here and I'll address them as they come up. Thanks again!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Fri, 27 Feb 2009 21:11:00 -0800</pubDate><guid>tag:www.setnode.com,2009-02-27:blog/quick-notes-on-how-to-use-rapidxml/</guid></item><item><title>Remember that users do not read!</title><link>http://www.setnode.com/blog/remember-that-users-do-not-read/</link><description>&lt;p&gt;Users do not read anything they are not interested in. This is &lt;a href="http://www.codinghorror.com/blog/archives/000114.htm"&gt;well&lt;/a&gt; &lt;a href="http://www.joelonsoftware.com/uibook/chapters/fog0000000062.html"&gt;known&lt;/a&gt; and mentioned by many others.&lt;/p&gt;
+&lt;p&gt;You might not agree, or think that only a small percentage of users don't read. After all, &lt;em&gt;you&lt;/em&gt; read. You &lt;em&gt;love&lt;/em&gt; to read! Unfortunately, you don't count. You're a programmer, you better love reading!&lt;/p&gt;
+&lt;p&gt;I had absorbed this information before, but there is a definite difference between knowledge and experience. A couple of weeks ago I witnessed first-hand evidence that users do not read. I introduced a friend (who is the same age as I am and computer literate, uses Facebook and instant messaging, comfortable with Microsoft Office, etc.) to a computer game. This game, like most casual games nowadays, has a friendly tutorial, with large (~48pt) colorful fonts and a very gradual learning curve. The first thing the tutorial does is put up five lines of text which is maybe two sentences worth of information. All five lines are promptly ignored and the cursor heads straight for the "&lt;em&gt;Next&lt;/em&gt;" button.&lt;/p&gt;
+&lt;p&gt;Well, that's okay, there's nothing important in that dialog anyway.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Next&lt;/em&gt;; &lt;em&gt;next&lt;/em&gt;; &lt;em&gt;next&lt;/em&gt;. The next three dialogs are skipped. The last dialog happens to contain important information on the more subtle points of the game.&lt;/p&gt;
+&lt;p&gt;This starts to drive me nuts, as I always eagerly soak up any bits of information a game throws at me. I want to play it to the best of my ability, after all. It hit me then: my friend just wanted to play and have fun. These dialogs were getting in the way! However, the game is entirely possible to play and enjoy without knowing every little intricate detail --- it's a 'casual' game after all.&lt;/p&gt;
+&lt;p&gt;All good software is like this. You should be able to dive in and use the program without reading anything. Your power users---the ones who use your program everyday---will know it's advantageous to learn as many shortcuts and tips as possible, so they can complete their tasks faster. They are the ones who might end up reading the information you throw at them (though it's still not a certainty). Your occasional user, on the other hand, wants to get their task done as soon as possible, because they have other things to do. You may assume they will not read anything you throw at them that is over two sentences long.&lt;/p&gt;
+&lt;p&gt;The most surprising thing to me was that those game dialogs were not close to being long. They were well under the "typical-users-see-nothing-past-this-word" limit and they still didn't get read. To me that implies that the only words you can assume will always get read are the words on the buttons themselves. Is your software still usable if all your explanatory text is missing?&lt;/p&gt;
+&lt;p&gt;Perhaps, since users read the text on buttons, you could somehow associate explanatory text with a button? I suspect the new &lt;a href="http://msdn.microsoft.com/en-us/library/aa511299.aspx"&gt;Task Dialogs&lt;/a&gt; in Windows Vista were developed with this in mind: they use massive buttons and associate explanatory text with a button. It's unfortunate that they weren't introduced earlier, as the main reason you so often see simple "Yes / No" or "OK / Cancel" dialogs in Windows applications is they are really simple to code:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;MessageBox&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;hWnd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Isn&amp;#39;t this easy?&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Yet Another Windows Application&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MB_YESNO&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;A task dialog type affair (pre-Vista), on the other hand, requires separate templates for each dialog or creating an indirect dialog (on the fly, with lots of simple but tedious math). Both of these approaches take infinitely longer to write.&lt;/p&gt;
+&lt;p&gt;If you really care about usability, though, perhaps it's time well spent.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Wed, 25 Feb 2009 14:42:00 -0800</pubDate><guid>tag:www.setnode.com,2009-02-25:blog/remember-that-users-do-not-read/</guid></item><item><title>lighttpd tips</title><link>http://www.setnode.com/blog/lighttpd-tips/</link><description>&lt;p&gt;&lt;a href="http://www.lighttpd.net/"&gt;lighttpd&lt;/a&gt; is a web server that is optimized for speed. It is particularly adept at serving static content. Since most web hosts provide Apache and most web applications assume you are running on Apache (which is why web hosts provide Apache and why web applications assume you use Apache and why web hosts provide Apache and ...) it can take a bit more effort to find lighttpd documentation.&lt;/p&gt;
+&lt;p&gt;Some little things that I have picked up for lighttpd:&lt;/p&gt;
+&lt;p&gt;lighttpd version:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; lighttpd -v
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;lighttpd version and supported features: &lt;em&gt;(note: that is a capital V)&lt;/em&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;gt; lighttpd -V
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;Using Apache to forward requests to lighttpd? Lighttpd will see that all incoming requests have the IP of the Apache proxy. There is a module &lt;a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/DocsModExtForward"&gt;&lt;code&gt;mod_extforward&lt;/code&gt;&lt;/a&gt; which will extract a real IP from the &lt;code&gt;X-Forwarded-For&lt;/code&gt; header. Add these lines in the appropriate locations to your &lt;code&gt;lighttpd.conf&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;server.modules&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="k"&gt;...&lt;/span&gt;                      &lt;span class="c1"&gt;# (other modules)&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;mod_extforward&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;        &lt;span class="c1"&gt;# change x-forwarded-for IPs into real IPs, &lt;/span&gt;
+                             &lt;span class="c1"&gt;# load after mod_accesslog&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;extforward.forwarder&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;127.0.0.1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;trust&amp;quot;&lt;/span&gt;   &lt;span class="c1"&gt;# where 127.0.0.1 is the IP address of the proxy&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;You can use variables in &lt;code&gt;lighttpd.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;server.username&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;myusername&amp;quot;&lt;/span&gt;                  &lt;span class="c1"&gt;# lighttpd configuration option&lt;/span&gt;
+&lt;span class="k"&gt;var.basedir&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/users/home/&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="k"&gt;server.username&lt;/span&gt;  &lt;span class="c1"&gt;# declares a variable called &amp;lt;em&amp;gt;basedir&amp;lt;/em&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;server.document-root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;basedir&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/www/&amp;quot;&lt;/span&gt;        &lt;span class="c1"&gt;# equal to &amp;lt;em&amp;gt;/users/home/myusername/www/&amp;lt;/em&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;Set a different &lt;code&gt;server.document-root&lt;/code&gt; depending on the host:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;$HTTP&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;host&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;www.example.org&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;server.document-root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;basedir&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/www/www.example.org/&amp;quot;&lt;/span&gt;  &lt;span class="c1"&gt;# basedir is our variable&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;Redirect people to a single canonical web address (in this example &lt;code&gt;http://example.org/blog/candy-is-yummy&lt;/code&gt; will redirect to &lt;code&gt;http://www.example.org/blog/candy-is-yummy&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# make sure to include the mod_redirect module&lt;/span&gt;
+&lt;span class="nb"&gt;$HTTP&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;host&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;example.org&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;                 &lt;span class="c1"&gt;# if host matches &amp;quot;example.org&amp;quot; then...&lt;/span&gt;
+    &lt;span class="k"&gt;url.redirect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;                             &lt;span class="c1"&gt;#   if the URL matches ^/(.*)$&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;^/(.*)$&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://www.example.org/$1&amp;quot;&lt;/span&gt; &lt;span class="c1"&gt;#   redirect to http://www.example.org/$1&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;                                            &lt;span class="c1"&gt;#   where $1 is what was captured by the&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;                                                &lt;span class="c1"&gt;#   the parenthesis (.*)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;^/(.*)$&lt;/code&gt; is an example of a &lt;a href="http://en.wikipedia.org/wiki/Regular_expression"&gt;regular expression&lt;/a&gt;. Specifically, lighttpd uses &lt;a href="http://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions"&gt;&lt;abbr title="Perl Compatible Regular Expressions"&gt;PCRE&lt;/abbr&gt;&lt;/a&gt;. Instead of equality, &lt;code&gt;==&lt;/code&gt;, you can also test for inequality with &lt;code&gt;!=&lt;/code&gt;. If you want to use regular expressions in the match conditional, you can use &lt;code&gt;=~&lt;/code&gt; and &lt;code&gt;!~&lt;/code&gt; for equality and inequality respectively (this is useful for paths):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# make sure to include the mod_access module&lt;/span&gt;
+&lt;span class="nb"&gt;$HTTP&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;host&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;www.example.org&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;server.document-root&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;basedir&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/www/www.example.org/&amp;quot;&lt;/span&gt;
+
+    &lt;span class="nb"&gt;$HTTP&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;url&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;^/private/&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;  &lt;span class="c1"&gt;# if url starts with /private then...&lt;/span&gt;
+        &lt;span class="k"&gt;url.access-deny&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;      &lt;span class="c1"&gt;#   deny access to URLs that end with &amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;                               &lt;span class="c1"&gt;#   (i.e. deny access to all URLs)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you use the regexp conditionals remember that many symbols have a special meaning. The '&lt;code&gt;.&lt;/code&gt;' (period) is a common example, as it has the special meaning of "match any single character". You can &lt;a href="http://en.wikipedia.org/wiki/Escape_character"&gt;escape&lt;/a&gt; it by prepending a backslash: '&lt;code&gt;\.&lt;/code&gt;'&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Mon, 09 Feb 2009 16:32:00 -0800</pubDate><guid>tag:www.setnode.com,2009-02-09:blog/lighttpd-tips/</guid></item><item><title>What is duck typing?</title><link>http://www.setnode.com/blog/what-is-duck-typing/</link><description>&lt;p&gt;I found that when I started dabbling in Python that it was a bit hard to get a grasp on what duck typing actually is. You hear that it achieves polymorphism without inheritance, but that really explains very little. I have a C++/Java/C# background and it took a bit of time before that wonderful epiphany came, where all of a sudden I seemed to get a good grasp on what the concept actually is.&lt;/p&gt;
+&lt;p&gt;From the &lt;a href="http://en.wikipedia.org/wiki/Duck_typing"&gt;Duck typing article on Wikipedia&lt;/a&gt; we find that the term comes from the phrase "&lt;em&gt;If it walks like a duck and quacks like a duck, I would call it a duck.&lt;/em&gt;"&lt;/p&gt;
+&lt;p&gt;That makes perfect sense now, but it definitely didn't help further my understanding when I first came across it.&lt;/p&gt;
+&lt;p&gt;Perhaps the best way to explain would be with some code. I'm using Java here because it's wordy enough that it's understandable even if you don't know the syntax. For this "real world" example we will be designing that ever so classic "real world application of object oriented programming": the hierarchy of vehicles.&lt;/p&gt;
+&lt;p&gt;So suppose we have an existing &lt;code&gt;Driver&lt;/code&gt; class that will drive our vehicles for us, as long as we provide the &lt;code&gt;gas()&lt;/code&gt;, &lt;code&gt;brake()&lt;/code&gt;, &lt;code&gt;turnLeft()&lt;/code&gt; and &lt;code&gt;turnRight()&lt;/code&gt; methods. In Java this would likely be expressed as an interface:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;interface&lt;/span&gt; &lt;span class="nc"&gt;IDriveable&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;gas&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;brake&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;turnLeft&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;turnRight&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then we would have a class that implements that interface, for example:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Car&lt;/span&gt; &lt;span class="kd"&gt;implements&lt;/span&gt; &lt;span class="n"&gt;IDriveable&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;gas&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Vroom vroom&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;brake&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Screeeechhhh!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;turnLeft&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Left&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;turnRight&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Right&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the &lt;code&gt;Driver&lt;/code&gt; class would be similar to:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Driver&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;drive&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;IDriveable&lt;/span&gt; &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;gas&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;turnLeft&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;brake&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the main class:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Start&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;Car&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Car&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;Driver&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Driver&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;drive&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Sample output:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Vroom vroom
+Left
+Screeeechhhh!
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is standard OOP stuff, where as long as our class implements the &lt;code&gt;IDriveable&lt;/code&gt; interface, it'll be driveable by the &lt;code&gt;Driver&lt;/code&gt; class. If the class does not implement that interface, the code will not even compile.&lt;/p&gt;
+&lt;p&gt;If we bring duck typing into the picture, things change. Instead of having a defined interface (&lt;code&gt;IDriveable&lt;/code&gt;) which must be implemented, all we require is that a given class implements the specific methods needed. There is no strict interface. In Python our code would look like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Car&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Vroom vroom&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;brake&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Screeeechhhh!&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;turnLeft&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Left&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;turnRight&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Right&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Driver&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;drive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;turnLeft&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;vehicle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;brake&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Car&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Driver&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;drive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Which produces the same output as above.&lt;/p&gt;
+&lt;p&gt;Let's add a new class to the Python code:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Pencil&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;gas&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Scribble scribble&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;turnLeft&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Left pencil turn?&amp;quot;&lt;/span&gt;
+    &lt;span class="c"&gt;# note that turnRight is missing!&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;brake&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;PUT YOUR PENCILS DOWN&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Although &lt;code&gt;Pencil&lt;/code&gt; having these methods makes absolutely no sense, we could pass this to the &lt;code&gt;drive()&lt;/code&gt; method and there will be no errors. Yep, even though &lt;code&gt;Pencil&lt;/code&gt; doesn't implement &lt;code&gt;turnRight()&lt;/code&gt;, because &lt;code&gt;turnRight()&lt;/code&gt; is never called, all this code will run, error free!&lt;/p&gt;
+&lt;p&gt;We have a &lt;code&gt;Pencil&lt;/code&gt; that can &lt;code&gt;gas()&lt;/code&gt;, &lt;code&gt;turnLeft()&lt;/code&gt;, and &lt;code&gt;brake()&lt;/code&gt;, just like a &lt;code&gt;Car&lt;/code&gt;. What is the difference between them, as far as this code is concerned? None!&lt;/p&gt;
+&lt;p&gt;This is what duck typing is. If a class acts like another class, it can substitute for that class. There's no need for there to be strictly defined relationships between classes.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Tue, 27 Jan 2009 14:12:00 -0800</pubDate><guid>tag:www.setnode.com,2009-01-27:blog/what-is-duck-typing/</guid></item><item><title>MapVirtualKey(), GetKeyNameText(), and a story of how to get proper names for the arrow keys</title><link>http://www.setnode.com/blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/</link><description>&lt;p&gt;So let's say you are currently storing and using virtual key codes to handle keyboard input for a game. You decide to let your users customize their keys, so you go ahead and write some key configuration code. This requires that you map virtual key codes to key names.&lt;/p&gt;
+&lt;p&gt;Luckily, Windows provides some functions that do exactly what you want! Essentially you use &lt;code&gt;MapVirtualKey()&lt;/code&gt; to get a scancode for that key and then pass that scancode (left-shifted by 16) into &lt;code&gt;GetKeyNameText()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Some minutes later you finish your code and you go to test it. You hit the A key and you see 'A'. The 5 key outputs '5'. Even the Backspace key outputs 'Backspace'. It works as expected.&lt;/p&gt;
+&lt;p&gt;Then you hit one of the arrow keys and your code spits out 'Num 8'. It's right yet it's wrong.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blogs.msdn.com/michkap/archive/2006/08/29/729476.aspx"&gt;Michael Kaplan has a blog entry&lt;/a&gt; that describes a recent update to the &lt;code&gt;MapVirtualKeyEx()&lt;/code&gt; call:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;MAPVK_VK_TO_VSC_EX:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Windows Vista and later&lt;/strong&gt;: The uCode parameter is a virtual-key code and is translated into a scan code. If it is a virtual-key code that does not distinguish between left- and right-hand keys, the left-hand scan code is returned. If the scan code is an extended scan code, the high byte of the uCode value can contain either 0xe0 or 0xe1 to specify the extended scan code. If there is no translation, the function returns 0.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Unfortunately this doesn't help much as Windows XP is still used by a majority of users. However, this does imply that the current &lt;code&gt;MapVirtualKey[Ex]()&lt;/code&gt; call does not specify the extended scan code. So if we just set the extended bit for some characters we may end up with a function similar to this:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;GetKeyName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;virtualKey&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;scanCode&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MapVirtualKey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;virtualKey&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;MAPVK_VK_TO_VSC&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="c1"&gt;// because MapVirtualKey strips the extended bit for some keys&lt;/span&gt;
+    &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;virtualKey&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_LEFT&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_UP&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_RIGHT&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_DOWN&lt;/span&gt;: &lt;span class="c1"&gt;// arrow keys&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_PRIOR&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_NEXT&lt;/span&gt;: &lt;span class="c1"&gt;// page up and page down&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_END&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_HOME&lt;/span&gt;:
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_INSERT&lt;/span&gt;: &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_DELETE&lt;/span&gt;:
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_DIVIDE&lt;/span&gt;: &lt;span class="c1"&gt;// numpad slash&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;VK_NUMLOCK&lt;/span&gt;:
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;scanCode&lt;/span&gt; &lt;span class="o"&gt;|=&lt;/span&gt; &lt;span class="mh"&gt;0x100&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// set extended bit&lt;/span&gt;
+            &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;keyName&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;GetKeyNameText&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scanCode&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;lt&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;keyName&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;keyName&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;keyName&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;[Error]&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 20 Dec 2008 14:50:00 -0800</pubDate><guid>tag:www.setnode.com,2008-12-20:blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/</guid></item><item><title>std::map access violation (or not)</title><link>http://www.setnode.com/blog/std-map-access-violation-or-not/</link><description>&lt;p&gt;I just spent some time tracking down this fun little bug:&lt;/p&gt;
+&lt;p&gt;I use a mix of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;std::map&lt;/span&gt;&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;Boost.Function&lt;/tt&gt; to reduce the ugliness of the Windows message loop. Everything is working just fine, until I make a couple of changes and all of a sudden one of my &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;std::map&lt;/span&gt;&lt;/tt&gt;s is throwing an exception in the destructor:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;Access violation reading location 0xccccccd4.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In this code in &lt;tt class="docutils literal"&gt;xtree&lt;/tt&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#if _HAS_ITERATOR_DEBUGGING&lt;/span&gt;
+    &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;_Orphan_ptr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_Myt&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;_Cont&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_Nodeptr&lt;/span&gt; &lt;span class="n"&gt;_Ptr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;const&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;       &lt;span class="c1"&gt;// orphan iterators with specified node pointers&lt;/span&gt;
+        &lt;span class="n"&gt;_Lockit&lt;/span&gt; &lt;span class="n"&gt;_Lock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_LOCK_DEBUG&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;const_iterator&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;const_iterator&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;_Cont&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_Myfirstiter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;_Ptr&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;_Myhead&lt;/span&gt;
+&lt;span class="hll"&gt;                &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;_Ptr&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;_Ptr&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;_Ptr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/span&gt;            &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;_Pnext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;const_iterator&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;_Mynextiter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="k"&gt;else&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt;       &lt;span class="c1"&gt;// orphan the iterator&lt;/span&gt;
+                &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;_Mycont&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;const_iterator&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;_Pnext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;_Mynextiter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="cp"&gt;#endif &lt;/span&gt;&lt;span class="cm"&gt;/* _HAS_ITERATOR_DEBUGGING */&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Of course, that is suspiciously close to &lt;tt class="docutils literal"&gt;0xcccccccc&lt;/tt&gt;, which is used by the debugging runtimes to mark uninitalized stack. (This will be important later.) In any case I go through the usual debugging motions, making sure I'm not putting anything funny into my map container and that values inside the container are what they should be.&lt;/p&gt;
+&lt;p&gt;So, what was the cause of this bug? It was a result of the change I was making earlier; this is the original code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;LVITEM&lt;/span&gt; &lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;ZeroMemory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cchTextMax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MAX_PATH&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;buff&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;MAX_PATH&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pszText&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;buff&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;SendMessage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;listViewHandle&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;LVM_GETITEMTEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;reinterpret_cast&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;LPARAM&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And I changed it to use the &lt;tt class="docutils literal"&gt;ListView_GetItemText&lt;/tt&gt; macro, which is far more succinct:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;MAX_PATH&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="n"&gt;ListView_GetItemText&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;listViewHandle&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_countof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;No problem yet, right? Ready for the punchline?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;I left this line in at the bottom:&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;SendMessage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;listViewHandle&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;LVM_GETITEMTEXT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;reinterpret_cast&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;LPARAM&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;itemText&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For those lucky folks who aren't familiar with all the wonderful intricacies of Windows programming:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;SendMessage()&lt;/tt&gt; is a magical &amp;quot;do all&amp;quot; function that sends a message to a particular window, with &lt;tt class="docutils literal"&gt;WPARAM&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;LPARAM&lt;/tt&gt; values tagging along. In this case, we're sending a message of &lt;tt class="docutils literal"&gt;LVM_GETITEMTEXT&lt;/tt&gt; to the control denoted by &lt;tt class="docutils literal"&gt;listViewHandle&lt;/tt&gt;. The MSDN documentation for &lt;tt class="docutils literal"&gt;LVM_GETITEMTEXT&lt;/tt&gt; states that it wants &lt;tt class="docutils literal"&gt;WPARAM&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;LPARAM&lt;/tt&gt; to be:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;WPARAM : iItem - Index of the list-view item&lt;/div&gt;
+&lt;div class="line"&gt;&lt;strong&gt;LPARAM : pitem - Pointer to an LVITEM structure.&lt;/strong&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;My &lt;tt class="docutils literal"&gt;LPARAM&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;itemText&lt;/tt&gt;, is no longer an &lt;tt class="docutils literal"&gt;LVITEM&lt;/tt&gt; structure (it is now a char array of size &lt;tt class="docutils literal"&gt;MAX_PATH&lt;/tt&gt;). There is absolutely no way that the &lt;tt class="docutils literal"&gt;LVM_GETITEMTEXT&lt;/tt&gt; code can know that I've made a colossal (yet tiny!) mistake, so I assume that it dutifully casts &lt;tt class="docutils literal"&gt;itemText&lt;/tt&gt; into an &lt;tt class="docutils literal"&gt;LVITEM&lt;/tt&gt; structure and does the right stuff with horrendously wrong data. Tada, stack corrupted.&lt;/p&gt;
+&lt;p&gt;Notice that the source of this bug appears nowhere near an &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;std::map&lt;/span&gt;&lt;/tt&gt;. It is, in fact, in a different function (and a different class and a different file...) entirely! This is why memory corruption errors are one of the most feared bugs around.&lt;/p&gt;
+&lt;p&gt;Conclusion: if &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;std::map&lt;/span&gt;&lt;/tt&gt; is dying in &lt;tt class="docutils literal"&gt;clear()&lt;/tt&gt; (or ever, frankly), you may very well be doing something bad, memory wise.&lt;/p&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sat, 11 Oct 2008 18:42:00 -0700</pubDate><guid>tag:www.setnode.com,2008-10-11:blog/std-map-access-violation-or-not/</guid></item><item><title>Proctors in Calgary</title><link>http://www.setnode.com/blog/proctors-in-calgary/</link><description>&lt;p&gt;"Proctor" is the fancy word for those people who administer exams and tests. If you're taking distance education courses, you may need to find one. I had to find a proctor a year ago to make up for an exam I missed, and it took some time to figure out how to even begin. (A search for "calgary proctors" did not bring up very much...)&lt;/p&gt;
+&lt;p&gt;I finally found some information on proctors by calling the librarians at the &lt;a href="http://newcpl.calgarypubliclibrary.com/Branches.aspx?id=2"&gt;Castell Central Library&lt;/a&gt;. So...my tip for finding a proctor is to call the library in your city.&lt;/p&gt;
+&lt;p&gt;In case there are any other Calgarians who need a proctor, here’s some information on proctors from &lt;strong&gt;2005&lt;/strong&gt;, along with per exam proctor fees:&lt;/p&gt;
+&lt;table&gt;&lt;tbody&gt;&lt;tr&gt;
+    &lt;td&gt;Athabasca University&lt;/td&gt;
+    &lt;td&gt;(403) 263-6465&lt;/td&gt;
+    &lt;td&gt;$40&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;University of Calgary&lt;/td&gt;
+    &lt;td&gt;(403) 220-5524&lt;/td&gt;
+    &lt;td&gt;$80&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;SAIT&lt;/td&gt;
+    &lt;td&gt;(403) 210-4283&lt;/td&gt;
+    &lt;td&gt;$50&lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;
+    &lt;td&gt;Rocky Mountain College&lt;/td&gt;
+    &lt;td&gt;(403) 284-5100&lt;/td&gt;
+    &lt;td&gt;$20&lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Tue, 11 Jul 2006 16:24:00 -0700</pubDate><guid>tag:www.setnode.com,2006-07-11:blog/proctors-in-calgary/</guid></item><item><title>Linksys BEFSR81 disconnects</title><link>http://www.setnode.com/blog/linksys-befsr81-disconnects/</link><description>&lt;p&gt;For the longest time I had this constant problem with my router, a Linksys BEFSR81 (the 8-port version of the BEFSR41) constantly disconnecting the computers connected to it. It wasn’t the Internet connection going down, since I had a computer that was directly connected to the modem as well, and it never had any problems.&lt;/p&gt;
+&lt;p&gt;So of course when troubleshooting something like a router, you go and get the latest firmware. No luck there. I also tried resetting the router, restoring default settings, changing the ports used on the back, and so on.&lt;/p&gt;
+&lt;p&gt;Finally, I tried giving one computer DMZ access (I’m not forgetting about the security concerns raised by doing this). It worked. No more disconnections for that computer, and for now, I’m satisfied.&lt;/p&gt;
+&lt;p&gt;Posting this in case it comes in handy for anyone else experiencing disconnection problems.&lt;/p&gt;
+&lt;p&gt;[2008 Addendum: The only real solution to this problem is to get a better router. The BEFSR81 is at least 7 years old now.]&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Tue, 11 Jul 2006 12:46:00 -0700</pubDate><guid>tag:www.setnode.com,2006-07-11:blog/linksys-befsr81-disconnects/</guid></item><item><title>University of Waterloo cheers</title><link>http://www.setnode.com/blog/university-of-waterloo-cheers/</link><description>&lt;p&gt;Here are some cheers from the University of Waterloo Math orientation (which I went through 4 years ago). These include such classics as &lt;em&gt;Math Rocks&lt;/em&gt;, &lt;em&gt;The Biggest Tie&lt;/em&gt;, &lt;em&gt;How's the Tie&lt;/em&gt;, and &lt;em&gt;Water Water Water&lt;/em&gt;. I'm not sure why, but my personal favorite is &lt;em&gt;The Biggest Tie&lt;/em&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;&lt;em&gt;Math Rocks&lt;/em&gt;&lt;/h3&gt;
+&lt;p&gt;M-A&lt;br /&gt;
+M-A-T&lt;br /&gt;
+M-A-T-H&lt;br /&gt;
+Math Rocks!  &lt;/p&gt;
+&lt;p&gt;Say it loud&lt;br /&gt;
+Say it big&lt;br /&gt;
+Let it boil in your blood, feel it zag as you zig&lt;br /&gt;
+We survive&lt;br /&gt;
+All the knocks&lt;br /&gt;
+We have pride when we cheer and we think Math Rocks!  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;One group chants the first verse while the other group chants the second verse, at the same time. The chants should converge on the phrase "Math Rocks!".&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;&lt;em&gt;The Biggest Tie&lt;/em&gt;&lt;/h3&gt;
+&lt;p&gt;The biggest tie&lt;br /&gt;
+I ever saw&lt;br /&gt;
+Was hanging from&lt;br /&gt;
+The MC wall  &lt;/p&gt;
+&lt;p&gt;I looked at it&lt;br /&gt;
+And then I knew&lt;br /&gt;
+I wanted to be&lt;br /&gt;
+A Mathie too  &lt;/p&gt;
+&lt;p&gt;I stole the tie&lt;br /&gt;
+It made me laugh&lt;br /&gt;
+Because it's true&lt;br /&gt;
+That I love Math  &lt;/p&gt;
+&lt;p&gt;And so began&lt;br /&gt;
+My new journey&lt;br /&gt;
+To be part of&lt;br /&gt;
+Math faculty  &lt;/p&gt;
+&lt;p&gt;My school is sweet&lt;br /&gt;
+SWEET LIKE A FOX!&lt;br /&gt;
+Because I know&lt;br /&gt;
+UW Math Rocks  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Sung to the tune and style of The Littlest Worm, The Princess Pat, or I Met a Bear.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;h3&gt;&lt;em&gt;Water Water Water&lt;/em&gt;&lt;/h3&gt;
+&lt;p&gt;Water water water!&lt;br /&gt;
+Loo loo loo!&lt;br /&gt;
+Water water water!&lt;br /&gt;
+Loo loo loo!&lt;br /&gt;
+Water!&lt;br /&gt;
+Loo!&lt;br /&gt;
+Water!&lt;br /&gt;
+Loo!&lt;br /&gt;
+Water water water!&lt;br /&gt;
+Loo loo loo!  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;One group (typically the orientation leaders) starts the cheer by yelling "Water water water!". The other group then replies with "Loo loo loo!". It continues in this fashion until the end of the cheer.&lt;/p&gt;
+&lt;p&gt;There are more Math cheers in the &lt;del&gt;Math Handbook&lt;/del&gt; &lt;a href="http://www.orientation.math.uwaterloo.ca/2008/cheers/"&gt;Math Orientation 2008 guide&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">richardwb</dc:creator><pubDate>Sun, 30 Apr 2006 17:23:00 -0700</pubDate><guid>tag:www.setnode.com,2006-04-30:blog/university-of-waterloo-cheers/</guid></item></channel></rss>

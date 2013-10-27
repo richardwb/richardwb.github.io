@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/" rel="bookmark" title="Permalink to Don't spend time micromanaging optimization options in Visual C++">Don't spend time micromanaging optimization options in Visual C++</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, March 14, 2009 @ 14:37
+	</footer>
+	<div class="body">
+		<p>It's surprisingly common to see people ask what the best Visual C++ optimization options are for their C++ code.</p>
+<p>The best answer is to profile and benchmark.</p>
+<p>Failing that, it's pretty simple. Use <code>/O2</code> to optimize for speed, and <code>/O1</code> to optimize for size. That's (almost) it. If you have a large program you will probably benefit more from optimizing for size:</p>
+<blockquote>
+<p>Generally speaking, small applications should be compiled with /O2, and large applications should be compiled with /O1 because very large applications can end up putting a lot of stress on the instruction cache of the processor, and this can lead to worse performance. To minimize this, use /O1 to reduce the amount of "code bloat" introduced by the optimizer from certain transformations such a loop unrolling or selection of larger, faster sequences of code. [<a href="http://msdn.microsoft.com/en-us/library/aa290055.aspx">MSDN</a>]</p>
+</blockquote>
+<p>But what about <em>Enable Intrinsic Functions</em> (<code>/Oi</code>), <em>Omit Frame Pointers</em> (<code>/Oy</code>), etc.?</p>
+<p>Check out the <a href="http://msdn.microsoft.com/en-us/library/8f8h5cxt.aspx">documentation</a> for <code>/O2</code> and <code>/O1</code>:</p>
+<ul>
+<li><code>/O1</code> (Minimize Size) : Equivalent to /Og /Os /Oy /Ob2 /Gs /GF /Gy</li>
+<li><code>/O2</code> (Maximize Speed) : Equivalent to /Og /Oi /Ot /Oy /Ob2 /Gs /GF /Gy</li>
+</ul>
+<p>They are already all specified. Yes, the property pages say <em>Disabled</em> or <em>No</em>, but what they really mean is <em>Default</em>.</p>
+<p>The only general optimization I'm aware of that doesn't fall in this category is <em>Whole Program Optimization</em> (<code>/GL</code>), which also requires <em>Link Time Code Generation</em> (<code>/LTCG</code>).</p>
+<p>Finally, what about <em>Full Optimization</em> (<code>/Ox</code>)? </p>
+<blockquote>
+<p>In general, /O2 should be preferred over /Ox and /O1 over /Oxs. [<a href="http://msdn.microsoft.com/en-us/library/59a3b321.aspx">MSDN</a>]</p>
+</blockquote>
+<p>[Edit: Note that there is an IDE bug in Visual Studio 2008 which may affect whether or not optimizations are applied. <a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/">I write more about it here.</a>]</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

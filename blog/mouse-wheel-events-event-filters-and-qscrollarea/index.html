@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/mouse-wheel-events-event-filters-and-qscrollarea/" rel="bookmark" title="Permalink to Mouse wheel events, event filters, and QScrollArea">Mouse wheel events, event filters, and QScrollArea</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Sunday, September 12, 2010 @ 18:21
+	</footer>
+	<div class="body">
+		<p>Let’s say you have a <code>QScrollArea</code> which contains some custom widget. Now, although this widget itself has no use for mouse wheel events, when it’s in your <code>QScrollArea</code> you’d really like for it to grow and shrink in response to the wheel. Or maybe you’d just like to map vertical wheel events to horizontal scrolling, since you know the widget will never need vertical scrollbars.</p>
+<p>The biggest problem here is that <code>QScrollArea</code> accepts wheel events (this isn’t strictly true, as you’ll soon see). Events propagate from the child up to the parent until someone accepts the event, and this means that <code>QScrollArea</code> will prevent wheel events from getting to your own code (again, this isn’t strictly true).</p>
+<p>Reading the documentation it’s clear that you’d either want to subclass <code>QScrollArea</code> or use <a href="http://qt-project.org/doc/qt-4.8/eventsandfilters.html">event filters</a>. Since you don’t need to subclass <code>QScrollArea</code> for any other reason, using event filters sounds like a reasonable approach. You’ll set up an event filter that forces wheel events to be ignored and install it on the <code>QScrollArea</code>. That way, it’ll propagate up to your containing widget.</p>
+<p>So you’d adjust your containing widget like so:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MyWidget</span> <span class="o">:</span> <span class="k">public</span> <span class="n">QObject</span>
+<span class="p">{</span>
+    <span class="nl">public:</span>
+        <span class="c1">// ...</span>
+
+        <span class="kt">bool</span> <span class="n">eventFilter</span><span class="p">(</span><span class="n">QObject</span><span class="o">*</span> <span class="cm">/*obj*/</span><span class="p">,</span> <span class="n">QEvent</span><span class="o">*</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">evt</span><span class="o">-&gt;</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">QEvent</span><span class="o">::</span><span class="n">Wheel</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// ignore the event (this effectively </span>
+                <span class="c1">// makes it &quot;skip&quot; one object)</span>
+                <span class="n">evt</span><span class="o">-&gt;</span><span class="n">ignore</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="c1">// return false to continue event propagation</span>
+            <span class="c1">// for all events</span>
+            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+    <span class="nl">protected:</span>
+        <span class="kt">void</span> <span class="n">wheelEvent</span><span class="p">(</span><span class="n">QWheelEvent</span><span class="o">*</span> <span class="n">event</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">// your own custom stuff</span>
+            <span class="c1">// ...</span>
+            <span class="c1">// if you handle the event and don&#39;t want it to</span>
+            <span class="c1">// propagate any further, accept it:</span>
+            <span class="n">event</span><span class="o">-&gt;</span><span class="n">accept</span><span class="p">();</span>
+        <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>And then you’d use it like so:</p>
+<div class="codehilite"><pre><span class="n">QScrollArea</span><span class="o">*</span> <span class="n">scrollArea</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QScrollArea</span><span class="p">(</span><span class="n">parent</span><span class="p">);</span>
+<span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">setWidget</span><span class="p">(</span><span class="n">someWidget</span><span class="p">);</span>
+<span class="c1">// assuming that &#39;this&#39; is MyWidget</span>
+<span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">installEventFilter</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</pre></div>
+
+
+<p>This doesn’t work. Instead, what you need to do is <code>installEventFilter()</code> on <code>QScrollArea</code>’s viewport:</p>
+<div class="codehilite"><pre><span class="n">scrollArea</span><span class="o">-&gt;</span><span class="n">viewport</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">installEventFilter</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</pre></div>
+
+
+<p>In fact, <code>QScrollArea</code> is not the one that is accepting wheel events. It’s the viewport that is doing all of that. By installing an event filter on the viewport, the wheel events will continue to propagate up the tree.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

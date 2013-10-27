@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/" rel="bookmark" title="Permalink to Building Boost (now with dual/quad/multi-core action!)">Building Boost (now with dual/quad/multi-core action!)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 02, 2009 @ 16:27
+	</footer>
+	<div class="body">
+		<p><em>Update: More recent versions of Boost (1.39.0 and later) have a simpler build process, which I've <a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/">written about here</a>.</em></p>
+<p>Steps to build the non-header-only Boost libraries on Windows, such as <code>Boost.Thread</code> and <code>Boost.Regex</code>, using Microsoft Visual Studio:</p>
+<ol>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost and extract it to some location, say, <code>D:\Boost\</code>, making sure to maintain the directory structure</p>
+</li>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost Jam (you want the ntx86 binaries) and extract it to some location (probably the same as above), again making sure to maintain the directory structure</p>
+</li>
+<li>
+<p>Your directory structure should now consist of <code>D:\Boost\boost_1_38_0\</code> and <code>D:\Boost\boost-jam-3.1.17-1-ntx86\</code></p>
+</li>
+<li>
+<p>Make sure you have lots of hard drive space (at least 5GB)</p>
+</li>
+<li>
+<p>In a command prompt, navigate to your Boost library folder (<code>D:\Boost\boost_1_38_0\</code>) and then use this command (read further down if you want details about what these arguments are doing):</p>
+<div class="codehilite"><pre>&gt; ..\boost-jam-3.1.17-1-ntx86\bjam.exe --toolset=msvc --build-type=complete stage
+</pre></div>
+
+
+</li>
+<li>
+<p>If you have a dual/quad/many-core processor or can otherwise take advantage of parallel jobs, also add the <code>-jN</code> switch, where <code>N</code> is the number of jobs to run at a time (e.g. <code>bjam.exe -j4 --toolset=msvc</code>).</p>
+</li>
+<li>
+<p>And wait. This will take a very long time.</p>
+</li>
+<li>
+<p>After it completes you will have a <code>stage</code> subdirectory (<code>D:\Boost\boost_1_38_0\stage\</code>) which will contain a <code>lib</code> subdirectory, containing the compiled libraries. You may move these anywhere you wish.</p>
+</li>
+<li>
+<p>You will also have a <code>bin.v2</code> subdirectory which was used for temporary files. You may delete this folder to reclaim some hard drive space.</p>
+</li>
+</ol>
+<p>More details:</p>
+<p><code>--toolset=msvc</code> : tells Boost Jam to compile with Microsoft Visual Studio.</p>
+<p><code>--build-type=complete</code> : notes that you want every possible combination built (Debug/Release, Multi/Single threaded, Static/Shared).</p>
+<p><code>stage</code> : a build target which builds the compiled libraries to the stage directory (which you can set with <code>--stagedir=&lt;STAGEDIR&gt;</code>). Contrast this with the <code>install</code> target, which builds the compiled libraries, but <em>also</em> copies the header-only libraries to a particular location. This is generally an unnecessary step since you've already extracted the Boost headers somewhere already. Look inside the <code>Jamroot</code> file inside your Boost folder for more details.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

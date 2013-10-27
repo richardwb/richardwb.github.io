@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/namespaces-are-one-honking-great-idea/" rel="bookmark" title="Permalink to Namespaces are one honking great idea">Namespaces are one honking great idea</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, April 29, 2009 @ 09:17
+	</footer>
+	<div class="body">
+		<p>The title of this post comes from the last line of <em><a href="http://www.python.org/dev/peps/pep-0020/">The Zen of Python</a></em>.</p>
+<p>It applies to C++ too: namespaces are great. Namespaces let the <a href="http://www.boost.org/">Boost</a> folks contain all sorts of widely varying libraries without having to worry about naming collisions in user code. Namespaces let you mix multiple libraries easily and safely. Namespaces let you group sets of related free functions together, without needing a class. Namespaces also let you work around one thing I've always found a bit unusual with enums: the way they don't have their own scope.</p>
+<div class="codehilite"><pre><span class="k">enum</span> <span class="n">ValidValues</span>
+<span class="p">{</span>
+    <span class="n">Value1</span><span class="p">,</span>
+    <span class="n">Value2</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>This ends up declaring <code>Value1</code> and <code>Value2</code> in the underlying scope. What I like to do is wrap the enum in a namespace:</p>
+<div class="codehilite"><pre><span class="k">namespace</span> <span class="n">ValidValues</span>
+<span class="p">{</span>
+    <span class="k">enum</span> <span class="n">Enum</span>
+    <span class="p">{</span>
+        <span class="n">Value1</span><span class="p">,</span>
+        <span class="n">Value2</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>This sticks <code>Value1</code> and <code>Value2</code> in the <code>ValidValues</code> namespace. The only disadvantage is declaring a variable of this enum type gets a bit silly and inconsistent. For example:</p>
+<div class="codehilite"><pre><span class="n">ValidValues</span> <span class="n">var</span> <span class="o">=</span> <span class="n">Value1</span><span class="p">;</span> <span class="c1">// error, ValidValues is a namespace, Value1 is undefined</span>
+<span class="n">ValidValues</span><span class="o">::</span><span class="n">Enum</span> <span class="n">var</span> <span class="o">=</span> <span class="n">Value1</span><span class="p">;</span> <span class="c1">// error, Value1 is undefined</span>
+<span class="n">ValidValues</span><span class="o">::</span><span class="n">Enum</span> <span class="n">var</span> <span class="o">=</span> <span class="n">ValidValues</span><span class="o">::</span><span class="n">Value1</span><span class="p">;</span> <span class="c1">// okay</span>
+</pre></div>
+
+
+<p>This is yet another area where C++0x will offer its own solution, in this case, <a href="http://en.wikipedia.org/wiki/C%2B%2B0x#Strongly_typed_enumerations">strongly typed enumerations</a>.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

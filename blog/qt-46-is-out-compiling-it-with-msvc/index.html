@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-46-is-out-compiling-it-with-msvc/" rel="bookmark" title="Permalink to Qt 4.6 is out, compiling it with MSVC">Qt 4.6 is out, compiling it with MSVC</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, December 02, 2009 @ 01:39
+	</footer>
+	<div class="body">
+		<p>Qt 4.6 has been released (with some <a href="http://doc.trolltech.com/4.6/qt4-6-intro.html">new features</a>) so I've taken the opportunity to make sure my <a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/">instructions on how to compile Qt with Visual Studio</a> are still accurate. The additional steps on how to take advantage of your multi-core processor (using <code>jom</code>) still work, as well.</p>
+<p><em>[Edit: Qt 4.6 actually has <a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/">prebuilt binaries/libraries</a> for Visual Studio 2008, which is preferable to spending hours building Qt]</em></p>
+<p>I've made a note in the article but I'll repeat it here because it's a major time-saver: you should delete, from your Qt folder, these instances of <code>mocinclude.tmp</code>:</p>
+<div class="codehilite"><pre>\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+</pre></div>
+
+
+<p>Deleting the first two <code>mocinclude.tmp</code> files will prevent a <code>LNK2019</code> error while building Webkit, while deleting the last two (which are new in Qt 4.6, as far as I can tell) will prevent an <code>Error: Unknown interface</code> while trying to build <code>qscriptextensionplugin.h</code>.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

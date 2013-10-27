@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/accessing-a-git-repository-with-tortoisehg-on-windows/" rel="bookmark" title="Permalink to Accessing a Git repository with TortoiseHg on Windows">Accessing a Git repository with TortoiseHg on Windows</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 09, 2010 @ 10:31
+	</footer>
+	<div class="body">
+		<p>If you're using Hg and you want to get hold of a Git repository there is an extension, hg-git, that lets you do this.</p>
+<p>On Windows the installation process for this hasn't always been the easiest, as you needed to first install the dulwich Python library (which I always seemed to have trouble doing) and then hg-git. The TortoiseHg guys have made this a lot easier in recent versions of TortoiseHg, as they now include the dulwich libraries.</p>
+<p>So, step by step:</p>
+<ol>
+<li>You'll need <a href="http://tortoisehg.bitbucket.org/‎">TortoiseHg 0.9.3</a> or later. Get the latest version.</li>
+<li>
+<p>Bring up a command line and enter this line to clone the latest hg-git to your desired directory (this is "installing" hg-git). I'll use <code>D:\TortoiseHg\hg-git</code> in this example.</p>
+<div class="codehilite"><pre>&gt; hg clone http://bitbucket.org/durin42/hg-git/ D:\TortoiseHg\hg-git
+</pre></div>
+
+
+</li>
+<li>
+<p>Open up your user-specific <code>Mercurial.ini</code>. The location of this file may change occasionally, read the <a href="http://www.selenic.com/mercurial/hgrc.5.html">Mercurial docs</a> if you have trouble finding it.<br />
+    On Windows Vista and Windows 7 this file is typically located at:</p>
+<div class="codehilite"><pre>C:\Users\YourUsername\Mercurial.ini
+</pre></div>
+
+
+<p>while on Windows XP you'll find it at:</p>
+<div class="codehilite"><pre>C:\Documents and Settings\YourUsername\Mercurial.ini
+</pre></div>
+
+
+<p>Alternatively, bring up the Windows "Run" dialog and enter:</p>
+<div class="codehilite"><pre>%USERPROFILE%\Mercurial.ini
+</pre></div>
+
+
+<p>which will work on all recent Windows platforms.</p>
+</li>
+<li>
+<p>Navigate down to the <code>[extensions]</code> section and add this line to that section:</p>
+<div class="codehilite"><pre>hggit = D:\TortoiseHg\hg-git
+</pre></div>
+
+
+<p>Where <code>D:\TortoiseHg\hg-git</code> is the directory you cloned hg-git to earlier. This line may already exist or may be commented out with a semicolon, in that case just remove the semicolon and update the directory.</p>
+</li>
+<li>
+<p>Now you can clone a Git repository like so:</p>
+<div class="codehilite"><pre>&gt; hg clone git://github.com/richhickey/clojure.git D:\TargetDirectory
+</pre></div>
+
+
+</li>
+<li>
+<p>The result is you'll have a Mercurial enabled repository at <code>D:\TargetDirectory</code>. You can <code>push</code>, <code>pull</code>, and generally treat it as an Hg repository. Try</p>
+<div class="codehilite"><pre>&gt; hg help hggit
+</pre></div>
+
+
+</li>
+</ol>
+<p>for additional help and information, or check the <a href="http://mercurial.selenic.com/wiki/HgGit">HgGit page</a> on the Mercurial wiki.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

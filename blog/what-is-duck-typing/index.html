@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/what-is-duck-typing/" rel="bookmark" title="Permalink to What is duck typing?">What is duck typing?</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, January 27, 2009 @ 14:12
+	</footer>
+	<div class="body">
+		<p>I found that when I started dabbling in Python that it was a bit hard to get a grasp on what duck typing actually is. You hear that it achieves polymorphism without inheritance, but that really explains very little. I have a C++/Java/C# background and it took a bit of time before that wonderful epiphany came, where all of a sudden I seemed to get a good grasp on what the concept actually is.</p>
+<p>From the <a href="http://en.wikipedia.org/wiki/Duck_typing">Duck typing article on Wikipedia</a> we find that the term comes from the phrase "<em>If it walks like a duck and quacks like a duck, I would call it a duck.</em>"</p>
+<p>That makes perfect sense now, but it definitely didn't help further my understanding when I first came across it.</p>
+<p>Perhaps the best way to explain would be with some code. I'm using Java here because it's wordy enough that it's understandable even if you don't know the syntax. For this "real world" example we will be designing that ever so classic "real world application of object oriented programming": the hierarchy of vehicles.</p>
+<p>So suppose we have an existing <code>Driver</code> class that will drive our vehicles for us, as long as we provide the <code>gas()</code>, <code>brake()</code>, <code>turnLeft()</code> and <code>turnRight()</code> methods. In Java this would likely be expressed as an interface:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IDriveable</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">gas</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">brake</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnLeft</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnRight</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And then we would have a class that implements that interface, for example:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Car</span> <span class="kd">implements</span> <span class="n">IDriveable</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">gas</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Vroom vroom&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">brake</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Screeeechhhh!&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnLeft</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Left&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnRight</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Right&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And the <code>Driver</code> class would be similar to:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Driver</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">drive</span><span class="o">(</span><span class="n">IDriveable</span> <span class="n">vehicle</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">gas</span><span class="o">();</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">turnLeft</span><span class="o">();</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">brake</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And the main class:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Start</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Car</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Car</span><span class="o">();</span>
+        <span class="n">Driver</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Driver</span><span class="o">();</span>
+        <span class="n">d</span><span class="o">.</span><span class="na">drive</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Sample output:</p>
+<div class="codehilite"><pre>Vroom vroom
+Left
+Screeeechhhh!
+</pre></div>
+
+
+<p>This is standard OOP stuff, where as long as our class implements the <code>IDriveable</code> interface, it'll be driveable by the <code>Driver</code> class. If the class does not implement that interface, the code will not even compile.</p>
+<p>If we bring duck typing into the picture, things change. Instead of having a defined interface (<code>IDriveable</code>) which must be implemented, all we require is that a given class implements the specific methods needed. There is no strict interface. In Python our code would look like:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Car</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">gas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Vroom vroom&quot;</span>
+    <span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Screeeechhhh!&quot;</span>
+    <span class="k">def</span> <span class="nf">turnLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Left&quot;</span>
+    <span class="k">def</span> <span class="nf">turnRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Right&quot;</span>
+
+<span class="k">class</span> <span class="nc">Driver</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle</span><span class="p">):</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">gas</span><span class="p">()</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">turnLeft</span><span class="p">()</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">brake</span><span class="p">()</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">Car</span><span class="p">()</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">Driver</span><span class="p">()</span>
+<span class="n">d</span><span class="o">.</span><span class="n">drive</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Which produces the same output as above.</p>
+<p>Let's add a new class to the Python code:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Pencil</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">gas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Scribble scribble&quot;</span>
+    <span class="k">def</span> <span class="nf">turnLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Left pencil turn?&quot;</span>
+    <span class="c"># note that turnRight is missing!</span>
+    <span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;PUT YOUR PENCILS DOWN&quot;</span>
+</pre></div>
+
+
+<p>Although <code>Pencil</code> having these methods makes absolutely no sense, we could pass this to the <code>drive()</code> method and there will be no errors. Yep, even though <code>Pencil</code> doesn't implement <code>turnRight()</code>, because <code>turnRight()</code> is never called, all this code will run, error free!</p>
+<p>We have a <code>Pencil</code> that can <code>gas()</code>, <code>turnLeft()</code>, and <code>brake()</code>, just like a <code>Car</code>. What is the difference between them, as far as this code is concerned? None!</p>
+<p>This is what duck typing is. If a class acts like another class, it can substitute for that class. There's no need for there to be strictly defined relationships between classes.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

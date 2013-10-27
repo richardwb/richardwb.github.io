@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/png-has-a-well-designed-magic-number-or-fourcc/" rel="bookmark" title="Permalink to PNG has a well designed magic number (or FourCC)">PNG has a well designed magic number (or FourCC)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 03, 2009 @ 17:20
+	</footer>
+	<div class="body">
+		<p>Even with all the XML floating around, binary formats still have their place. It's good practice to place an identifier at the beginning of the binary file, so that the file type can be determined even in the absence of a proper file extension.</p>
+<p>The simplest route to take is to just stuff some plain text there:</p>
+<div class="codehilite"><pre>[M Y F I L E][rest of file]
+</pre></div>
+
+
+<p>However, consider following the design of the PNG magic number, described in detail in <a href="http://www.libpng.org/pub/png/book/chapter08.html">the PNG book</a>. With some really neat design they are able to quickly detect some common forms of corruption caused by an incompatible transfer mechanism. In that case your identifier may look like:</p>
+<div class="codehilite"><pre>[\211 M Y F I L E \r \n \032 \n][rest of file]
+</pre></div>
+
+
+<p>With an identifier like this many common forms of transfer corruption can be quickly identified, and you can spit out a simple "corrupt file" message instead of trying to read a broken file.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

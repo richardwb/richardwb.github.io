@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/" rel="bookmark" title="Permalink to MapVirtualKey(), GetKeyNameText(), and a story of how to get proper names for the arrow keys">MapVirtualKey(), GetKeyNameText(), and a story of how to get proper names for the arrow keys</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, December 20, 2008 @ 14:50
+	</footer>
+	<div class="body">
+		<p>So let's say you are currently storing and using virtual key codes to handle keyboard input for a game. You decide to let your users customize their keys, so you go ahead and write some key configuration code. This requires that you map virtual key codes to key names.</p>
+<p>Luckily, Windows provides some functions that do exactly what you want! Essentially you use <code>MapVirtualKey()</code> to get a scancode for that key and then pass that scancode (left-shifted by 16) into <code>GetKeyNameText()</code>.</p>
+<p>Some minutes later you finish your code and you go to test it. You hit the A key and you see 'A'. The 5 key outputs '5'. Even the Backspace key outputs 'Backspace'. It works as expected.</p>
+<p>Then you hit one of the arrow keys and your code spits out 'Num 8'. It's right yet it's wrong.</p>
+<p><a href="http://blogs.msdn.com/michkap/archive/2006/08/29/729476.aspx">Michael Kaplan has a blog entry</a> that describes a recent update to the <code>MapVirtualKeyEx()</code> call:</p>
+<blockquote>
+<p>MAPVK_VK_TO_VSC_EX:</p>
+<p><strong>Windows Vista and later</strong>: The uCode parameter is a virtual-key code and is translated into a scan code. If it is a virtual-key code that does not distinguish between left- and right-hand keys, the left-hand scan code is returned. If the scan code is an extended scan code, the high byte of the uCode value can contain either 0xe0 or 0xe1 to specify the extended scan code. If there is no translation, the function returns 0.</p>
+</blockquote>
+<p>Unfortunately this doesn't help much as Windows XP is still used by a majority of users. However, this does imply that the current <code>MapVirtualKey[Ex]()</code> call does not specify the extended scan code. So if we just set the extended bit for some characters we may end up with a function similar to this:</p>
+<div class="codehilite"><pre><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">GetKeyName</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">virtualKey</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">scanCode</span> <span class="o">=</span> <span class="n">MapVirtualKey</span><span class="p">(</span><span class="n">virtualKey</span><span class="p">,</span> <span class="n">MAPVK_VK_TO_VSC</span><span class="p">);</span>
+
+    <span class="c1">// because MapVirtualKey strips the extended bit for some keys</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">virtualKey</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">case</span> <span class="n">VK_LEFT</span>: <span class="k">case</span> <span class="n">VK_UP</span>: <span class="k">case</span> <span class="n">VK_RIGHT</span>: <span class="k">case</span> <span class="n">VK_DOWN</span>: <span class="c1">// arrow keys</span>
+        <span class="k">case</span> <span class="n">VK_PRIOR</span>: <span class="k">case</span> <span class="n">VK_NEXT</span>: <span class="c1">// page up and page down</span>
+        <span class="k">case</span> <span class="n">VK_END</span>: <span class="k">case</span> <span class="n">VK_HOME</span>:
+        <span class="k">case</span> <span class="n">VK_INSERT</span>: <span class="k">case</span> <span class="n">VK_DELETE</span>:
+        <span class="k">case</span> <span class="n">VK_DIVIDE</span>: <span class="c1">// numpad slash</span>
+        <span class="k">case</span> <span class="n">VK_NUMLOCK</span>:
+        <span class="p">{</span>
+            <span class="n">scanCode</span> <span class="o">|=</span> <span class="mh">0x100</span><span class="p">;</span> <span class="c1">// set extended bit</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kt">char</span> <span class="n">keyName</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">GetKeyNameText</span><span class="p">(</span><span class="n">scanCode</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="mi">16</span><span class="p">,</span> <span class="n">keyName</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">keyName</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">keyName</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;[Error]&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

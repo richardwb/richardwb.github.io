@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/several-compilation-options-i-use-with-c-project/" rel="bookmark" title="Permalink to Several compilation options I use with C++ projects in Visual Studio">Several compilation options I use with C++ projects in Visual Studio</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, March 12, 2009 @ 16:39
+	</footer>
+	<div class="body">
+		<p>These are compilation options that I typically enable for any C++ projects in Visual Studio. They should go in the project's property settings, under <em>Configuration Properties</em>-&gt;<em>C/C++</em>-&gt;<em>Command Line</em>, in the <em>Additional options</em> textbox. They are listed here exactly as they should be entered in that box (equal signs and all).</p>
+<ul>
+<li><code>/MP</code> : This enables multi-process compilation, which can provide a significant speed boost on the multi-core processor you likely have in your development (or build) machine. As the MSDN documentation states, it is not compatible with the <em>Enable Minimal Rebuild</em> option, which, depending on the situation, may negate any performance advantage this switch has. Disabling minimal rebuild is not as bad as it sounds<sup id="fnref:minimalrebuild"><a class="footnote-ref" href="#fn:minimalrebuild" rel="footnote">1</a></sup> and in my projects I've found that using <code>/MP</code> confers a significant improvement in compilation time. You definitely want to enable it for <em>Release</em> builds, at least. <a href="http://msdn.microsoft.com/en-us/library/bb385193.aspx">Reference</a>.</li>
+<li><code>/D_CRT_SECURE_NO_WARNINGS</code> : This switch disables the warnings that Visual Studio spits out if you use any of the <strong>C</strong> <strong>R</strong>un<strong>T</strong>ime functions that Microsoft has provided secure replacements for (such as <code>strncpy</code>). This isn't necessarily a bad idea, but their safe functions are not part of the standard and are thus non-portable. <a href="http://msdn.microsoft.com/en-us/library/8ef0s5kh.aspx">Reference</a>.</li>
+<li><code>/D_SCL_SECURE_NO_WARNINGS</code> : Just like the switch above, only for the <strong>S</strong>tandard <strong>C</strong>++ <strong>L</strong>ibrary (anything in the <code>std</code> namespace). <a href="http://msdn.microsoft.com/en-us/library/aa985974.aspx">Reference</a>.</li>
+<li><code>/D_SECURE_SCL=0</code> : Disables checked iterators. Disabling this feature can improve performance when using iterators, at the expense of less protection against unsafe iterator use. Generally there isn't too much of a performance difference (a Visual C++ lead states that they measured about a 6% difference in <a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=105752">this feedback / bug page</a>) so it may be worth leaving it on most of the time. <a href="http://msdn.microsoft.com/en-us/library/aa985896.aspx">Reference</a>.</li>
+</ul>
+<p>Note that <code>/D_CRT_SECURE_NO_<em>WARNINGS</em></code> and <code>/D_SCL_SECURE_NO_<em>WARNINGS</em></code> are <code>/D_CRT_SECURE_NO_<em>DEPRECATE</em></code> and <code>/D_SCL_SECURE_NO_<em>DEPRECATE</em></code>, respectively, in versions prior to Visual Studio 2008.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:minimalrebuild">
+<p>Disabling Minimal Rebuild does not mean that the whole project gets rebuilt every time, just that Visual Studio uses a "was this .cpp/.h modified?" approach instead of trying to determine if the exact changes you made warrant a recompile.&#160;<a class="footnote-backref" href="#fnref:minimalrebuild" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

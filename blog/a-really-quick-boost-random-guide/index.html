@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/a-really-quick-boost-random-guide/" rel="bookmark" title="Permalink to A really quick boost::random guide">A really quick boost::random guide</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, May 06, 2009 @ 20:03
+	</footer>
+	<div class="body">
+		<p>This is a really short and quick guide on how to use <code>boost::random</code>. The best place to start is, as always, the <a href="http://www.boost.org/doc/libs/release/libs/random/index.html">documentation</a>, but Boost also provides a <a href="http://www.boost.org/doc/libs/release/libs/random/random_demo.cpp">simple sample program</a> that covers the library in a good "how to get started" fashion.</p>
+<p>What I'm about to write here is even shorter and less detailed -- it's just the basic code needed to generate some random numbers.</p>
+<div class="codehilite"><pre><span class="c1">// Initialize a random number generator.</span>
+<span class="c1">// Boost provides a bunch of these, note that some of them are not meant</span>
+<span class="c1">// for direct user usage and you should instead use a specialization (for </span>
+<span class="c1">// example, don&#39;t use linear_congruential and use minstd_rand or </span>
+<span class="c1">// minstd_rand0 instead)</span>
+
+<span class="c1">// This constructor seeds the generator with the current time.</span>
+<span class="c1">// As mentioned in Boost&#39;s sample program, time(0) is not a great seed,</span>
+<span class="c1">// but you can probably get away with it for most situations.</span>
+<span class="c1">// Consider using more precise timers such as gettimeofday on *nix or</span>
+<span class="c1">// GetTickCount/timeGetTime/QueryPerformanceCounter on Windows.</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">mt19937</span> <span class="n">randGen</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+
+<span class="c1">// Now we set up a distribution. Boost provides a bunch of these as well.</span>
+<span class="c1">// This is the preferred way to generate numbers in a certain range.</span>
+<span class="c1">// In this example we initialize a uniform distribution between 0 and the max</span>
+<span class="c1">// value that an unsigned char can hold (255 for most architectures)</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">uniform_int</span><span class="o">&lt;&gt;</span> <span class="n">uInt8Dist</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">());</span>
+
+<span class="c1">// Finally, declare a variate_generator which maps the random number</span>
+<span class="c1">// generator and the distribution together. This variate_generator</span>
+<span class="c1">// is usable like a function call.</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">variate_generator</span><span class="o">&lt;</span> <span class="n">boost</span><span class="o">::</span><span class="n">mt19937</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">uniform_int</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> 
+    <span class="n">GetRand</span><span class="p">(</span><span class="n">randGen</span><span class="p">,</span> <span class="n">uInt8Dist</span><span class="p">);</span>
+
+<span class="c1">// Generate a random number</span>
+<span class="kt">int</span> <span class="n">aRandomNumber</span> <span class="o">=</span> <span class="n">GetRand</span><span class="p">();</span>
+</pre></div>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

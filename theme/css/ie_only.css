@@ -1,0 +1,28 @@
+/* 
+ * Handles random quirks in IE.
+ */
+
+/* Centering cause IE5- doesn't know margin: auto */
+body { text-align: center; }
+
+/* "Peekaboo" bug, max-width, canceling the text-align from above */
+#mega { height: 1%; width:expression(document.body.clientWidth > 800? "700px": "auto" ); text-align: left; }
+
+/* Cause IE5- doesn't inherit stuff in tables properly and makes the font way too large */
+/* the f\ont-size property is correctly visible to IE6 and later */
+tr { font-size: 82%; f\ont-size: 100%; }
+
+/* Overrides the width to make sure IE counts ordered lists correctly */
+.comment { width: auto; }
+
+/* Unindent */
+ul.comments_error { margin-left: -0.5em; }
+
+/* Fixes overflow on pre for IE6- (at the expense of setting an explicit width) */
+* html pre { width: 100%; }
+
+/* Prevents IE scrollbars from overlapping content */
+pre { overflow: visible; overflow-x: auto; overflow-y: hidden; padding-bottom: 18px; padding-bottom: expression(this.scrollWidth > this.offsetWidth ? 18 : 0); }
+
+/* IE needs a display: block for some reason for <hr> */
+.post .body hr { display: block; margin: -7px 0; }

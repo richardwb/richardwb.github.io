@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/" rel="bookmark" title="Permalink to Don't spend time micromanaging optimization options in Visual C++">Don't spend time micromanaging optimization options in Visual C++</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, March 14, 2009 @ 14:37
+	</footer>
+	<div class="body">
+		<p>It's surprisingly common to see people ask what the best Visual C++ optimization options are for their C++ code.</p>
+<p>The best answer is to profile and benchmark.</p>
+<p>Failing that, it's pretty simple. Use <code>/O2</code> to optimize for speed, and <code>/O1</code> to optimize for size. That's (almost) it. If you have a large program you will probably benefit more from optimizing for size:</p>
+<blockquote>
+<p>Generally speaking, small applications should be compiled with /O2, and large applications should be compiled with /O1 because very large applications can end up putting a lot of stress on the instruction cache of the processor, and this can lead to worse performance. To minimize this, use /O1 to reduce the amount of "code bloat" introduced by the optimizer from certain transformations such a loop unrolling or selection of larger, faster sequences of code. [<a href="http://msdn.microsoft.com/en-us/library/aa290055.aspx">MSDN</a>]</p>
+</blockquote>
+<p>But what about <em>Enable Intrinsic Functions</em> (<code>/Oi</code>), <em>Omit Frame Pointers</em> (<code>/Oy</code>), etc.?</p>
+<p>Check out the <a href="http://msdn.microsoft.com/en-us/library/8f8h5cxt.aspx">documentation</a> for <code>/O2</code> and <code>/O1</code>:</p>
+<ul>
+<li><code>/O1</code> (Minimize Size) : Equivalent to /Og /Os /Oy /Ob2 /Gs /GF /Gy</li>
+<li><code>/O2</code> (Maximize Speed) : Equivalent to /Og /Oi /Ot /Oy /Ob2 /Gs /GF /Gy</li>
+</ul>
+<p>They are already all specified. Yes, the property pages say <em>Disabled</em> or <em>No</em>, but what they really mean is <em>Default</em>.</p>
+<p>The only general optimization I'm aware of that doesn't fall in this category is <em>Whole Program Optimization</em> (<code>/GL</code>), which also requires <em>Link Time Code Generation</em> (<code>/LTCG</code>).</p>
+<p>Finally, what about <em>Full Optimization</em> (<code>/Ox</code>)? </p>
+<blockquote>
+<p>In general, /O2 should be preferred over /Ox and /O1 over /Oxs. [<a href="http://msdn.microsoft.com/en-us/library/59a3b321.aspx">MSDN</a>]</p>
+</blockquote>
+<p>[Edit: Note that there is an IDE bug in Visual Studio 2008 which may affect whether or not optimizations are applied. <a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/">I write more about it here.</a>]</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/several-compilation-options-i-use-with-c-project/" rel="bookmark" title="Permalink to Several compilation options I use with C++ projects in Visual Studio">Several compilation options I use with C++ projects in Visual Studio</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, March 12, 2009 @ 16:39
+	</footer>
+	<div class="body">
+		<p>These are compilation options that I typically enable for any C++ projects in Visual Studio. They should go in the project's property settings, under <em>Configuration Properties</em>-&gt;<em>C/C++</em>-&gt;<em>Command Line</em>, in the <em>Additional options</em> textbox. They are listed here exactly as they should be entered in that box (equal signs and all).</p>
+<ul>
+<li><code>/MP</code> : This enables multi-process compilation, which can provide a significant speed boost on the multi-core processor you likely have in your development (or build) machine. As the MSDN documentation states, it is not compatible with the <em>Enable Minimal Rebuild</em> option, which, depending on the situation, may negate any performance advantage this switch has. Disabling minimal rebuild is not as bad as it sounds<sup id="fnref:minimalrebuild"><a class="footnote-ref" href="#fn:minimalrebuild" rel="footnote">1</a></sup> and in my projects I've found that using <code>/MP</code> confers a significant improvement in compilation time. You definitely want to enable it for <em>Release</em> builds, at least. <a href="http://msdn.microsoft.com/en-us/library/bb385193.aspx">Reference</a>.</li>
+<li><code>/D_CRT_SECURE_NO_WARNINGS</code> : This switch disables the warnings that Visual Studio spits out if you use any of the <strong>C</strong> <strong>R</strong>un<strong>T</strong>ime functions that Microsoft has provided secure replacements for (such as <code>strncpy</code>). This isn't necessarily a bad idea, but their safe functions are not part of the standard and are thus non-portable. <a href="http://msdn.microsoft.com/en-us/library/8ef0s5kh.aspx">Reference</a>.</li>
+<li><code>/D_SCL_SECURE_NO_WARNINGS</code> : Just like the switch above, only for the <strong>S</strong>tandard <strong>C</strong>++ <strong>L</strong>ibrary (anything in the <code>std</code> namespace). <a href="http://msdn.microsoft.com/en-us/library/aa985974.aspx">Reference</a>.</li>
+<li><code>/D_SECURE_SCL=0</code> : Disables checked iterators. Disabling this feature can improve performance when using iterators, at the expense of less protection against unsafe iterator use. Generally there isn't too much of a performance difference (a Visual C++ lead states that they measured about a 6% difference in <a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=105752">this feedback / bug page</a>) so it may be worth leaving it on most of the time. <a href="http://msdn.microsoft.com/en-us/library/aa985896.aspx">Reference</a>.</li>
+</ul>
+<p>Note that <code>/D_CRT_SECURE_NO_<em>WARNINGS</em></code> and <code>/D_SCL_SECURE_NO_<em>WARNINGS</em></code> are <code>/D_CRT_SECURE_NO_<em>DEPRECATE</em></code> and <code>/D_SCL_SECURE_NO_<em>DEPRECATE</em></code>, respectively, in versions prior to Visual Studio 2008.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:minimalrebuild">
+<p>Disabling Minimal Rebuild does not mean that the whole project gets rebuilt every time, just that Visual Studio uses a "was this .cpp/.h modified?" approach instead of trying to determine if the exact changes you made warrant a recompile.&#160;<a class="footnote-backref" href="#fnref:minimalrebuild" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/stop-wasting-time-stepping-into-functions-you-dont/" rel="bookmark" title="Permalink to Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)">Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 09, 2009 @ 17:58
+	</footer>
+	<div class="body">
+		<p>The Visual Studio debugger is amazingly useful. However, you soon learn to sigh the moment you come into contact with something like this:</p>
+<div class="codehilite"><pre><span class="n">boost</span><span class="o">::</span><span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">Startup</span><span class="o">&gt;</span> <span class="n">dlg</span><span class="p">(</span>
+    <span class="k">new</span> <span class="n">Startup</span><span class="p">(</span><span class="n">settings</span><span class="o">-&gt;</span><span class="n">GetWindowPosition</span><span class="p">()));</span>
+</pre></div>
+
+
+<p>You want to step into the <code>Startup</code> constructor, but there is a lot of stuff in your way. </p>
+<ol>
+<li>First you will step into <code>shared_ptr::operator-&gt;</code> (did I mention that <code>settings</code> was a <code>shared_ptr</code>?).</li>
+<li>Then you will step into <code>GetWindowPosition()</code>.</li>
+<li>Then into <code>operator new</code>.</li>
+<li>And then into your <code>Startup</code> constructor. Yes!</li>
+<li>And finally you'll finish with the <code>scoped_ptr</code> constructor if you so choose.</li>
+</ol>
+<p>If you've done this a lot you've probably gotten really good at the <em>Step Out</em> shortcut (Shift-F11).</p>
+<p>Well, here are two alternatives!</p>
+<p>First, while program execution is paused, right-click anywhere in the source window and look for the <em>Step Into Specific</em> item. You can select any of these functions to instantly step inside.</p>
+<p>Alternatively, there is a special undocumented (and unsupported) registry key that you can use to specify functions that you always want to skip. Navigate to <code>HKLM\SOFTWARE\Microsoft\VisualStudio\9.0\NativeDE\StepOver</code> (users of a 64-bit variant of Windows will want to check <code>HKLM\SOFTWARE\Wow6432Node\Microsoft\...</code> instead) and add some string values like this example:</p>
+<blockquote>
+<p>Name: 50 (priority, higher values have greater priority)<br />
+Value: <code>std\:\:.*=NoStepInto</code></p>
+<p>Name: 60<br />
+Value: <code>operator new=NoStepInto</code></p>
+<p>Name: 70<br />
+Value: <code>boost\:\:.*=NoStepInto</code></p>
+</blockquote>
+<p>The backslashes are necessary because <code>:</code> (colon) is a special character in <a href="http://msdn.microsoft.com/en-us/library/2k3te2cs(VS.80).aspx">Visual Studio regex</a>. You sometimes see two backslashes used in other examples, this is only necessary if you are directly editing a <code>.reg</code> file (which I don't recommend). These rules will adjust the behaviour of the <em>Step-Into</em> command and make it skip anything from the <code>std</code> or <code>boost</code> namespaces, as well as the basic <code>operator new</code>. It will still step into an overloaded <code>operator new</code>, so don't fear. There are more details on <a href="http://blogs.msdn.com/andypennell/archive/2004/02/06/69004.aspx">this blog post</a>, as well as <a href="http://groups.google.com/group/microsoft.public.vsnet.debugging/msg/26addb1b539883e8">microsoft.public.vsnet.debugging</a>.</p>
+<p>One more thing: you can combine these two approaches. Say that you've added a skip for the entire <code>boost</code> namespace, but you decide you really want to take a peek inside one particular line and see exactly what is happening to your parameters. Pause execution on that line, and then right-click and use <em>Step Into Specific</em>. This is still the same list as before and it works the same as before, regardless of any NoStepInto rules.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/boostthread-triggers-warning-c4103-in-microsoft-vi/" rel="bookmark" title="Permalink to Boost.Thread triggers warning C4103 in Microsoft Visual Studio">Boost.Thread triggers warning C4103 in Microsoft Visual Studio</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 02, 2009 @ 17:28
+	</footer>
+	<div class="body">
+		<p>Got a whole mess of warnings when I moved some of my includes around, particularly this one: <code>#include &lt;boost/thread.hpp&gt;</code></p>
+<div class="codehilite"><pre>abi_prefix.hpp(19) : warning C4103: 
+&#39;d:\\boost\\boost_1_38_0\\boost\\config\\abi_prefix.hpp&#39; : 
+alignment changed after including header, may be due to missing 
+#pragma pack(pop)
+</pre></div>
+
+
+<p>Some experimentation reveals that including <code>thread.hpp</code> before <code>winsock2.h</code> triggers all these warnings. The simple solution is to just move <code>#include &lt;boost/thread.hpp&gt;</code> down below <code>#include &lt;winsock2.h&gt;</code>.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/" rel="bookmark" title="Permalink to Building Boost (now with dual/quad/multi-core action!)">Building Boost (now with dual/quad/multi-core action!)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 02, 2009 @ 16:27
+	</footer>
+	<div class="body">
+		<p><em>Update: More recent versions of Boost (1.39.0 and later) have a simpler build process, which I've <a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/">written about here</a>.</em></p>
+<p>Steps to build the non-header-only Boost libraries on Windows, such as <code>Boost.Thread</code> and <code>Boost.Regex</code>, using Microsoft Visual Studio:</p>
+<ol>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost and extract it to some location, say, <code>D:\Boost\</code>, making sure to maintain the directory structure</p>
+</li>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost Jam (you want the ntx86 binaries) and extract it to some location (probably the same as above), again making sure to maintain the directory structure</p>
+</li>
+<li>
+<p>Your directory structure should now consist of <code>D:\Boost\boost_1_38_0\</code> and <code>D:\Boost\boost-jam-3.1.17-1-ntx86\</code></p>
+</li>
+<li>
+<p>Make sure you have lots of hard drive space (at least 5GB)</p>
+</li>
+<li>
+<p>In a command prompt, navigate to your Boost library folder (<code>D:\Boost\boost_1_38_0\</code>) and then use this command (read further down if you want details about what these arguments are doing):</p>
+<div class="codehilite"><pre>&gt; ..\boost-jam-3.1.17-1-ntx86\bjam.exe --toolset=msvc --build-type=complete stage
+</pre></div>
+
+
+</li>
+<li>
+<p>If you have a dual/quad/many-core processor or can otherwise take advantage of parallel jobs, also add the <code>-jN</code> switch, where <code>N</code> is the number of jobs to run at a time (e.g. <code>bjam.exe -j4 --toolset=msvc</code>).</p>
+</li>
+<li>
+<p>And wait. This will take a very long time.</p>
+</li>
+<li>
+<p>After it completes you will have a <code>stage</code> subdirectory (<code>D:\Boost\boost_1_38_0\stage\</code>) which will contain a <code>lib</code> subdirectory, containing the compiled libraries. You may move these anywhere you wish.</p>
+</li>
+<li>
+<p>You will also have a <code>bin.v2</code> subdirectory which was used for temporary files. You may delete this folder to reclaim some hard drive space.</p>
+</li>
+</ol>
+<p>More details:</p>
+<p><code>--toolset=msvc</code> : tells Boost Jam to compile with Microsoft Visual Studio.</p>
+<p><code>--build-type=complete</code> : notes that you want every possible combination built (Debug/Release, Multi/Single threaded, Static/Shared).</p>
+<p><code>stage</code> : a build target which builds the compiled libraries to the stage directory (which you can set with <code>--stagedir=&lt;STAGEDIR&gt;</code>). Contrast this with the <code>install</code> target, which builds the compiled libraries, but <em>also</em> copies the header-only libraries to a particular location. This is generally an unnecessary step since you've already extracted the Boost headers somewhere already. Look inside the <code>Jamroot</code> file inside your Boost folder for more details.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/" rel="bookmark" title="Permalink to Quick notes on how to use RapidXML">Quick notes on how to use RapidXML</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, February 27, 2009 @ 21:11
+	</footer>
+	<div class="body">
+		<p>There's a C++ XML library called <a href="http://rapidxml.sourceforge.net/">RapidXML</a> which is perfect for most non-enterprise uses of XML. I wouldn't call this a tutorial, but I hope this ends up helping someone. The documentation isn't very explicit on how to output an XML declaration, for example.</p>
+<p>How to create your XML from scratch and then output this XML into a string, with an XML declaration:</p>
+<div class="codehilite"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;rootnode</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span> <span class="na">type=</span><span class="s">&quot;example&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;childnode/&gt;</span>
+<span class="nt">&lt;/rootnode&gt;</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">rapidxml</span><span class="p">;</span>
+
+<span class="n">xml_document</span><span class="o">&lt;&gt;</span> <span class="n">doc</span><span class="p">;</span>
+
+<span class="c1">// xml declaration</span>
+<span class="n">xml_node</span><span class="o">&lt;&gt;*</span> <span class="n">decl</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">allocate_node</span><span class="p">(</span><span class="n">node_declaration</span><span class="p">);</span>
+<span class="n">decl</span><span class="o">-&gt;</span><span class="n">append_attribute</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">allocate_attribute</span><span class="p">(</span><span class="s">&quot;version&quot;</span><span class="p">,</span> <span class="s">&quot;1.0&quot;</span><span class="p">));</span>
+<span class="n">decl</span><span class="o">-&gt;</span><span class="n">append_attribute</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">allocate_attribute</span><span class="p">(</span><span class="s">&quot;encoding&quot;</span><span class="p">,</span> <span class="s">&quot;utf-8&quot;</span><span class="p">));</span>
+<span class="n">doc</span><span class="p">.</span><span class="n">append_node</span><span class="p">(</span><span class="n">decl</span><span class="p">);</span>
+
+<span class="c1">// root node</span>
+<span class="n">xml_node</span><span class="o">&lt;&gt;*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">allocate_node</span><span class="p">(</span><span class="n">node_element</span><span class="p">,</span> <span class="s">&quot;rootnode&quot;</span><span class="p">);</span>
+<span class="n">root</span><span class="o">-&gt;</span><span class="n">append_attribute</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">allocate_attribute</span><span class="p">(</span><span class="s">&quot;version&quot;</span><span class="p">,</span> <span class="s">&quot;1.0&quot;</span><span class="p">));</span>
+<span class="n">root</span><span class="o">-&gt;</span><span class="n">append_attribute</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">allocate_attribute</span><span class="p">(</span><span class="s">&quot;type&quot;</span><span class="p">,</span> <span class="s">&quot;example&quot;</span><span class="p">));</span>
+<span class="n">doc</span><span class="p">.</span><span class="n">append_node</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+
+<span class="c1">// child node</span>
+<span class="n">xml_node</span><span class="o">&lt;&gt;*</span> <span class="n">child</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">allocate_node</span><span class="p">(</span><span class="n">node_element</span><span class="p">,</span> <span class="s">&quot;childnode&quot;</span><span class="p">);</span>
+<span class="n">root</span><span class="o">-&gt;</span><span class="n">append_node</span><span class="p">(</span><span class="n">child</span><span class="p">);</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">xml_as_string</span><span class="p">;</span>
+<span class="c1">// watch for name collisions here, print() is a very common function name!</span>
+<span class="n">print</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">back_inserter</span><span class="p">(</span><span class="n">xml_as_string</span><span class="p">),</span> <span class="n">doc</span><span class="p">);</span>
+<span class="c1">// xml_as_string now contains the XML in string form, indented</span>
+<span class="c1">// (in all its angle bracket glory)</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">xml_no_indent</span><span class="p">;</span>
+<span class="c1">// print_no_indenting is the only flag that print() knows about</span>
+<span class="n">print</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">back_inserter</span><span class="p">(</span><span class="n">xml_no_indent</span><span class="p">),</span> <span class="n">doc</span><span class="p">,</span> <span class="n">print_no_indenting</span><span class="p">);</span>
+<span class="c1">// xml_no_indent now contains non-indented XML</span>
+</pre></div>
+
+
+<p><br /><br />
+Parsing and traversing an XML document like this one:</p>
+<div class="codehilite"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;rootnode</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span> <span class="na">type=</span><span class="s">&quot;example&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;childnode</span> <span class="na">entry=</span><span class="s">&quot;1&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;evendeepernode</span> <span class="na">attr1=</span><span class="s">&quot;cat&quot;</span> <span class="na">attr2=</span><span class="s">&quot;dog&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;evendeepernode</span> <span class="na">attr1=</span><span class="s">&quot;lion&quot;</span> <span class="na">attr2=</span><span class="s">&quot;wolf&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/childnode&gt;</span>
+  <span class="nt">&lt;childnode</span> <span class="na">entry=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/childnode&gt;</span>
+<span class="nt">&lt;/rootnode&gt;</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">traverse_xml</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">input_xml</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// (input_xml contains the above XML)</span>
+
+    <span class="c1">// make a safe-to-modify copy of input_xml</span>
+    <span class="c1">// (you should never modify the contents of an std::string directly)</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">xml_copy</span><span class="p">(</span><span class="n">input_xml</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">input_xml</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+    <span class="n">xml_copy</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="sc">&#39;\0&#39;</span><span class="p">);</span>
+
+    <span class="c1">// only use xml_copy from here on!</span>
+    <span class="n">xml_document</span><span class="o">&lt;&gt;</span> <span class="n">doc</span><span class="p">;</span>
+    <span class="c1">// we are choosing to parse the XML declaration</span>
+    <span class="c1">// parse_no_data_nodes prevents RapidXML from using the somewhat surprising</span>
+    <span class="c1">// behavior of having both values and data nodes, and having data nodes take</span>
+    <span class="c1">// precedence over values when printing</span>
+    <span class="c1">// &gt;&gt;&gt; note that this will skip parsing of CDATA nodes &lt;&lt;&lt;</span>
+    <span class="n">doc</span><span class="p">.</span><span class="n">parse</span><span class="o">&lt;</span><span class="n">parse_declaration_node</span> <span class="o">|</span> <span class="n">parse_no_data_nodes</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">xml_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+    <span class="c1">// alternatively, use one of the two commented lines below to parse CDATA nodes, </span>
+    <span class="c1">// but please note the above caveat about surprising interactions between </span>
+    <span class="c1">// values and data nodes (also read http://www.setnode.com/blog/a-rapidxml-gotcha/)</span>
+    <span class="c1">// if you use one of these two declarations try to use data nodes exclusively and</span>
+    <span class="c1">// avoid using value()</span>
+    <span class="c1">//doc.parse&lt;parse_declaration_node&gt;(&amp;xml_copy[0]); // just get the XML declaration</span>
+    <span class="c1">//doc.parse&lt;parse_full&gt;(&amp;xml_copy[0]); // parses everything (slowest)</span>
+
+    <span class="c1">// since we have parsed the XML declaration, it is the first node</span>
+    <span class="c1">// (otherwise the first node would be our root node)</span>
+    <span class="n">string</span> <span class="n">encoding</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">first_node</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">first_attribute</span><span class="p">(</span><span class="s">&quot;encoding&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">();</span>
+    <span class="c1">// encoding == &quot;utf-8&quot;</span>
+
+    <span class="c1">// we didn&#39;t keep track of our previous traversal, so let&#39;s start again</span>
+    <span class="c1">// we can match nodes by name, skipping the xml declaration entirely</span>
+    <span class="n">xml_node</span><span class="o">&lt;&gt;*</span> <span class="n">cur_node</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span><span class="n">first_node</span><span class="p">(</span><span class="s">&quot;rootnode&quot;</span><span class="p">);</span>
+    <span class="n">string</span> <span class="n">rootnode_type</span> <span class="o">=</span> <span class="n">cur_node</span><span class="o">-&gt;</span><span class="n">first_attribute</span><span class="p">(</span><span class="s">&quot;type&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">();</span>
+    <span class="c1">// rootnode_type == &quot;example&quot;</span>
+
+    <span class="c1">// go straight to the first evendeepernode</span>
+    <span class="n">cur_node</span> <span class="o">=</span> <span class="n">cur_node</span><span class="o">-&gt;</span><span class="n">first_node</span><span class="p">(</span><span class="s">&quot;childnode&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">first_node</span><span class="p">(</span><span class="s">&quot;evendeepernode&quot;</span><span class="p">);</span>
+    <span class="n">string</span> <span class="n">attr2</span> <span class="o">=</span> <span class="n">cur_node</span><span class="o">-&gt;</span><span class="n">first_attribute</span><span class="p">(</span><span class="s">&quot;attr2&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">();</span>
+    <span class="c1">// attr2 == &quot;dog&quot;</span>
+
+    <span class="c1">// and then to the second evendeepernode</span>
+    <span class="n">cur_node</span> <span class="o">=</span> <span class="n">cur_node</span><span class="o">-&gt;</span><span class="n">next_sibling</span><span class="p">(</span><span class="s">&quot;evendeepernode&quot;</span><span class="p">);</span>
+    <span class="n">attr2</span> <span class="o">=</span> <span class="n">cur_node</span><span class="o">-&gt;</span><span class="n">first_attribute</span><span class="p">(</span><span class="s">&quot;attr2&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">();</span>
+    <span class="c1">// now attr2 == &quot;wolf&quot;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>[Edit: Thanks to Michele Tavella for catching a silly bug on my part!]<br />
+[Edit: Thanks to Wei for noting that <code>parse_no_data_nodes</code> will skip over CDATA nodes]<br />
+[Edit: Thanks to remo for catching a typo]</p>
+<p>Thanks for the comments everyone! I'm glad to help out where I can, but please do note that I check this blog rather infrequently at this point in time and will often not respond for days, if not weeks. If you have a question to which you need an answer within a reasonable time frame, I'd recommend using Stack Overflow. On the other hand, if you have corrections and/or suggestions, please continue to leave them here and I'll address them as they come up. Thanks again!</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/remember-that-users-do-not-read/" rel="bookmark" title="Permalink to Remember that users do not read!">Remember that users do not read!</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, February 25, 2009 @ 14:42
+	</footer>
+	<div class="body">
+		<p>Users do not read anything they are not interested in. This is <a href="http://www.codinghorror.com/blog/archives/000114.htm">well</a> <a href="http://www.joelonsoftware.com/uibook/chapters/fog0000000062.html">known</a> and mentioned by many others.</p>
+<p>You might not agree, or think that only a small percentage of users don't read. After all, <em>you</em> read. You <em>love</em> to read! Unfortunately, you don't count. You're a programmer, you better love reading!</p>
+<p>I had absorbed this information before, but there is a definite difference between knowledge and experience. A couple of weeks ago I witnessed first-hand evidence that users do not read. I introduced a friend (who is the same age as I am and computer literate, uses Facebook and instant messaging, comfortable with Microsoft Office, etc.) to a computer game. This game, like most casual games nowadays, has a friendly tutorial, with large (~48pt) colorful fonts and a very gradual learning curve. The first thing the tutorial does is put up five lines of text which is maybe two sentences worth of information. All five lines are promptly ignored and the cursor heads straight for the "<em>Next</em>" button.</p>
+<p>Well, that's okay, there's nothing important in that dialog anyway.</p>
+<p><em>Next</em>; <em>next</em>; <em>next</em>. The next three dialogs are skipped. The last dialog happens to contain important information on the more subtle points of the game.</p>
+<p>This starts to drive me nuts, as I always eagerly soak up any bits of information a game throws at me. I want to play it to the best of my ability, after all. It hit me then: my friend just wanted to play and have fun. These dialogs were getting in the way! However, the game is entirely possible to play and enjoy without knowing every little intricate detail --- it's a 'casual' game after all.</p>
+<p>All good software is like this. You should be able to dive in and use the program without reading anything. Your power users---the ones who use your program everyday---will know it's advantageous to learn as many shortcuts and tips as possible, so they can complete their tasks faster. They are the ones who might end up reading the information you throw at them (though it's still not a certainty). Your occasional user, on the other hand, wants to get their task done as soon as possible, because they have other things to do. You may assume they will not read anything you throw at them that is over two sentences long.</p>
+<p>The most surprising thing to me was that those game dialogs were not close to being long. They were well under the "typical-users-see-nothing-past-this-word" limit and they still didn't get read. To me that implies that the only words you can assume will always get read are the words on the buttons themselves. Is your software still usable if all your explanatory text is missing?</p>
+<p>Perhaps, since users read the text on buttons, you could somehow associate explanatory text with a button? I suspect the new <a href="http://msdn.microsoft.com/en-us/library/aa511299.aspx">Task Dialogs</a> in Windows Vista were developed with this in mind: they use massive buttons and associate explanatory text with a button. It's unfortunate that they weren't introduced earlier, as the main reason you so often see simple "Yes / No" or "OK / Cancel" dialogs in Windows applications is they are really simple to code:</p>
+<div class="codehilite"><pre><span class="n">MessageBox</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="s">&quot;Isn&#39;t this easy?&quot;</span><span class="p">,</span> <span class="s">&quot;Yet Another Windows Application&quot;</span><span class="p">,</span> <span class="n">MB_YESNO</span><span class="p">);</span>
+</pre></div>
+
+
+<p>A task dialog type affair (pre-Vista), on the other hand, requires separate templates for each dialog or creating an indirect dialog (on the fly, with lots of simple but tedious math). Both of these approaches take infinitely longer to write.</p>
+<p>If you really care about usability, though, perhaps it's time well spent.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/lighttpd-tips/" rel="bookmark" title="Permalink to lighttpd tips">lighttpd tips</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, February 09, 2009 @ 16:32
+	</footer>
+	<div class="body">
+		<p><a href="http://www.lighttpd.net/">lighttpd</a> is a web server that is optimized for speed. It is particularly adept at serving static content. Since most web hosts provide Apache and most web applications assume you are running on Apache (which is why web hosts provide Apache and why web applications assume you use Apache and why web hosts provide Apache and ...) it can take a bit more effort to find lighttpd documentation.</p>
+<p>Some little things that I have picked up for lighttpd:</p>
+<p>lighttpd version:</p>
+<div class="codehilite"><pre>&gt; lighttpd -v
+</pre></div>
+
+
+<p>lighttpd version and supported features: <em>(note: that is a capital V)</em></p>
+<div class="codehilite"><pre>&gt; lighttpd -V
+</pre></div>
+
+
+<p><br /></p>
+<p>Using Apache to forward requests to lighttpd? Lighttpd will see that all incoming requests have the IP of the Apache proxy. There is a module <a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/DocsModExtForward"><code>mod_extforward</code></a> which will extract a real IP from the <code>X-Forwarded-For</code> header. Add these lines in the appropriate locations to your <code>lighttpd.conf</code> file:</p>
+<div class="codehilite"><pre><span class="k">server.modules</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="k">...</span>                      <span class="c1"># (other modules)</span>
+    <span class="s2">&quot;mod_extforward&quot;</span><span class="p">,</span>        <span class="c1"># change x-forwarded-for IPs into real IPs, </span>
+                             <span class="c1"># load after mod_accesslog</span>
+<span class="p">)</span>
+<span class="k">extforward.forwarder</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;127.0.0.1&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;trust&quot;</span>   <span class="c1"># where 127.0.0.1 is the IP address of the proxy</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>You can use variables in <code>lighttpd.conf</code>:</p>
+<div class="codehilite"><pre><span class="k">server.username</span> <span class="o">=</span> <span class="s2">&quot;myusername&quot;</span>                  <span class="c1"># lighttpd configuration option</span>
+<span class="k">var.basedir</span> <span class="o">=</span> <span class="s2">&quot;/users/home/&quot;</span> <span class="o">+</span> <span class="k">server.username</span>  <span class="c1"># declares a variable called &lt;em&gt;basedir&lt;/em&gt;</span>
+<span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/&quot;</span>        <span class="c1"># equal to &lt;em&gt;/users/home/myusername/www/&lt;/em&gt;</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>Set a different <code>server.document-root</code> depending on the host:</p>
+<div class="codehilite"><pre><span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;www.example.org&quot;</span> <span class="p">{</span>
+    <span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/www.example.org/&quot;</span>  <span class="c1"># basedir is our variable</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>Redirect people to a single canonical web address (in this example <code>http://example.org/blog/candy-is-yummy</code> will redirect to <code>http://www.example.org/blog/candy-is-yummy</code>):</p>
+<div class="codehilite"><pre><span class="c1"># make sure to include the mod_redirect module</span>
+<span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;example.org&quot;</span> <span class="p">{</span>                 <span class="c1"># if host matches &quot;example.org&quot; then...</span>
+    <span class="k">url.redirect</span> <span class="o">=</span> <span class="p">(</span>                             <span class="c1">#   if the URL matches ^/(.*)$</span>
+        <span class="s2">&quot;^/(.*)$&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://www.example.org/$1&quot;</span> <span class="c1">#   redirect to http://www.example.org/$1</span>
+    <span class="p">)</span>                                            <span class="c1">#   where $1 is what was captured by the</span>
+<span class="p">}</span>                                                <span class="c1">#   the parenthesis (.*)</span>
+</pre></div>
+
+
+<p><code>^/(.*)$</code> is an example of a <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a>. Specifically, lighttpd uses <a href="http://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions"><abbr title="Perl Compatible Regular Expressions">PCRE</abbr></a>. Instead of equality, <code>==</code>, you can also test for inequality with <code>!=</code>. If you want to use regular expressions in the match conditional, you can use <code>=~</code> and <code>!~</code> for equality and inequality respectively (this is useful for paths):</p>
+<div class="codehilite"><pre><span class="c1"># make sure to include the mod_access module</span>
+<span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;www.example.org&quot;</span> <span class="p">{</span>
+    <span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/www.example.org/&quot;</span>
+
+    <span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=~</span> <span class="s2">&quot;^/private/&quot;</span> <span class="p">{</span>  <span class="c1"># if url starts with /private then...</span>
+        <span class="k">url.access-deny</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>      <span class="c1">#   deny access to URLs that end with &quot;&quot;</span>
+    <span class="p">}</span>                               <span class="c1">#   (i.e. deny access to all URLs)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>If you use the regexp conditionals remember that many symbols have a special meaning. The '<code>.</code>' (period) is a common example, as it has the special meaning of "match any single character". You can <a href="http://en.wikipedia.org/wiki/Escape_character">escape</a> it by prepending a backslash: '<code>\.</code>'</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/what-is-duck-typing/" rel="bookmark" title="Permalink to What is duck typing?">What is duck typing?</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, January 27, 2009 @ 14:12
+	</footer>
+	<div class="body">
+		<p>I found that when I started dabbling in Python that it was a bit hard to get a grasp on what duck typing actually is. You hear that it achieves polymorphism without inheritance, but that really explains very little. I have a C++/Java/C# background and it took a bit of time before that wonderful epiphany came, where all of a sudden I seemed to get a good grasp on what the concept actually is.</p>
+<p>From the <a href="http://en.wikipedia.org/wiki/Duck_typing">Duck typing article on Wikipedia</a> we find that the term comes from the phrase "<em>If it walks like a duck and quacks like a duck, I would call it a duck.</em>"</p>
+<p>That makes perfect sense now, but it definitely didn't help further my understanding when I first came across it.</p>
+<p>Perhaps the best way to explain would be with some code. I'm using Java here because it's wordy enough that it's understandable even if you don't know the syntax. For this "real world" example we will be designing that ever so classic "real world application of object oriented programming": the hierarchy of vehicles.</p>
+<p>So suppose we have an existing <code>Driver</code> class that will drive our vehicles for us, as long as we provide the <code>gas()</code>, <code>brake()</code>, <code>turnLeft()</code> and <code>turnRight()</code> methods. In Java this would likely be expressed as an interface:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IDriveable</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">gas</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">brake</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnLeft</span><span class="o">();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnRight</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And then we would have a class that implements that interface, for example:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Car</span> <span class="kd">implements</span> <span class="n">IDriveable</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">gas</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Vroom vroom&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">brake</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Screeeechhhh!&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnLeft</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Left&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">turnRight</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Right&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And the <code>Driver</code> class would be similar to:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Driver</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">drive</span><span class="o">(</span><span class="n">IDriveable</span> <span class="n">vehicle</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">gas</span><span class="o">();</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">turnLeft</span><span class="o">();</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="na">brake</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>And the main class:</p>
+<div class="codehilite"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Start</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Car</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Car</span><span class="o">();</span>
+        <span class="n">Driver</span> <span class="n">d</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Driver</span><span class="o">();</span>
+        <span class="n">d</span><span class="o">.</span><span class="na">drive</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Sample output:</p>
+<div class="codehilite"><pre>Vroom vroom
+Left
+Screeeechhhh!
+</pre></div>
+
+
+<p>This is standard OOP stuff, where as long as our class implements the <code>IDriveable</code> interface, it'll be driveable by the <code>Driver</code> class. If the class does not implement that interface, the code will not even compile.</p>
+<p>If we bring duck typing into the picture, things change. Instead of having a defined interface (<code>IDriveable</code>) which must be implemented, all we require is that a given class implements the specific methods needed. There is no strict interface. In Python our code would look like:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Car</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">gas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Vroom vroom&quot;</span>
+    <span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Screeeechhhh!&quot;</span>
+    <span class="k">def</span> <span class="nf">turnLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Left&quot;</span>
+    <span class="k">def</span> <span class="nf">turnRight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Right&quot;</span>
+
+<span class="k">class</span> <span class="nc">Driver</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle</span><span class="p">):</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">gas</span><span class="p">()</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">turnLeft</span><span class="p">()</span>
+        <span class="n">vehicle</span><span class="o">.</span><span class="n">brake</span><span class="p">()</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">Car</span><span class="p">()</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">Driver</span><span class="p">()</span>
+<span class="n">d</span><span class="o">.</span><span class="n">drive</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Which produces the same output as above.</p>
+<p>Let's add a new class to the Python code:</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">Pencil</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">gas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Scribble scribble&quot;</span>
+    <span class="k">def</span> <span class="nf">turnLeft</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Left pencil turn?&quot;</span>
+    <span class="c"># note that turnRight is missing!</span>
+    <span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;PUT YOUR PENCILS DOWN&quot;</span>
+</pre></div>
+
+
+<p>Although <code>Pencil</code> having these methods makes absolutely no sense, we could pass this to the <code>drive()</code> method and there will be no errors. Yep, even though <code>Pencil</code> doesn't implement <code>turnRight()</code>, because <code>turnRight()</code> is never called, all this code will run, error free!</p>
+<p>We have a <code>Pencil</code> that can <code>gas()</code>, <code>turnLeft()</code>, and <code>brake()</code>, just like a <code>Car</code>. What is the difference between them, as far as this code is concerned? None!</p>
+<p>This is what duck typing is. If a class acts like another class, it can substitute for that class. There's no need for there to be strictly defined relationships between classes.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/" rel="bookmark" title="Permalink to MapVirtualKey(), GetKeyNameText(), and a story of how to get proper names for the arrow keys">MapVirtualKey(), GetKeyNameText(), and a story of how to get proper names for the arrow keys</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, December 20, 2008 @ 14:50
+	</footer>
+	<div class="body">
+		<p>So let's say you are currently storing and using virtual key codes to handle keyboard input for a game. You decide to let your users customize their keys, so you go ahead and write some key configuration code. This requires that you map virtual key codes to key names.</p>
+<p>Luckily, Windows provides some functions that do exactly what you want! Essentially you use <code>MapVirtualKey()</code> to get a scancode for that key and then pass that scancode (left-shifted by 16) into <code>GetKeyNameText()</code>.</p>
+<p>Some minutes later you finish your code and you go to test it. You hit the A key and you see 'A'. The 5 key outputs '5'. Even the Backspace key outputs 'Backspace'. It works as expected.</p>
+<p>Then you hit one of the arrow keys and your code spits out 'Num 8'. It's right yet it's wrong.</p>
+<p><a href="http://blogs.msdn.com/michkap/archive/2006/08/29/729476.aspx">Michael Kaplan has a blog entry</a> that describes a recent update to the <code>MapVirtualKeyEx()</code> call:</p>
+<blockquote>
+<p>MAPVK_VK_TO_VSC_EX:</p>
+<p><strong>Windows Vista and later</strong>: The uCode parameter is a virtual-key code and is translated into a scan code. If it is a virtual-key code that does not distinguish between left- and right-hand keys, the left-hand scan code is returned. If the scan code is an extended scan code, the high byte of the uCode value can contain either 0xe0 or 0xe1 to specify the extended scan code. If there is no translation, the function returns 0.</p>
+</blockquote>
+<p>Unfortunately this doesn't help much as Windows XP is still used by a majority of users. However, this does imply that the current <code>MapVirtualKey[Ex]()</code> call does not specify the extended scan code. So if we just set the extended bit for some characters we may end up with a function similar to this:</p>
+<div class="codehilite"><pre><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">GetKeyName</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">virtualKey</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">scanCode</span> <span class="o">=</span> <span class="n">MapVirtualKey</span><span class="p">(</span><span class="n">virtualKey</span><span class="p">,</span> <span class="n">MAPVK_VK_TO_VSC</span><span class="p">);</span>
+
+    <span class="c1">// because MapVirtualKey strips the extended bit for some keys</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">virtualKey</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">case</span> <span class="n">VK_LEFT</span>: <span class="k">case</span> <span class="n">VK_UP</span>: <span class="k">case</span> <span class="n">VK_RIGHT</span>: <span class="k">case</span> <span class="n">VK_DOWN</span>: <span class="c1">// arrow keys</span>
+        <span class="k">case</span> <span class="n">VK_PRIOR</span>: <span class="k">case</span> <span class="n">VK_NEXT</span>: <span class="c1">// page up and page down</span>
+        <span class="k">case</span> <span class="n">VK_END</span>: <span class="k">case</span> <span class="n">VK_HOME</span>:
+        <span class="k">case</span> <span class="n">VK_INSERT</span>: <span class="k">case</span> <span class="n">VK_DELETE</span>:
+        <span class="k">case</span> <span class="n">VK_DIVIDE</span>: <span class="c1">// numpad slash</span>
+        <span class="k">case</span> <span class="n">VK_NUMLOCK</span>:
+        <span class="p">{</span>
+            <span class="n">scanCode</span> <span class="o">|=</span> <span class="mh">0x100</span><span class="p">;</span> <span class="c1">// set extended bit</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kt">char</span> <span class="n">keyName</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">GetKeyNameText</span><span class="p">(</span><span class="n">scanCode</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="mi">16</span><span class="p">,</span> <span class="n">keyName</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">keyName</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">keyName</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s">&quot;[Error]&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/std-map-access-violation-or-not/" rel="bookmark" title="Permalink to std::map access violation (or not)">std::map access violation (or not)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, October 11, 2008 @ 18:42
+	</footer>
+	<div class="body">
+		<p>I just spent some time tracking down this fun little bug:</p>
+<p>I use a mix of <tt class="docutils literal"><span class="pre">std::map</span></tt> and <tt class="docutils literal">Boost.Function</tt> to reduce the ugliness of the Windows message loop. Everything is working just fine, until I make a couple of changes and all of a sudden one of my <tt class="docutils literal"><span class="pre">std::map</span></tt>s is throwing an exception in the destructor:</p>
+<div class="highlight"><pre>Access violation reading location 0xccccccd4.
+</pre></div>
+<p>In this code in <tt class="docutils literal">xtree</tt>:</p>
+<div class="highlight"><pre><span class="cp">#if _HAS_ITERATOR_DEBUGGING</span>
+    <span class="kt">void</span> <span class="nf">_Orphan_ptr</span><span class="p">(</span><span class="n">_Myt</span><span class="o">&amp;</span> <span class="n">_Cont</span><span class="p">,</span> <span class="n">_Nodeptr</span> <span class="n">_Ptr</span><span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>       <span class="c1">// orphan iterators with specified node pointers</span>
+        <span class="n">_Lockit</span> <span class="n">_Lock</span><span class="p">(</span><span class="n">_LOCK_DEBUG</span><span class="p">);</span>
+        <span class="n">const_iterator</span> <span class="o">**</span><span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="n">_Cont</span><span class="p">.</span><span class="n">_Myfirstiter</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">((</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Ptr</span> <span class="o">==</span> <span class="n">_Myhead</span>
+<span class="hll">                <span class="o">||</span> <span class="n">_Ptr</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Ptr</span> <span class="o">!=</span> <span class="n">_Ptr</span><span class="p">)</span>
+</span>            <span class="p">{</span>
+                <span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">**</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mynextiter</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>       <span class="c1">// orphan the iterator</span>
+                <span class="p">(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mycont</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="o">*</span><span class="n">_Pnext</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_iterator</span> <span class="o">*</span><span class="p">)(</span><span class="o">*</span><span class="n">_Pnext</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_Mynextiter</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="cp">#endif </span><span class="cm">/* _HAS_ITERATOR_DEBUGGING */</span><span class="cp"></span>
+</pre></div>
+<p>Of course, that is suspiciously close to <tt class="docutils literal">0xcccccccc</tt>, which is used by the debugging runtimes to mark uninitalized stack. (This will be important later.) In any case I go through the usual debugging motions, making sure I'm not putting anything funny into my map container and that values inside the container are what they should be.</p>
+<p>So, what was the cause of this bug? It was a result of the change I was making earlier; this is the original code:</p>
+<div class="highlight"><pre><span class="n">LVITEM</span> <span class="n">itemText</span><span class="p">;</span>
+<span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">itemText</span><span class="p">));</span>
+<span class="n">itemText</span><span class="p">.</span><span class="n">cchTextMax</span> <span class="o">=</span> <span class="n">MAX_PATH</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">buff</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">];</span>
+<span class="n">itemText</span><span class="p">.</span><span class="n">pszText</span> <span class="o">=</span> <span class="n">buff</span><span class="p">;</span>
+<span class="n">SendMessage</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">LVM_GETITEMTEXT</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">LPARAM</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>And I changed it to use the <tt class="docutils literal">ListView_GetItemText</tt> macro, which is far more succinct:</p>
+<div class="highlight"><pre><span class="kt">char</span> <span class="n">itemText</span><span class="p">[</span><span class="n">MAX_PATH</span><span class="p">];</span>
+<span class="n">ListView_GetItemText</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">itemText</span><span class="p">,</span> <span class="n">_countof</span><span class="p">(</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>No problem yet, right? Ready for the punchline?</p>
+<p><em>I left this line in at the bottom:</em></p>
+<div class="highlight"><pre><span class="n">SendMessage</span><span class="p">(</span><span class="n">listViewHandle</span><span class="p">,</span> <span class="n">LVM_GETITEMTEXT</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">LPARAM</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">itemText</span><span class="p">));</span>
+</pre></div>
+<p>For those lucky folks who aren't familiar with all the wonderful intricacies of Windows programming:</p>
+<p><tt class="docutils literal">SendMessage()</tt> is a magical &quot;do all&quot; function that sends a message to a particular window, with <tt class="docutils literal">WPARAM</tt> and <tt class="docutils literal">LPARAM</tt> values tagging along. In this case, we're sending a message of <tt class="docutils literal">LVM_GETITEMTEXT</tt> to the control denoted by <tt class="docutils literal">listViewHandle</tt>. The MSDN documentation for <tt class="docutils literal">LVM_GETITEMTEXT</tt> states that it wants <tt class="docutils literal">WPARAM</tt> and <tt class="docutils literal">LPARAM</tt> to be:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">WPARAM : iItem - Index of the list-view item</div>
+<div class="line"><strong>LPARAM : pitem - Pointer to an LVITEM structure.</strong></div>
+</div>
+</blockquote>
+<p>My <tt class="docutils literal">LPARAM</tt>, <tt class="docutils literal">itemText</tt>, is no longer an <tt class="docutils literal">LVITEM</tt> structure (it is now a char array of size <tt class="docutils literal">MAX_PATH</tt>). There is absolutely no way that the <tt class="docutils literal">LVM_GETITEMTEXT</tt> code can know that I've made a colossal (yet tiny!) mistake, so I assume that it dutifully casts <tt class="docutils literal">itemText</tt> into an <tt class="docutils literal">LVITEM</tt> structure and does the right stuff with horrendously wrong data. Tada, stack corrupted.</p>
+<p>Notice that the source of this bug appears nowhere near an <tt class="docutils literal"><span class="pre">std::map</span></tt>. It is, in fact, in a different function (and a different class and a different file...) entirely! This is why memory corruption errors are one of the most feared bugs around.</p>
+<p>Conclusion: if <tt class="docutils literal"><span class="pre">std::map</span></tt> is dying in <tt class="docutils literal">clear()</tt> (or ever, frankly), you may very well be doing something bad, memory wise.</p>
+
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/proctors-in-calgary/" rel="bookmark" title="Permalink to Proctors in Calgary">Proctors in Calgary</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, July 11, 2006 @ 16:24
+	</footer>
+	<div class="body">
+		<p>"Proctor" is the fancy word for those people who administer exams and tests. If you're taking distance education courses, you may need to find one. I had to find a proctor a year ago to make up for an exam I missed, and it took some time to figure out how to even begin. (A search for "calgary proctors" did not bring up very much...)</p>
+<p>I finally found some information on proctors by calling the librarians at the <a href="http://newcpl.calgarypubliclibrary.com/Branches.aspx?id=2">Castell Central Library</a>. So...my tip for finding a proctor is to call the library in your city.</p>
+<p>In case there are any other Calgarians who need a proctor, here’s some information on proctors from <strong>2005</strong>, along with per exam proctor fees:</p>
+<table><tbody><tr>
+    <td>Athabasca University</td>
+    <td>(403) 263-6465</td>
+    <td>$40</td>
+</tr><tr>
+    <td>University of Calgary</td>
+    <td>(403) 220-5524</td>
+    <td>$80</td>
+</tr><tr>
+    <td>SAIT</td>
+    <td>(403) 210-4283</td>
+    <td>$50</td>
+</tr><tr>
+    <td>Rocky Mountain College</td>
+    <td>(403) 284-5100</td>
+    <td>$20</td>
+</tr></tbody></table>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/linksys-befsr81-disconnects/" rel="bookmark" title="Permalink to Linksys BEFSR81 disconnects">Linksys BEFSR81 disconnects</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, July 11, 2006 @ 12:46
+	</footer>
+	<div class="body">
+		<p>For the longest time I had this constant problem with my router, a Linksys BEFSR81 (the 8-port version of the BEFSR41) constantly disconnecting the computers connected to it. It wasn’t the Internet connection going down, since I had a computer that was directly connected to the modem as well, and it never had any problems.</p>
+<p>So of course when troubleshooting something like a router, you go and get the latest firmware. No luck there. I also tried resetting the router, restoring default settings, changing the ports used on the back, and so on.</p>
+<p>Finally, I tried giving one computer DMZ access (I’m not forgetting about the security concerns raised by doing this). It worked. No more disconnections for that computer, and for now, I’m satisfied.</p>
+<p>Posting this in case it comes in handy for anyone else experiencing disconnection problems.</p>
+<p>[2008 Addendum: The only real solution to this problem is to get a better router. The BEFSR81 is at least 7 years old now.]</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/university-of-waterloo-cheers/" rel="bookmark" title="Permalink to University of Waterloo cheers">University of Waterloo cheers</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Sunday, April 30, 2006 @ 17:23
+	</footer>
+	<div class="body">
+		<p>Here are some cheers from the University of Waterloo Math orientation (which I went through 4 years ago). These include such classics as <em>Math Rocks</em>, <em>The Biggest Tie</em>, <em>How's the Tie</em>, and <em>Water Water Water</em>. I'm not sure why, but my personal favorite is <em>The Biggest Tie</em>.</p>
+<blockquote>
+<h3><em>Math Rocks</em></h3>
+<p>M-A<br />
+M-A-T<br />
+M-A-T-H<br />
+Math Rocks!  </p>
+<p>Say it loud<br />
+Say it big<br />
+Let it boil in your blood, feel it zag as you zig<br />
+We survive<br />
+All the knocks<br />
+We have pride when we cheer and we think Math Rocks!  </p>
+</blockquote>
+<p>One group chants the first verse while the other group chants the second verse, at the same time. The chants should converge on the phrase "Math Rocks!".</p>
+<blockquote>
+<h3><em>The Biggest Tie</em></h3>
+<p>The biggest tie<br />
+I ever saw<br />
+Was hanging from<br />
+The MC wall  </p>
+<p>I looked at it<br />
+And then I knew<br />
+I wanted to be<br />
+A Mathie too  </p>
+<p>I stole the tie<br />
+It made me laugh<br />
+Because it's true<br />
+That I love Math  </p>
+<p>And so began<br />
+My new journey<br />
+To be part of<br />
+Math faculty  </p>
+<p>My school is sweet<br />
+SWEET LIKE A FOX!<br />
+Because I know<br />
+UW Math Rocks  </p>
+</blockquote>
+<p>Sung to the tune and style of The Littlest Worm, The Princess Pat, or I Met a Bear.</p>
+<blockquote>
+<h3><em>Water Water Water</em></h3>
+<p>Water water water!<br />
+Loo loo loo!<br />
+Water water water!<br />
+Loo loo loo!<br />
+Water!<br />
+Loo!<br />
+Water!<br />
+Loo!<br />
+Water water water!<br />
+Loo loo loo!  </p>
+</blockquote>
+<p>One group (typically the orientation leaders) starts the cheer by yelling "Water water water!". The other group then replies with "Loo loo loo!". It continues in this fashion until the end of the cheer.</p>
+<p>There are more Math cheers in the <del>Math Handbook</del> <a href="http://www.orientation.math.uwaterloo.ca/2008/cheers/">Math Orientation 2008 guide</a>.</p>
+	</div>
+</section>
+
+	<p class="next_link">
+		<a href="/page/2/">Newer &raquo;</a>
+	</p>
+</section>
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

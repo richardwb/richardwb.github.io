@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/lighttpd-tips/" rel="bookmark" title="Permalink to lighttpd tips">lighttpd tips</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, February 09, 2009 @ 16:32
+	</footer>
+	<div class="body">
+		<p><a href="http://www.lighttpd.net/">lighttpd</a> is a web server that is optimized for speed. It is particularly adept at serving static content. Since most web hosts provide Apache and most web applications assume you are running on Apache (which is why web hosts provide Apache and why web applications assume you use Apache and why web hosts provide Apache and ...) it can take a bit more effort to find lighttpd documentation.</p>
+<p>Some little things that I have picked up for lighttpd:</p>
+<p>lighttpd version:</p>
+<div class="codehilite"><pre>&gt; lighttpd -v
+</pre></div>
+
+
+<p>lighttpd version and supported features: <em>(note: that is a capital V)</em></p>
+<div class="codehilite"><pre>&gt; lighttpd -V
+</pre></div>
+
+
+<p><br /></p>
+<p>Using Apache to forward requests to lighttpd? Lighttpd will see that all incoming requests have the IP of the Apache proxy. There is a module <a href="http://redmine.lighttpd.net/projects/lighttpd/wiki/DocsModExtForward"><code>mod_extforward</code></a> which will extract a real IP from the <code>X-Forwarded-For</code> header. Add these lines in the appropriate locations to your <code>lighttpd.conf</code> file:</p>
+<div class="codehilite"><pre><span class="k">server.modules</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="k">...</span>                      <span class="c1"># (other modules)</span>
+    <span class="s2">&quot;mod_extforward&quot;</span><span class="p">,</span>        <span class="c1"># change x-forwarded-for IPs into real IPs, </span>
+                             <span class="c1"># load after mod_accesslog</span>
+<span class="p">)</span>
+<span class="k">extforward.forwarder</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;127.0.0.1&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;trust&quot;</span>   <span class="c1"># where 127.0.0.1 is the IP address of the proxy</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>You can use variables in <code>lighttpd.conf</code>:</p>
+<div class="codehilite"><pre><span class="k">server.username</span> <span class="o">=</span> <span class="s2">&quot;myusername&quot;</span>                  <span class="c1"># lighttpd configuration option</span>
+<span class="k">var.basedir</span> <span class="o">=</span> <span class="s2">&quot;/users/home/&quot;</span> <span class="o">+</span> <span class="k">server.username</span>  <span class="c1"># declares a variable called &lt;em&gt;basedir&lt;/em&gt;</span>
+<span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/&quot;</span>        <span class="c1"># equal to &lt;em&gt;/users/home/myusername/www/&lt;/em&gt;</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>Set a different <code>server.document-root</code> depending on the host:</p>
+<div class="codehilite"><pre><span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;www.example.org&quot;</span> <span class="p">{</span>
+    <span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/www.example.org/&quot;</span>  <span class="c1"># basedir is our variable</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><br /></p>
+<p>Redirect people to a single canonical web address (in this example <code>http://example.org/blog/candy-is-yummy</code> will redirect to <code>http://www.example.org/blog/candy-is-yummy</code>):</p>
+<div class="codehilite"><pre><span class="c1"># make sure to include the mod_redirect module</span>
+<span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;example.org&quot;</span> <span class="p">{</span>                 <span class="c1"># if host matches &quot;example.org&quot; then...</span>
+    <span class="k">url.redirect</span> <span class="o">=</span> <span class="p">(</span>                             <span class="c1">#   if the URL matches ^/(.*)$</span>
+        <span class="s2">&quot;^/(.*)$&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://www.example.org/$1&quot;</span> <span class="c1">#   redirect to http://www.example.org/$1</span>
+    <span class="p">)</span>                                            <span class="c1">#   where $1 is what was captured by the</span>
+<span class="p">}</span>                                                <span class="c1">#   the parenthesis (.*)</span>
+</pre></div>
+
+
+<p><code>^/(.*)$</code> is an example of a <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a>. Specifically, lighttpd uses <a href="http://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions"><abbr title="Perl Compatible Regular Expressions">PCRE</abbr></a>. Instead of equality, <code>==</code>, you can also test for inequality with <code>!=</code>. If you want to use regular expressions in the match conditional, you can use <code>=~</code> and <code>!~</code> for equality and inequality respectively (this is useful for paths):</p>
+<div class="codehilite"><pre><span class="c1"># make sure to include the mod_access module</span>
+<span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;host&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;www.example.org&quot;</span> <span class="p">{</span>
+    <span class="k">server.document-root</span> <span class="o">=</span> <span class="k">basedir</span> <span class="o">+</span> <span class="s2">&quot;/www/www.example.org/&quot;</span>
+
+    <span class="nb">$HTTP</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=~</span> <span class="s2">&quot;^/private/&quot;</span> <span class="p">{</span>  <span class="c1"># if url starts with /private then...</span>
+        <span class="k">url.access-deny</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>      <span class="c1">#   deny access to URLs that end with &quot;&quot;</span>
+    <span class="p">}</span>                               <span class="c1">#   (i.e. deny access to all URLs)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>If you use the regexp conditionals remember that many symbols have a special meaning. The '<code>.</code>' (period) is a common example, as it has the special meaning of "match any single character". You can <a href="http://en.wikipedia.org/wiki/Escape_character">escape</a> it by prepending a backslash: '<code>\.</code>'</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

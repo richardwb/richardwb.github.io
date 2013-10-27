@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/a-rapidxml-gotcha/" rel="bookmark" title="Permalink to A RapidXML gotcha">A RapidXML gotcha</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, March 26, 2009 @ 13:00
+	</footer>
+	<div class="body">
+		<p>I just spent a couple of hours trying to track down why I was seemingly losing data values while modifying nodes in the DOM. It's spelled out in the documentation, but it definitely threw me for a loop (I would consider this behavior surprising). Basically, RapidXML gives you the ability to assign/modify the value of a node and it also likes to create data nodes when you parse a document. When printing, the data node takes precedence over the value.</p>
+<p>When you create a document from scratch this likely won't bite you, but when you parse an existing document and neglect to supply the <code>parse_no_data_nodes</code> flag, the parser creates data nodes. If you try to update your values with the <code>value()</code> function, it works just fine (and you can even pull it back out without any problems), but when you use the <code>print()</code> function, the data node (which you haven't updated) will show up instead.</p>
+<p>What made this even more difficult to track down was how <code>value()</code> will return the first data node it finds if there isn't a value yet, so it really does seem like you have a value already. I've updated my <a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/">prior RapidXML entry</a> to include the <code>parse_no_data_nodes</code> flag, which may save someone some time down the road.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

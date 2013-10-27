@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/remember-that-users-do-not-read/" rel="bookmark" title="Permalink to Remember that users do not read!">Remember that users do not read!</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, February 25, 2009 @ 14:42
+	</footer>
+	<div class="body">
+		<p>Users do not read anything they are not interested in. This is <a href="http://www.codinghorror.com/blog/archives/000114.htm">well</a> <a href="http://www.joelonsoftware.com/uibook/chapters/fog0000000062.html">known</a> and mentioned by many others.</p>
+<p>You might not agree, or think that only a small percentage of users don't read. After all, <em>you</em> read. You <em>love</em> to read! Unfortunately, you don't count. You're a programmer, you better love reading!</p>
+<p>I had absorbed this information before, but there is a definite difference between knowledge and experience. A couple of weeks ago I witnessed first-hand evidence that users do not read. I introduced a friend (who is the same age as I am and computer literate, uses Facebook and instant messaging, comfortable with Microsoft Office, etc.) to a computer game. This game, like most casual games nowadays, has a friendly tutorial, with large (~48pt) colorful fonts and a very gradual learning curve. The first thing the tutorial does is put up five lines of text which is maybe two sentences worth of information. All five lines are promptly ignored and the cursor heads straight for the "<em>Next</em>" button.</p>
+<p>Well, that's okay, there's nothing important in that dialog anyway.</p>
+<p><em>Next</em>; <em>next</em>; <em>next</em>. The next three dialogs are skipped. The last dialog happens to contain important information on the more subtle points of the game.</p>
+<p>This starts to drive me nuts, as I always eagerly soak up any bits of information a game throws at me. I want to play it to the best of my ability, after all. It hit me then: my friend just wanted to play and have fun. These dialogs were getting in the way! However, the game is entirely possible to play and enjoy without knowing every little intricate detail --- it's a 'casual' game after all.</p>
+<p>All good software is like this. You should be able to dive in and use the program without reading anything. Your power users---the ones who use your program everyday---will know it's advantageous to learn as many shortcuts and tips as possible, so they can complete their tasks faster. They are the ones who might end up reading the information you throw at them (though it's still not a certainty). Your occasional user, on the other hand, wants to get their task done as soon as possible, because they have other things to do. You may assume they will not read anything you throw at them that is over two sentences long.</p>
+<p>The most surprising thing to me was that those game dialogs were not close to being long. They were well under the "typical-users-see-nothing-past-this-word" limit and they still didn't get read. To me that implies that the only words you can assume will always get read are the words on the buttons themselves. Is your software still usable if all your explanatory text is missing?</p>
+<p>Perhaps, since users read the text on buttons, you could somehow associate explanatory text with a button? I suspect the new <a href="http://msdn.microsoft.com/en-us/library/aa511299.aspx">Task Dialogs</a> in Windows Vista were developed with this in mind: they use massive buttons and associate explanatory text with a button. It's unfortunate that they weren't introduced earlier, as the main reason you so often see simple "Yes / No" or "OK / Cancel" dialogs in Windows applications is they are really simple to code:</p>
+<div class="codehilite"><pre><span class="n">MessageBox</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="s">&quot;Isn&#39;t this easy?&quot;</span><span class="p">,</span> <span class="s">&quot;Yet Another Windows Application&quot;</span><span class="p">,</span> <span class="n">MB_YESNO</span><span class="p">);</span>
+</pre></div>
+
+
+<p>A task dialog type affair (pre-Vista), on the other hand, requires separate templates for each dialog or creating an indirect dialog (on the fly, with lots of simple but tedious math). Both of these approaches take infinitely longer to write.</p>
+<p>If you really care about usability, though, perhaps it's time well spent.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

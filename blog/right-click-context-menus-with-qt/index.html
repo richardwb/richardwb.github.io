@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/right-click-context-menus-with-qt/" rel="bookmark" title="Permalink to Right-click context menus with Qt">Right-click context menus with Qt</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, July 23, 2009 @ 20:47
+	</footer>
+	<div class="body">
+		<p>Getting right-clicks to popup a context menu is pretty straightforward in Qt. There are just a couple of things to watch out for...</p>
+<p>First, there are several ways to tell Qt you want a context menu. One approach is to subclass the widget and override the <code>QWidget::contextMenuEvent()</code> event handler. However, I think the easiest approach is to call <code>setContextMenuPolicy(Qt::CustomContextMenu)</code> on the widget you want, and then connect the <code>customContextMenuRequested()</code> signal to the appropriate slot:</p>
+<div class="codehilite"><pre><span class="c1">// myWidget is any QWidget-derived class</span>
+<span class="n">myWidget</span><span class="o">-&gt;</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">::</span><span class="n">CustomContextMenu</span><span class="p">);</span>
+<span class="n">connect</span><span class="p">(</span><span class="n">myWidget</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="n">customContextMenuRequested</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span><span class="p">)),</span>
+    <span class="k">this</span><span class="p">,</span> <span class="n">SLOT</span><span class="p">(</span><span class="n">ShowContextMenu</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span><span class="p">)));</span>
+</pre></div>
+
+
+<p>Next, note that the <code>const QPoint&amp; pos</code> parameter in the <code>customContextMenuRequested()</code> signal is <a href="http://doc.trolltech.com/4.5/qwidget.html#customContextMenuRequested">normally in widget coordinates</a>. However, also note that classes which inherit from <code>QAbstractScrollArea</code><sup id="fnref:viewportclasses"><a class="footnote-ref" href="#fn:viewportclasses" rel="footnote">1</a></sup> instead use the coordinates of their <code>viewport()</code>. Either way, you will need to map these coordinates to global coordinates using <code>mapToGlobal()</code>.</p>
+<p>Finally, simply either <code>popup()</code> or <code>exec()</code> your <code>QMenu</code>. Remember that <code>popup()</code> is non-blocking, so if you wish to use that, make sure your <code>QMenu</code> is created on the heap (or some other way of guaranteeing that the QMenu's lifetime outlasts the scope of the function)!</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">ShowContextMenu</span><span class="p">(</span><span class="k">const</span> <span class="n">QPoint</span><span class="o">&amp;</span> <span class="n">pos</span><span class="p">)</span> <span class="c1">// this is a slot</span>
+<span class="p">{</span>
+    <span class="c1">// for most widgets</span>
+    <span class="n">QPoint</span> <span class="n">globalPos</span> <span class="o">=</span> <span class="n">myWidget</span><span class="o">-&gt;</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">pos</span><span class="p">);</span>
+    <span class="c1">// for QAbstractScrollArea and derived classes you would use:</span>
+    <span class="c1">// QPoint globalPos = myWidget-&gt;viewport()-&gt;mapToGlobal(pos);</span>
+
+    <span class="n">QMenu</span> <span class="n">myMenu</span><span class="p">;</span>
+    <span class="n">myMenu</span><span class="p">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&quot;Menu Item 1&quot;</span><span class="p">);</span>
+    <span class="c1">// ...</span>
+
+    <span class="n">QAction</span><span class="o">*</span> <span class="n">selectedItem</span> <span class="o">=</span> <span class="n">myMenu</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="n">globalPos</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">selectedItem</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// something was chosen, do stuff</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="c1">// nothing was chosen</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:viewportclasses">
+<p>Examples include <code>QTreeWidget</code>, <code>QTreeView</code>, <code>QListWidget</code>, <code>QListView</code>, <code>QTableWidget</code>, <code>QTableView</code>, <code>QTextEdit</code>, <code>QPlainTextEdit</code>, and <code>QMdiArea</code>.&#160;<a class="footnote-backref" href="#fnref:viewportclasses" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

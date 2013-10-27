@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/include-guidelines/" rel="bookmark" title="Permalink to #include Guidelines">#include Guidelines</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, June 22, 2009 @ 19:20
+	</footer>
+	<div class="body">
+		<p>This is mostly for my own reference, but here are some of the guidelines I like to follow when it comes to <code>#include</code>s in C++. Given <code>foo.cpp</code> and <code>foo.h</code>:</p>
+<ul>
+<li>
+<p><code>foo.h</code> should include everything it mentions and no more. For example, if you use <code>boost::random</code> in the implementation, don't <code>#include &lt;boost/random.hpp&gt;</code> in <code>foo.h</code>.</p>
+</li>
+<li>
+<p><code>foo.cpp</code> should also include everything it mentions and no more.</p>
+</li>
+<li>
+<p><code>foo.cpp</code>'s first include should be <code>#include "foo.h"</code>.</p>
+</li>
+<li>
+<p>Precompiled headers, if used, should be specified in <code>foo.cpp</code> only and will need to be the first <code>#include</code> (<code>#include "foo.h"</code> will then be the second).</p>
+</li>
+<li>
+<p>Except for the above two exceptions, the order I like to follow for <code>#include</code>s is:</p>
+<ol>
+<li>Headers from your own project (generally of the form <code>#include "baz.h"</code>)</li>
+<li>Headers from non-standard libraries (such as Qt)</li>
+<li>Standard libraries (I include Boost in here because I use it so pervasively)</li>
+<li>Platform headers (like <code>#include &lt;windows.h&gt;</code>)</li>
+</ol>
+</li>
+<li>
+<p>Within each of the above groups try to alphabetically order the <code>#include</code>s if at all possible.</p>
+</li>
+<li>
+<p>Forward declare whenever you can get away with it.</p>
+</li>
+</ul>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/the-difference-between-qt-key-enter-and-qt-key-r/" rel="bookmark" title="Permalink to The difference between Qt::Key_Enter and Qt::Key_Return">The difference between Qt::Key_Enter and Qt::Key_Return</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, June 10, 2009 @ 10:48
+	</footer>
+	<div class="body">
+		<p>It's specified in the <a href="http://doc.trolltech.com/4.5/qt.html#Key-enum">documentation</a>, though in a slightly subtle manner. Essentially, <code>Qt::Key_Enter</code> is the keypad Enter, while <code>Qt::Key_Return</code> is the "regular" Enter, the one which you normally use while typing.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/visual-studio-2010-sounds-pretty-neat-so-far/" rel="bookmark" title="Permalink to Visual Studio 2010 sounds pretty neat so far">Visual Studio 2010 sounds pretty neat so far</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Tuesday, June 09, 2009 @ 10:04
+	</footer>
+	<div class="body">
+		<p>I'm a very big fan of the Visual Studio IDE (I think it's the best around, for any platform). However, Microsoft has historically put less of a emphasis on the C++ portion and the past couple of versions have had only minor bullet points on the C++ side.</p>
+<p>I think they've wizened up a bit and the next Visual C++, 2010, has some notable improvements in store (C++0x support, for one). They've also put a lot of work into completely reworking their C++ IntelliSense engine. There's not much for me to say, really, as they have a great <a href="http://blogs.msdn.com/vcblog/default.aspx">blog</a>. I'll just highlight some of the articles I found the most interesting, which coincidentally all focus on IntelliSense:</p>
+<ul>
+<li><a href="http://blogs.msdn.com/vcblog/archive/2009/01/27/dev10-is-just-the-beginning.aspx">A bit of history about the current IntelliSense engine, FEACP</a></li>
+<li><a href="http://blogs.msdn.com/vcblog/archive/2009/03/10/testing-vc-compiler-and-intellisense.aspx">Just how do they test it anyway?</a></li>
+<li><a href="http://blogs.msdn.com/vcblog/archive/2009/05/27/rebuilding-intellisense.aspx">Details about the upcoming engine</a></li>
+<li><a href="http://blogs.msdn.com/vcblog/archive/2009/06/01/c-gets-squiggles.aspx">Squiggles.</a></li>
+</ul>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-staticmetaobject-is-not-a-member-of/" rel="bookmark" title="Permalink to Qt: staticMetaObject is not a member of...">Qt: staticMetaObject is not a member of...</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, May 29, 2009 @ 21:11
+	</footer>
+	<div class="body">
+		<p>Just got this error message while compiling a tiny class that derives from <code>QTreeWidgetItem</code>:</p>
+<div class="codehilite"><pre>error C2039: &#39;staticMetaObject&#39; : is not a member of &#39;QTreeWidgetItem&#39;
+</pre></div>
+
+
+<p>What this is saying is that <code>QTreeWidgetItem</code> does not inherit from <code>QObject</code>, meaning that your own, singly-inherited class also does not inherit from <code>QObject</code>. Inheriting from <code>QObject</code> is <a href="http://doc.trolltech.com/qobject.html#Q_OBJECT">one of the prerequisites</a> to using the <code>Q_OBJECT</code> macro, which, if you're anything like me, you automatically insert into any Qt GUI related class.</p>
+<p>If you're not using any of the meta object stuff in your subclass, such as signals/slots or properties, just take out the <code>Q_OBJECT</code> macro. If you need to use signals and slots, you'll need to make your subclass multiply-inherit from <code>QObject</code> as well. If you take this route, remember that "<a href="http://doc.trolltech.com/4.5/moc.html">Multiple Inheritance Requires QObject to Be First</a>", otherwise you'll get either the same error as above, or something along the lines of "<code>YourClass</code> inherits from two QObject subclasses" from the moc.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/captchas-shouldnt-be-the-default-defense-against-b/" rel="bookmark" title="Permalink to Captchas shouldn't be the default defense against bots">Captchas shouldn't be the default defense against bots</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, May 21, 2009 @ 15:17
+	</footer>
+	<div class="body">
+		<p><a href="http://en.wikipedia.org/wiki/Captcha">Captchas</a> are useful to prevent bots or similarly automated activities from occurring. However, they're not perfect and many of them can be broken with a targeted attack. In a sort of arms race fashion, captchas get more and more intricate, but some take this a bit too far and aren't really even human solvable.</p>
+<p>In any case, large sites have to have some way to separate bots from humans, and captchas may be the only solution. It's still an arms race, but at least the large sites have the resources to throw at it.</p>
+<p>What about the small sites? Your blog about your cat? Your forum for fellow gum-chewers? Do you really need (or want) a captcha for these types of sites? Unfortunately, what happens is a crawler stumbles upon your site, notices it uses some popular blog or forum application it knows about, and attempts to register so it can subsequently flood your site with spam. If you use a popular application, such as <a href="http://www.phpbb.com/">phpBB3</a> (for the sake of argument), once the generic, built-in captcha gets broken, all non-customized phpBB3 sites are vulnerable. So a spammer just needs to try to break this one particular captcha and suddenly they've unlocked the ability to spam millions of forums. It provides the volume that spammers need to make spam work.</p>
+<p>What I suggest instead is that the default mode of operation for a forum (or any application, really) should be to ask a simple question upon registration, with both the answer and question provided by the person who is running the site:</p>
+<blockquote>
+<p>Q: What is my cat's name?<br />
+A: Fluffy  </p>
+<p>Q: Which of the following is a brand of gum? Oreos, Jellybeans, Trident, Snickers<br />
+A: Trident  </p>
+</blockquote>
+<p>Incidentally, yes/no type questions should be disallowed, as the answers ('yes' and 'no') would be common enough to automate.</p>
+<p>Now, spamming your forum requires actual human intervention. Obviously this sort of approach will fail if you have a large or popular site, but if you own such a site you already know you have to take more steps to protect your site.</p>
+<p>One potential problem is I could see lists of questions/answers being hand-generated and passed around, but this could be mitigated by expiring questions/answers after some time. If you're feeling particularly clever you could even flag the old answer as being a 'bot-answer', which might work well in concert with an <a href="http://en.wikipedia.org/wiki/Akismet">Akismet</a> type service:</p>
+<blockquote>
+<p>Q: How old is my cat?<br />
+A: Fluffy <em>(hello, bot!)</em>  </p>
+</blockquote>
+<p>Anyway, I feel that captchas are a bit of dead end in terms of anti-spam measures for small sites. Small sites are not typical targets for spammers, as the reward is not worth the effort. However, if all these small sites are protected by the same captcha, breaking that captcha gives that spammer access to <em>(small-sites &#215; millions)</em>, which <em>is</em> worth the effort.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/more-thoughts-on-qt-45/" rel="bookmark" title="Permalink to More thoughts on Qt 4.5">More thoughts on Qt 4.5</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, May 07, 2009 @ 16:35
+	</footer>
+	<div class="body">
+		<p>I've been using Qt 4.5 for a couple more weeks now and I've had a few more thoughts on the framework.</p>
+<ul>
+<li>I don't know if I could handle using the plain Win32 API for GUI ever again</li>
+<li>Even with Qt's "parent handles the deletion of its children" memory management system it's still easier to use (and reason about) <code>shared_ptr</code> or another smart pointer, as long as you're not working with widgets or similar GUI elements. If you're working with GUI elements, Qt's memory management works perfectly and makes sense.</li>
+<li>You can assume that any <code>addWidget()</code>-like function will take ownership unless explicitly stated otherwise. I still wish they would just say straight out that "this function takes ownership".</li>
+<li>In my opinion the documentation would be much improved for newcomers if they had a "Qt Best Practices" section. You can get a sense of how things should be structured if you look at their sample programs, but there's a lot to go through.</li>
+<li>Other than those two nitpicks, the documentation is consistently quite good.</li>
+<li>I would suggest that you avoid using the <a href="http://doc.qtsoftware.com/4.5/containers.html">Qt containers</a> and instead favor the standard C++ containers whenever possible. There's less to learn, and most C++ programmers will have a firm grasp of the containers in the <code>std</code> namespace. Some Qt functions do return <a href="http://doc.trolltech.com/4.5/qstringlist.html"><code>QStringList</code></a> or some other Qt container, in which case you may as well just leave it in the container you get it in.</li>
+<li>On the other hand, if you're going to use Qt, you may as well use <a href="http://doc.trolltech.com/4.5/qstring.html"><code>QString</code></a> everywhere. It's used extensively through the Qt framework, so you won't be able to avoid it. It's a pretty decent string library anyway, with plenty of useful functions, and it handles Unicode cleanly in my experience.</li>
+<li><a href="http://doc.trolltech.com/4.5/qtextedit.html"><code>QTextEdit</code></a> isn't particularly performant, particularly when you resize it and it has to perform lots of word wrap calculations. Use <a href="http://doc.trolltech.com/4.5/qplaintextedit.html"><code>QPlainTextEdit</code></a> if you can.</li>
+</ul>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/a-really-quick-boost-random-guide/" rel="bookmark" title="Permalink to A really quick boost::random guide">A really quick boost::random guide</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, May 06, 2009 @ 20:03
+	</footer>
+	<div class="body">
+		<p>This is a really short and quick guide on how to use <code>boost::random</code>. The best place to start is, as always, the <a href="http://www.boost.org/doc/libs/release/libs/random/index.html">documentation</a>, but Boost also provides a <a href="http://www.boost.org/doc/libs/release/libs/random/random_demo.cpp">simple sample program</a> that covers the library in a good "how to get started" fashion.</p>
+<p>What I'm about to write here is even shorter and less detailed -- it's just the basic code needed to generate some random numbers.</p>
+<div class="codehilite"><pre><span class="c1">// Initialize a random number generator.</span>
+<span class="c1">// Boost provides a bunch of these, note that some of them are not meant</span>
+<span class="c1">// for direct user usage and you should instead use a specialization (for </span>
+<span class="c1">// example, don&#39;t use linear_congruential and use minstd_rand or </span>
+<span class="c1">// minstd_rand0 instead)</span>
+
+<span class="c1">// This constructor seeds the generator with the current time.</span>
+<span class="c1">// As mentioned in Boost&#39;s sample program, time(0) is not a great seed,</span>
+<span class="c1">// but you can probably get away with it for most situations.</span>
+<span class="c1">// Consider using more precise timers such as gettimeofday on *nix or</span>
+<span class="c1">// GetTickCount/timeGetTime/QueryPerformanceCounter on Windows.</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">mt19937</span> <span class="n">randGen</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+
+<span class="c1">// Now we set up a distribution. Boost provides a bunch of these as well.</span>
+<span class="c1">// This is the preferred way to generate numbers in a certain range.</span>
+<span class="c1">// In this example we initialize a uniform distribution between 0 and the max</span>
+<span class="c1">// value that an unsigned char can hold (255 for most architectures)</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">uniform_int</span><span class="o">&lt;&gt;</span> <span class="n">uInt8Dist</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">());</span>
+
+<span class="c1">// Finally, declare a variate_generator which maps the random number</span>
+<span class="c1">// generator and the distribution together. This variate_generator</span>
+<span class="c1">// is usable like a function call.</span>
+<span class="n">boost</span><span class="o">::</span><span class="n">variate_generator</span><span class="o">&lt;</span> <span class="n">boost</span><span class="o">::</span><span class="n">mt19937</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">uniform_int</span><span class="o">&lt;&gt;</span> <span class="o">&gt;</span> 
+    <span class="n">GetRand</span><span class="p">(</span><span class="n">randGen</span><span class="p">,</span> <span class="n">uInt8Dist</span><span class="p">);</span>
+
+<span class="c1">// Generate a random number</span>
+<span class="kt">int</span> <span class="n">aRandomNumber</span> <span class="o">=</span> <span class="n">GetRand</span><span class="p">();</span>
+</pre></div>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/namespaces-are-one-honking-great-idea/" rel="bookmark" title="Permalink to Namespaces are one honking great idea">Namespaces are one honking great idea</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Wednesday, April 29, 2009 @ 09:17
+	</footer>
+	<div class="body">
+		<p>The title of this post comes from the last line of <em><a href="http://www.python.org/dev/peps/pep-0020/">The Zen of Python</a></em>.</p>
+<p>It applies to C++ too: namespaces are great. Namespaces let the <a href="http://www.boost.org/">Boost</a> folks contain all sorts of widely varying libraries without having to worry about naming collisions in user code. Namespaces let you mix multiple libraries easily and safely. Namespaces let you group sets of related free functions together, without needing a class. Namespaces also let you work around one thing I've always found a bit unusual with enums: the way they don't have their own scope.</p>
+<div class="codehilite"><pre><span class="k">enum</span> <span class="n">ValidValues</span>
+<span class="p">{</span>
+    <span class="n">Value1</span><span class="p">,</span>
+    <span class="n">Value2</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>This ends up declaring <code>Value1</code> and <code>Value2</code> in the underlying scope. What I like to do is wrap the enum in a namespace:</p>
+<div class="codehilite"><pre><span class="k">namespace</span> <span class="n">ValidValues</span>
+<span class="p">{</span>
+    <span class="k">enum</span> <span class="n">Enum</span>
+    <span class="p">{</span>
+        <span class="n">Value1</span><span class="p">,</span>
+        <span class="n">Value2</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>This sticks <code>Value1</code> and <code>Value2</code> in the <code>ValidValues</code> namespace. The only disadvantage is declaring a variable of this enum type gets a bit silly and inconsistent. For example:</p>
+<div class="codehilite"><pre><span class="n">ValidValues</span> <span class="n">var</span> <span class="o">=</span> <span class="n">Value1</span><span class="p">;</span> <span class="c1">// error, ValidValues is a namespace, Value1 is undefined</span>
+<span class="n">ValidValues</span><span class="o">::</span><span class="n">Enum</span> <span class="n">var</span> <span class="o">=</span> <span class="n">Value1</span><span class="p">;</span> <span class="c1">// error, Value1 is undefined</span>
+<span class="n">ValidValues</span><span class="o">::</span><span class="n">Enum</span> <span class="n">var</span> <span class="o">=</span> <span class="n">ValidValues</span><span class="o">::</span><span class="n">Value1</span><span class="p">;</span> <span class="c1">// okay</span>
+</pre></div>
+
+
+<p>This is yet another area where C++0x will offer its own solution, in this case, <a href="http://en.wikipedia.org/wiki/C%2B%2B0x#Strongly_typed_enumerations">strongly typed enumerations</a>.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/right-aligning-a-button-in-a-qtoolbar/" rel="bookmark" title="Permalink to Right aligning a button in a QToolBar">Right aligning a button in a QToolBar</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, April 23, 2009 @ 08:32
+	</footer>
+	<div class="body">
+		<p>Sometimes you will want to add a right-aligned button to a <code>QToolBar</code>. The first thing that probably comes to mind is to add a <code>QSpacerItem</code> to the toolbar, but that won't work as <code>QSpacerItem</code> is not a child of <code>QWidget</code>, so you can't use the <code>addWidget()</code> member of <code>QToolBar</code>. Instead, make a basic <code>QWidget</code>, set its <code>sizePolicy</code> to <code>Expanding</code>, and add that widget to your <code>QToolBar</code>. For example:</p>
+<div class="codehilite"><pre><span class="n">QWidget</span><span class="o">*</span> <span class="n">spacer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">QWidget</span><span class="p">();</span>
+<span class="n">spacer</span><span class="o">-&gt;</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">::</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">::</span><span class="n">Expanding</span><span class="p">);</span>
+<span class="c1">// toolBar is a pointer to an existing toolbar</span>
+<span class="n">toolBar</span><span class="o">-&gt;</span><span class="n">addWidget</span><span class="p">(</span><span class="n">spacer</span><span class="p">);</span>
+<span class="n">toolBar</span><span class="o">-&gt;</span><span class="n">addAction</span><span class="p">(</span><span class="s">&quot;Right-aligned button&quot;</span><span class="p">);</span>
+</pre></div>
+
+
+<p>If you end up using a lot of these spacers you could even create a subclass.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-45/" rel="bookmark" title="Permalink to Qt 4.5">Qt 4.5</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, April 20, 2009 @ 09:16
+	</footer>
+	<div class="body">
+		<p><a href="http://www.qtsoftware.com/products/">Qt</a> is a well known cross platform framework. It's probably most well known as the framework on which <a href="http://www.kde.org/">KDE</a> is written.</p>
+<p>Anyway, over the weekend I experimented with it a bit, and in terms of C++ GUI development it's a breath of fresh air. It approaches the ease of use of the .net GUI facilities, which is great for a language with no built in introspection abilities. The "moc" preprocessor that Qt requires (that lets them do things such as signals and slots) you to run on your source files is still a bit weird, but it's really not as bad as it seems.</p>
+<p>The Qt framework is also impressively comprehensive, making it very easy to code applications directly against Qt, instead of coding against a particular OS or a particular compiler.</p>
+<p>The style of the framework itself is more traditional than the common notion of modern C++, having more of an emphasis on subclassing and overriding virtual functions than on generic algorithms. The memory management system is definitely foreign: they encourage you to allocate on the heap, yet there are very few <code>delete</code> statements. The way it works is that <code>QObject</code>s (Qt's base class) accept a pointer to a parent in their constructor, which makes that particular <code>QObject</code> a child of the parent. When the parent is deleted, it takes care of deleting all its children. It's a change from RAII, for sure.</p>
+<p>It also takes a couple of hours to compile Visual Studio compatible versions of the various components, so don't do it as a last minute thing.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/porting-a-winsock-application-to-linuxselect2-is-n/" rel="bookmark" title="Permalink to Porting a Winsock application to Linux...select(2) is not as simple as MSDN makes it seem">Porting a Winsock application to Linux...select(2) is not as simple as MSDN makes it seem</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 10, 2009 @ 17:54
+	</footer>
+	<div class="body">
+		<p>I'm in the middle of porting bits of a Winsock application to Linux. Luckily when I first wrote the networking bits I had made an effort to write it in a somewhat cross platform manner. As a result, I stuck to <code>select()</code>, <code>send()</code>, <code>recv()</code>, and all the other function calls that Winsock provides that are close to the <a href="http://en.wikipedia.org/wiki/Berkeley_sockets">Berkeley socket interface</a>. Things go pretty smoothly, although for some reason there's this really weird pause when connecting that didn't exist before...</p>
+<p>Finally I hit a point where, for some reason, I couldn't establish a connection to the server and it just times out. That's really strange, so I threw good old debug statements all over the place and find out that this <code>select()</code> call is not doing much of a select:</p>
+<div class="codehilite"><pre>if (select(0, &amp;rdset, &amp;wtset, &amp;errset, &amp;tv) &gt; 0)
+</pre></div>
+
+
+<p>Notice the 0? <a href="http://msdn.microsoft.com/en-us/library/ms740141(VS.85).aspx">MSDN</a> states that it is:</p>
+<blockquote>
+<p><code>nfds</code><br />
+Ignored. The nfds parameter is included only for compatibility with Berkeley sockets.</p>
+</blockquote>
+<p>Then I check the <a href="http://linux.die.net/man/2/select">equivalent docs</a> on the Linux side of things:</p>
+<blockquote>
+<p><code>nfds</code> is the highest-numbered file descriptor in any of the three sets, plus 1.</p>
+</blockquote>
+<p>Well, if I set <code>nfds</code> to 0, <code>select()</code> won't be doing very much selecting! Windows has <code>FD_SETSIZE</code> at 64 by default, and it ignores <code>nfds</code> and just checks whatever descriptors are in the <code>fd_set</code>s that you pass to it. Linux considers sockets and files the same thing, and thus has a much higher <code>FD_SETSIZE</code> (1024 and 4096 seem to be common). You don't want <code>select()</code> checking 4096 descriptors, so you set nfds to the highest file descriptor you want it to check, plus one. (As an aside, setting nfds to <code>FD_SETSIZE</code> is a bad idea.)</p>
+<div class="codehilite"><pre>if (select(my_socket + 1, &amp;rdset, &amp;wtset, &amp;errset, &amp;tv) &gt; 0)
+</pre></div>
+
+
+<p>Where <code>my_socket</code> is an appropriate file descriptor (such as the one returned by <code>socket()</code>). This works just fine in Windows too, since it ignores the <code>nfds</code> parameter.</p>
+<p>Armed with this newfound knowledge, I go and fix all the other <code>select()</code> statements in my code, which ends up fixing the weird pause as well. Effectively, without a proper <code>nfds</code> value, <code>select()</code> just acts as a timer and blocks until the specified amount of time has elapsed.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/all-ajax-sites-need-a-fancy-indeterminate-progress/" rel="bookmark" title="Permalink to All AJAX sites need a fancy indeterminate progress indicator...">All AJAX sites need a fancy indeterminate progress indicator...</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Sunday, April 05, 2009 @ 20:22
+	</footer>
+	<div class="body">
+		<p><a href="http://www.ajaxload.info/">Ajaxload</a> is a neat little site that generates those throbbers/spinning wheels that are in vogue nowadays. Your website/application won't be complete without one, after all.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/png-has-a-well-designed-magic-number-or-fourcc/" rel="bookmark" title="Permalink to PNG has a well designed magic number (or FourCC)">PNG has a well designed magic number (or FourCC)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 03, 2009 @ 17:20
+	</footer>
+	<div class="body">
+		<p>Even with all the XML floating around, binary formats still have their place. It's good practice to place an identifier at the beginning of the binary file, so that the file type can be determined even in the absence of a proper file extension.</p>
+<p>The simplest route to take is to just stuff some plain text there:</p>
+<div class="codehilite"><pre>[M Y F I L E][rest of file]
+</pre></div>
+
+
+<p>However, consider following the design of the PNG magic number, described in detail in <a href="http://www.libpng.org/pub/png/book/chapter08.html">the PNG book</a>. With some really neat design they are able to quickly detect some common forms of corruption caused by an incompatible transfer mechanism. In that case your identifier may look like:</p>
+<div class="codehilite"><pre>[\211 M Y F I L E \r \n \032 \n][rest of file]
+</pre></div>
+
+
+<p>With an identifier like this many common forms of transfer corruption can be quickly identified, and you can spit out a simple "corrupt file" message instead of trying to read a broken file.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/" rel="bookmark" title="Permalink to Don't forget about copy constructors and the copy assignment operator">Don't forget about copy constructors and the copy assignment operator</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 03, 2009 @ 12:30
+	</footer>
+	<div class="body">
+		<p>Something that I've always found handy to do is to decide, right away, what the copy semantics of a particular class are. Generally it turns out that it makes no sense (or is a lot of work) to allow copying, in which case the standard approach is to define the copy constructor and assignment operator as <code>private</code>.</p>
+<p>An alternative approach and one that I think is a bit more self-documenting, is to inherit from <a href="http://www.boost.org/doc/libs/1_38_0/libs/utility/utility.htm#Class_noncopyable"><code>boost::noncopyable</code></a>. This achieves the same effect and makes it immediately obvious that the class will not allow copying.</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MyClass</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span> <span class="p">{</span> <span class="p">};</span>
+</pre></div>
+
+
+<p>The most correct way to use <code>boost::noncopyable</code> is to inherit it privately, since inheriting it publicly could let people do really funny stuff like:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">stuff</span><span class="p">(</span><span class="k">const</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">);</span>
+</pre></div>
+
+
+<p><a href="http://groups.google.com/group/comp.lang.c++/browse_thread/thread/830d8840c2b86114">(more details here)</a></p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/a-rapidxml-gotcha/" rel="bookmark" title="Permalink to A RapidXML gotcha">A RapidXML gotcha</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, March 26, 2009 @ 13:00
+	</footer>
+	<div class="body">
+		<p>I just spent a couple of hours trying to track down why I was seemingly losing data values while modifying nodes in the DOM. It's spelled out in the documentation, but it definitely threw me for a loop (I would consider this behavior surprising). Basically, RapidXML gives you the ability to assign/modify the value of a node and it also likes to create data nodes when you parse a document. When printing, the data node takes precedence over the value.</p>
+<p>When you create a document from scratch this likely won't bite you, but when you parse an existing document and neglect to supply the <code>parse_no_data_nodes</code> flag, the parser creates data nodes. If you try to update your values with the <code>value()</code> function, it works just fine (and you can even pull it back out without any problems), but when you use the <code>print()</code> function, the data node (which you haven't updated) will show up instead.</p>
+<p>What made this even more difficult to track down was how <code>value()</code> will return the first data node it finds if there isn't a value yet, so it really does seem like you have a value already. I've updated my <a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/">prior RapidXML entry</a> to include the <code>parse_no_data_nodes</code> flag, which may save someone some time down the road.</p>
+	</div>
+</section>
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/" rel="bookmark" title="Permalink to shared_ptr is great...but sometimes auto_ptr is actually better!">shared_ptr is great...but sometimes auto_ptr is actually better!</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, March 21, 2009 @ 18:04
+	</footer>
+	<div class="body">
+		<p>Modern C++ programming benefits greatly from smart pointers. Smart pointers automate the error-prone process of making sure you have a matching number of <code>new</code> and <code>delete</code> statements. There's even one included in the C++ standard library: <code>std::auto_ptr</code>.</p>
+<p>It's not a true general purpose smart pointer, however. For one, it has somewhat unusual transfer-of-ownership semantics:</p>
+<div class="codehilite"><pre><span class="n">std</span><span class="o">::</span><span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">(</span><span class="k">new</span> <span class="n">MyClass</span><span class="p">());</span>
+<span class="n">std</span><span class="o">::</span><span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="c1">// a now points to nothing!</span>
+</pre></div>
+
+
+<p>This also makes it dangerous to use in containers, as described in <a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"><em>Using auto_ptr Effectively</em></a>. On the other hand, <code>shared_ptr</code> (which will be available in the next C++ standard, C++0x, and is now available in the <a href="http://www.boost.org/doc/libs/release/libs/smart_ptr/shared_ptr.htm">Boost libraries</a>) is a reference counting smart pointer. It keeps track of the number of references to a particular object, and when there are no more references, it deletes the object. This is safe to use in containers. In fact, you can use <code>shared_ptr</code> pretty much everywhere and you will never have to worry about manually releasing memory again (cycles and threading are pretty much the only major problems).</p>
+<p>However, while <code>shared_ptr</code> is a great general purpose smart pointer, <code>auto_ptr</code> has its uses. If you have a function that involves transfer-of-ownership semantics (whether receiving or giving), why not use the smart pointer that perfectly captures those requirements? The 'sources' (creates and then gives away ownership) and 'sinks' (takes ownership) described in the <a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"><em>Using auto_ptr Effectively</em></a> article is a prime example of this. Instead of using comments to specify that the caller of a function must manage the lifetime of the returned object, <code>auto_ptr</code> forces them to manage it (and if they don't, it'll clean itself up anyway). <code>shared_ptr</code> will likely work just as well, but it doesn't capture the semantics.</p>
+<p>Another noteworthy reason to use <code>auto_ptr</code> when the semantics are suitable is that while <code>auto_ptr</code> can give away ownership to <code>shared_ptr</code>, <code>shared_ptr</code> cannot give away ownership to <code>auto_ptr</code> or another smart pointer (there is no <code>release()</code> function in <code>shared_ptr</code>).</p>
+<p><code>auto_ptr</code> is <a href="http://www.informit.com/guides/content.aspx?g=cplusplus&amp;seqNum=400">on its way to deprecation</a>, but we haven't even seen C++0x yet, so I wouldn't worry too much about it. Its replacement, <code>unique_ptr</code>, will have the same transfer-of-ownership semantics, just implemented in a much safer way, so it'd be worth the effort to get used to using the right smart pointer for the job.</p>
+<p>Speaking of which, do you know what <code>scoped_ptr</code> is?</p>
+	</div>
+</section>
+
+	<p class="next_link">
+		<a href="/">Newer &raquo;</a>
+	</p>
+	<p class="prev_link">
+		<a href="/page/3/">&laquo; Older</a>
+	</p>
+</section>
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

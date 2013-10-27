@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-staticmetaobject-is-not-a-member-of/" rel="bookmark" title="Permalink to Qt: staticMetaObject is not a member of...">Qt: staticMetaObject is not a member of...</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, May 29, 2009 @ 21:11
+	</footer>
+	<div class="body">
+		<p>Just got this error message while compiling a tiny class that derives from <code>QTreeWidgetItem</code>:</p>
+<div class="codehilite"><pre>error C2039: &#39;staticMetaObject&#39; : is not a member of &#39;QTreeWidgetItem&#39;
+</pre></div>
+
+
+<p>What this is saying is that <code>QTreeWidgetItem</code> does not inherit from <code>QObject</code>, meaning that your own, singly-inherited class also does not inherit from <code>QObject</code>. Inheriting from <code>QObject</code> is <a href="http://doc.trolltech.com/qobject.html#Q_OBJECT">one of the prerequisites</a> to using the <code>Q_OBJECT</code> macro, which, if you're anything like me, you automatically insert into any Qt GUI related class.</p>
+<p>If you're not using any of the meta object stuff in your subclass, such as signals/slots or properties, just take out the <code>Q_OBJECT</code> macro. If you need to use signals and slots, you'll need to make your subclass multiply-inherit from <code>QObject</code> as well. If you take this route, remember that "<a href="http://doc.trolltech.com/4.5/moc.html">Multiple Inheritance Requires QObject to Be First</a>", otherwise you'll get either the same error as above, or something along the lines of "<code>YourClass</code> inherits from two QObject subclasses" from the moc.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

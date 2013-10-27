@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/" rel="bookmark" title="Permalink to An update on building Boost with MSVC (still with dual/quad/multi-core action)">An update on building Boost with MSVC (still with dual/quad/multi-core action)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, November 19, 2009 @ 02:05
+	</footer>
+	<div class="body">
+		<p>I've noticed that in recent versions of Boost (1.39.0 and newer) there is a way to do a <a href="http://www.boost.org/doc/libs/release/more/getting_started/windows.html#or-simplified-build-from-source">"Simplified Build from Source"</a> if you're using Microsoft Visual Studio. Here are the steps as I like to write them:</p>
+<ol>
+<li>
+<p><a href="http://www.boost.org/users/download/">Download</a> the latest version of Boost and extract it to some location (we'll assume <code>D:\Boost\</code>), making sure to maintain the directory structure.</p>
+</li>
+<li>
+<p>In a command prompt, navigate to your Boost library folder (<code>D:\Boost\boost_1_41_0\</code>) and then use this command, which builds your very own copy of Boost Jam (a build system):</p>
+<div class="codehilite"><pre>&gt; bootstrap
+</pre></div>
+
+
+</li>
+<li>
+<p>Now, in the same command prompt, enter this command, where N is the number of processors/cores you have available for compiling (for example, <code>-j4</code> if you have a quad-core processor):</p>
+<div class="codehilite"><pre>&gt; bjam.exe -jN
+</pre></div>
+
+
+</li>
+<li>
+<p>Wait.</p>
+</li>
+<li>
+<p>After the build completes you will have a <code>stage</code> subdirectory (<code>D:\Boost\boost_1_41_0\stage\</code>) which will contain a <code>lib</code> subdirectory, containing the compiled libraries.</p>
+</li>
+</ol>
+<p>This simplified process removes the need to get a copy of Boost Jam, which, as trivial as it sounds, really does make a big difference to the friendliness of the entire procedure. It also reduces the number of necessary arguments to zero (or one, if you consider multi-core a necessity), although there are some situations where you may still need the older arguments (in which case I refer you to my previous <a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/">entry on the subject</a>).</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

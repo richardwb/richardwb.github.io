@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/stop-wasting-time-stepping-into-functions-you-dont/" rel="bookmark" title="Permalink to Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)">Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, March 09, 2009 @ 17:58
+	</footer>
+	<div class="body">
+		<p>The Visual Studio debugger is amazingly useful. However, you soon learn to sigh the moment you come into contact with something like this:</p>
+<div class="codehilite"><pre><span class="n">boost</span><span class="o">::</span><span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">Startup</span><span class="o">&gt;</span> <span class="n">dlg</span><span class="p">(</span>
+    <span class="k">new</span> <span class="n">Startup</span><span class="p">(</span><span class="n">settings</span><span class="o">-&gt;</span><span class="n">GetWindowPosition</span><span class="p">()));</span>
+</pre></div>
+
+
+<p>You want to step into the <code>Startup</code> constructor, but there is a lot of stuff in your way. </p>
+<ol>
+<li>First you will step into <code>shared_ptr::operator-&gt;</code> (did I mention that <code>settings</code> was a <code>shared_ptr</code>?).</li>
+<li>Then you will step into <code>GetWindowPosition()</code>.</li>
+<li>Then into <code>operator new</code>.</li>
+<li>And then into your <code>Startup</code> constructor. Yes!</li>
+<li>And finally you'll finish with the <code>scoped_ptr</code> constructor if you so choose.</li>
+</ol>
+<p>If you've done this a lot you've probably gotten really good at the <em>Step Out</em> shortcut (Shift-F11).</p>
+<p>Well, here are two alternatives!</p>
+<p>First, while program execution is paused, right-click anywhere in the source window and look for the <em>Step Into Specific</em> item. You can select any of these functions to instantly step inside.</p>
+<p>Alternatively, there is a special undocumented (and unsupported) registry key that you can use to specify functions that you always want to skip. Navigate to <code>HKLM\SOFTWARE\Microsoft\VisualStudio\9.0\NativeDE\StepOver</code> (users of a 64-bit variant of Windows will want to check <code>HKLM\SOFTWARE\Wow6432Node\Microsoft\...</code> instead) and add some string values like this example:</p>
+<blockquote>
+<p>Name: 50 (priority, higher values have greater priority)<br />
+Value: <code>std\:\:.*=NoStepInto</code></p>
+<p>Name: 60<br />
+Value: <code>operator new=NoStepInto</code></p>
+<p>Name: 70<br />
+Value: <code>boost\:\:.*=NoStepInto</code></p>
+</blockquote>
+<p>The backslashes are necessary because <code>:</code> (colon) is a special character in <a href="http://msdn.microsoft.com/en-us/library/2k3te2cs(VS.80).aspx">Visual Studio regex</a>. You sometimes see two backslashes used in other examples, this is only necessary if you are directly editing a <code>.reg</code> file (which I don't recommend). These rules will adjust the behaviour of the <em>Step-Into</em> command and make it skip anything from the <code>std</code> or <code>boost</code> namespaces, as well as the basic <code>operator new</code>. It will still step into an overloaded <code>operator new</code>, so don't fear. There are more details on <a href="http://blogs.msdn.com/andypennell/archive/2004/02/06/69004.aspx">this blog post</a>, as well as <a href="http://groups.google.com/group/microsoft.public.vsnet.debugging/msg/26addb1b539883e8">microsoft.public.vsnet.debugging</a>.</p>
+<p>One more thing: you can combine these two approaches. Say that you've added a skip for the entire <code>boost</code> namespace, but you decide you really want to take a peek inside one particular line and see exactly what is happening to your parameters. Pause execution on that line, and then right-click and use <em>Step Into Specific</em>. This is still the same list as before and it works the same as before, regardless of any NoStepInto rules.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

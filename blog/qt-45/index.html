@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/qt-45/" rel="bookmark" title="Permalink to Qt 4.5">Qt 4.5</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Monday, April 20, 2009 @ 09:16
+	</footer>
+	<div class="body">
+		<p><a href="http://www.qtsoftware.com/products/">Qt</a> is a well known cross platform framework. It's probably most well known as the framework on which <a href="http://www.kde.org/">KDE</a> is written.</p>
+<p>Anyway, over the weekend I experimented with it a bit, and in terms of C++ GUI development it's a breath of fresh air. It approaches the ease of use of the .net GUI facilities, which is great for a language with no built in introspection abilities. The "moc" preprocessor that Qt requires (that lets them do things such as signals and slots) you to run on your source files is still a bit weird, but it's really not as bad as it seems.</p>
+<p>The Qt framework is also impressively comprehensive, making it very easy to code applications directly against Qt, instead of coding against a particular OS or a particular compiler.</p>
+<p>The style of the framework itself is more traditional than the common notion of modern C++, having more of an emphasis on subclassing and overriding virtual functions than on generic algorithms. The memory management system is definitely foreign: they encourage you to allocate on the heap, yet there are very few <code>delete</code> statements. The way it works is that <code>QObject</code>s (Qt's base class) accept a pointer to a parent in their constructor, which makes that particular <code>QObject</code> a child of the parent. When the parent is deleted, it takes care of deleting all its children. It's a change from RAII, for sure.</p>
+<p>It also takes a couple of hours to compile Visual Studio compatible versions of the various components, so don't do it as a last minute thing.</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

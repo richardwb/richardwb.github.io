@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/" rel="bookmark" title="Permalink to shared_ptr is great...but sometimes auto_ptr is actually better!">shared_ptr is great...but sometimes auto_ptr is actually better!</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Saturday, March 21, 2009 @ 18:04
+	</footer>
+	<div class="body">
+		<p>Modern C++ programming benefits greatly from smart pointers. Smart pointers automate the error-prone process of making sure you have a matching number of <code>new</code> and <code>delete</code> statements. There's even one included in the C++ standard library: <code>std::auto_ptr</code>.</p>
+<p>It's not a true general purpose smart pointer, however. For one, it has somewhat unusual transfer-of-ownership semantics:</p>
+<div class="codehilite"><pre><span class="n">std</span><span class="o">::</span><span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">(</span><span class="k">new</span> <span class="n">MyClass</span><span class="p">());</span>
+<span class="n">std</span><span class="o">::</span><span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">MyClass</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+<span class="c1">// a now points to nothing!</span>
+</pre></div>
+
+
+<p>This also makes it dangerous to use in containers, as described in <a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"><em>Using auto_ptr Effectively</em></a>. On the other hand, <code>shared_ptr</code> (which will be available in the next C++ standard, C++0x, and is now available in the <a href="http://www.boost.org/doc/libs/release/libs/smart_ptr/shared_ptr.htm">Boost libraries</a>) is a reference counting smart pointer. It keeps track of the number of references to a particular object, and when there are no more references, it deletes the object. This is safe to use in containers. In fact, you can use <code>shared_ptr</code> pretty much everywhere and you will never have to worry about manually releasing memory again (cycles and threading are pretty much the only major problems).</p>
+<p>However, while <code>shared_ptr</code> is a great general purpose smart pointer, <code>auto_ptr</code> has its uses. If you have a function that involves transfer-of-ownership semantics (whether receiving or giving), why not use the smart pointer that perfectly captures those requirements? The 'sources' (creates and then gives away ownership) and 'sinks' (takes ownership) described in the <a href="http://www.gotw.ca/publications/using_auto_ptr_effectively.htm"><em>Using auto_ptr Effectively</em></a> article is a prime example of this. Instead of using comments to specify that the caller of a function must manage the lifetime of the returned object, <code>auto_ptr</code> forces them to manage it (and if they don't, it'll clean itself up anyway). <code>shared_ptr</code> will likely work just as well, but it doesn't capture the semantics.</p>
+<p>Another noteworthy reason to use <code>auto_ptr</code> when the semantics are suitable is that while <code>auto_ptr</code> can give away ownership to <code>shared_ptr</code>, <code>shared_ptr</code> cannot give away ownership to <code>auto_ptr</code> or another smart pointer (there is no <code>release()</code> function in <code>shared_ptr</code>).</p>
+<p><code>auto_ptr</code> is <a href="http://www.informit.com/guides/content.aspx?g=cplusplus&amp;seqNum=400">on its way to deprecation</a>, but we haven't even seen C++0x yet, so I wouldn't worry too much about it. Its replacement, <code>unique_ptr</code>, will have the same transfer-of-ownership semantics, just implemented in a much safer way, so it'd be worth the effort to get used to using the right smart pointer for the job.</p>
+<p>Speaking of which, do you know what <code>scoped_ptr</code> is?</p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

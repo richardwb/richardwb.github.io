@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/" rel="bookmark" title="Permalink to Compile Qt 4.5 for Visual Studio, using your multi-core processor">Compile Qt 4.5 for Visual Studio, using your multi-core processor</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, June 25, 2009 @ 20:28
+	</footer>
+	<div class="body">
+		<p>If you want to use Qt 4.5 with Visual Studio you'll need to compile it yourself. The instructions are simple, and fairly well documented on <a href="http://www.google.com/search?hl=en&amp;q=compile+qt+visual+studio">various blogs and websites</a>. Essentially: <em>(read steps 7 and on for multi-threading information)</em></p>
+<p><em>[Edit: These steps still apply for Qt 4.6, but Qt 4.6 actually has <a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/">prebuilt binaries/libraries</a> for Visual Studio 2008 which I highly suggest looking at instead]</em></p>
+<ol>
+<li>
+<p><strong>This step is important.</strong> You will potentially save some time by deleting these <code>mocinclude.tmp</code> files:</p>
+<div class="codehilite"><pre>\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\3rdparty\webkit\WebCore\tmp\moc\release_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\debug_shared\mocinclude.tmp
+\Qt\2009.05\qt\src\script\tmp\moc\release_shared\mocinclude.tmp
+</pre></div>
+
+
+<p>Deleting the first two <code>mocinclude.tmp</code> files will prevent a LNK2019 error from building Webkit, while deleting the last two (which are present in Qt 4.6) will prevent <code>Error: Unknown interface</code> from occurring while trying to build <code>qscriptextensionplugin.h</code>. If you're missing any of them don't fret, it's actually a good thing.</p>
+</li>
+<li>
+<p>Using a <em>Visual Studio Command Prompt</em>, navigate to your Qt folder (I'll use <code>D:\Coding\Qt\2009.05</code> in this example).</p>
+</li>
+<li>
+<p>Go to the Qt folder inside there (e.g. <code>D:\Coding\Qt\2009.05\qt</code>). It's the one that contains <code>configure.exe</code>.</p>
+</li>
+<li>
+<p>Enter the following command, changing <code>win32-msvc2008</code> to <code>win32-msvc2005</code> if necessary.</p>
+<div class="codehilite"><pre>&gt; configure -opensource -shared -ltcg -no-qt3support -platform win32-msvc2008
+</pre></div>
+
+
+</li>
+<li>
+<p>What this does is fairly self explanatory. The <code>-shared</code> switch will make sure that Qt is configured for dynamic linking (even though that's usually the default option there's no guarantee). We need to specify the <code>-ltcg</code> switch to turn on <em>Link Time Code Generation</em>. LTCG is off by default since, in combination with a statically built Qt, it will make linking very slow for any projects that use Qt. However, if we configure Qt for dynamic linking this won't be an issue.</p>
+</li>
+<li>
+<p>You can add or remove switches as desired (try <code>configure help</code>) but I find most of the defaults suitable. Sure, you may not need OpenGL (or SQL or Phonon or...) support right now, but it's a separate module anyway and you're already compiling the rest of Qt.</p>
+</li>
+<li>
+<p><strong>All you need to do now is run <code>nmake</code>...<em>but wait</em>.</strong></p>
+</li>
+<li>
+<p>Do you have a dual-core or quad-core processor or can take advantage of multi-threaded compilation? Get the <code>jom</code> tool instead. There's some info about <code>jom</code> in this <a href="http://labs.trolltech.com/blogs/2009/03/27/speeding-up-visual-c-qt-builds/">Qt Labs Blogs article</a>. You can download the latest version of <code>jom</code> from <a href="ftp://ftp.qt.nokia.com/jom/">ftp://ftp.qt.nokia.com/jom/</a> (<code>jom.zip</code> should be just fine).</p>
+</li>
+<li>
+<p>Use <code>jom</code> by simply unzipping and running it in the same directory as <code>configure</code> (which is still the same as before, <code>D:\Coding\Qt\2009.05\qt</code>).</p>
+<div class="codehilite"><pre>&gt; jom
+</pre></div>
+
+
+</li>
+<li>
+<p>Happily build Qt much faster. For example, on my machine (a Core 2 Quad) it took an hour for the build to complete.</p>
+</li>
+<li>
+<p>Unless you really enjoy manually handling custom build steps, don't forget to get the <a href="http://www.qtsoftware.com/downloads/visual-studio-add-in">Qt Visual Studio Add-In</a>. After installing it make sure that it's aware of the location of your Qt installation (<code>Qt-&gt;Qt Options</code>) and then use <code>File-&gt;New-&gt;Project...</code> and select one of the Qt templates to get started.</p>
+</li>
+</ol>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

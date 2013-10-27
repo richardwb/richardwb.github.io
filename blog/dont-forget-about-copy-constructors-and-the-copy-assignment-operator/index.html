@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/" rel="bookmark" title="Permalink to Don't forget about copy constructors and the copy assignment operator">Don't forget about copy constructors and the copy assignment operator</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Friday, April 03, 2009 @ 12:30
+	</footer>
+	<div class="body">
+		<p>Something that I've always found handy to do is to decide, right away, what the copy semantics of a particular class are. Generally it turns out that it makes no sense (or is a lot of work) to allow copying, in which case the standard approach is to define the copy constructor and assignment operator as <code>private</code>.</p>
+<p>An alternative approach and one that I think is a bit more self-documenting, is to inherit from <a href="http://www.boost.org/doc/libs/1_38_0/libs/utility/utility.htm#Class_noncopyable"><code>boost::noncopyable</code></a>. This achieves the same effect and makes it immediately obvious that the class will not allow copying.</p>
+<div class="codehilite"><pre><span class="k">class</span> <span class="nc">MyClass</span> <span class="o">:</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span> <span class="p">{</span> <span class="p">};</span>
+</pre></div>
+
+
+<p>The most correct way to use <code>boost::noncopyable</code> is to inherit it privately, since inheriting it publicly could let people do really funny stuff like:</p>
+<div class="codehilite"><pre><span class="kt">void</span> <span class="nf">stuff</span><span class="p">(</span><span class="k">const</span> <span class="n">boost</span><span class="o">::</span><span class="n">noncopyable</span><span class="o">&amp;</span> <span class="n">obj</span><span class="p">);</span>
+</pre></div>
+
+
+<p><a href="http://groups.google.com/group/comp.lang.c++/browse_thread/thread/830d8840c2b86114">(more details here)</a></p>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>

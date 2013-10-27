@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>setnode.com</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="/theme/css/main.css" />
+	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" type="text/css" href="/styling/ie_only.css" />
+		<script src="/styling/sfhover.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
+	<![endif]-->
+	<link rel="openid2.provider" href="https://openid.stackexchange.com/openid/provider" />
+	<link rel="openid2.local_id" href="https://openid.stackexchange.com/user/be323590-9c0a-43be-85b0-c75f26c74afc" />
+
+
+
+
+</head>
+
+<body id="index" class="home">
+	<div id="mega">
+		<header id="header">
+			<h1>
+				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
+			</h1>
+			<!-- <span id="subtitle">/</span> -->
+		</header>
+		<nav id="menu">
+			<ul>
+				<li>Navigation
+					<ul>
+							<li><a href="http://www.setnode.com/about/">About</a></li>
+					</ul>
+					<ul>
+						<li><a href="/archives/">Archives</a></li>
+					</ul>
+				</li>
+				<li>Links
+					<ul>
+						<li><a href="http://www.codinghorror.com/blog/">Coding Horror</a></li>
+						<li><a href="https://news.ycombinator.com/news">Hacker News</a></li>
+						<li><a href="http://www.stackoverflow.com/">Stack Overflow</a></li>
+					</ul>
+				</li>
+			</ul>
+			<p>
+        		<a href="/rss/" title="RSS feed">RSS</a>
+        	</p>
+		</nav>
+
+<section class="post">
+	<header>
+		<h2 class="title">
+			<a href="http://www.setnode.com/blog/more-thoughts-on-qt-45/" rel="bookmark" title="Permalink to More thoughts on Qt 4.5">More thoughts on Qt 4.5</a>
+		</h2>
+		
+	</header>
+	<footer class="meta">&#8212;
+			richardwb on 
+		Thursday, May 07, 2009 @ 16:35
+	</footer>
+	<div class="body">
+		<p>I've been using Qt 4.5 for a couple more weeks now and I've had a few more thoughts on the framework.</p>
+<ul>
+<li>I don't know if I could handle using the plain Win32 API for GUI ever again</li>
+<li>Even with Qt's "parent handles the deletion of its children" memory management system it's still easier to use (and reason about) <code>shared_ptr</code> or another smart pointer, as long as you're not working with widgets or similar GUI elements. If you're working with GUI elements, Qt's memory management works perfectly and makes sense.</li>
+<li>You can assume that any <code>addWidget()</code>-like function will take ownership unless explicitly stated otherwise. I still wish they would just say straight out that "this function takes ownership".</li>
+<li>In my opinion the documentation would be much improved for newcomers if they had a "Qt Best Practices" section. You can get a sense of how things should be structured if you look at their sample programs, but there's a lot to go through.</li>
+<li>Other than those two nitpicks, the documentation is consistently quite good.</li>
+<li>I would suggest that you avoid using the <a href="http://doc.qtsoftware.com/4.5/containers.html">Qt containers</a> and instead favor the standard C++ containers whenever possible. There's less to learn, and most C++ programmers will have a firm grasp of the containers in the <code>std</code> namespace. Some Qt functions do return <a href="http://doc.trolltech.com/4.5/qstringlist.html"><code>QStringList</code></a> or some other Qt container, in which case you may as well just leave it in the container you get it in.</li>
+<li>On the other hand, if you're going to use Qt, you may as well use <a href="http://doc.trolltech.com/4.5/qstring.html"><code>QString</code></a> everywhere. It's used extensively through the Qt framework, so you won't be able to avoid it. It's a pretty decent string library anyway, with plenty of useful functions, and it handles Unicode cleanly in my experience.</li>
+<li><a href="http://doc.trolltech.com/4.5/qtextedit.html"><code>QTextEdit</code></a> isn't particularly performant, particularly when you resize it and it has to perform lots of word wrap calculations. Use <a href="http://doc.trolltech.com/4.5/qplaintextedit.html"><code>QPlainTextEdit</code></a> if you can.</li>
+</ul>
+	</div>
+</section>
+
+		<footer id="footer">
+			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
+		</footer>
+	</div>
+</body>
+</html>
