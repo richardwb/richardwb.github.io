@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-		<title>setnode.com</title>
+	
+		<title>Building Boost (now with dual/quad/multi-core action!) - setnode.com</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="/theme/css/main.css" />
 	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
@@ -24,7 +25,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -45,8 +45,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -101,11 +101,36 @@
 <p><code>--build-type=complete</code> : notes that you want every possible combination built (Debug/Release, Multi/Single threaded, Static/Shared).</p>
 <p><code>stage</code> : a build target which builds the compiled libraries to the stage directory (which you can set with <code>--stagedir=&lt;STAGEDIR&gt;</code>). Contrast this with the <code>install</code> target, which builds the compiled libraries, but <em>also</em> copies the header-only libraries to a particular location. This is generally an unnecessary step since you've already extracted the Boost headers somewhere already. Look inside the <code>Jamroot</code> file inside your Boost folder for more details.</p>
 	</div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+var disqus_identifier = 'blog/building-boost-now-with-dual-quad-multi-core-action/';
+var disqus_title = 'Building Boost (now with dual/quad/multi-core action!)';
+var disqus_url = 'http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+	var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </section>
 
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>

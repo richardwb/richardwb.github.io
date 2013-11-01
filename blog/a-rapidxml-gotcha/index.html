@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-		<title>setnode.com</title>
+	
+		<title>A RapidXML gotcha - setnode.com</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="/theme/css/main.css" />
 	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
@@ -24,7 +25,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -45,8 +45,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -65,11 +65,36 @@
 <p>When you create a document from scratch this likely won't bite you, but when you parse an existing document and neglect to supply the <code>parse_no_data_nodes</code> flag, the parser creates data nodes. If you try to update your values with the <code>value()</code> function, it works just fine (and you can even pull it back out without any problems), but when you use the <code>print()</code> function, the data node (which you haven't updated) will show up instead.</p>
 <p>What made this even more difficult to track down was how <code>value()</code> will return the first data node it finds if there isn't a value yet, so it really does seem like you have a value already. I've updated my <a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/">prior RapidXML entry</a> to include the <code>parse_no_data_nodes</code> flag, which may save someone some time down the road.</p>
 	</div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+var disqus_identifier = 'blog/a-rapidxml-gotcha/';
+var disqus_title = 'A RapidXML gotcha';
+var disqus_url = 'http://www.setnode.com/blog/a-rapidxml-gotcha/';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+	var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </section>
 
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>

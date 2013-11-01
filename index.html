@@ -20,7 +20,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -41,8 +40,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -107,6 +106,9 @@
 
 <p>In fact, <code>QScrollArea</code> is not the one that is accepting wheel events. It’s the viewport that is doing all of that. By installing an event filter on the viewport, the wheel events will continue to propagate up the tree.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/mouse-wheel-events-event-filters-and-qscrollarea/#disqus_thread" data-disqus-identifer="blog/mouse-wheel-events-event-filters-and-qscrollarea/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -133,6 +135,9 @@
 <p><a href="/images/logitech_g500_properties.png"><img src="/images/logitech_g500_properties_thumb.jpg" alt="Logitech G500 Properties Dialog Thumbnail" height="200" width="162" /></a></p>
 <p>It's pretty interesting assigning a keystroke like 'A' to a side button or having your DPI buttons control the system's volume. After setting my bindings up I uninstalled the SetPoint software and still have a fully working mouse. Neat.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/logitech-g500-gaming-mouse-impressions/#disqus_thread" data-disqus-identifer="blog/logitech-g500-gaming-mouse-impressions/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -202,6 +207,9 @@
 </ol>
 <p>for additional help and information, or check the <a href="http://mercurial.selenic.com/wiki/HgGit">HgGit page</a> on the Mercurial wiki.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/accessing-a-git-repository-with-tortoisehg-on-windows/#disqus_thread" data-disqus-identifer="blog/accessing-a-git-repository-with-tortoisehg-on-windows/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -218,6 +226,9 @@
 		<p>I found out from the <a href="http://sandfly.net.nz/blog/2010/04/a-better-boost-book/">Life of Andrew</a> blog that there is a new source for <a href="http://en.highscore.de/cpp/boost/">Boost information</a> available. It's a Creative Commons licensed book covering a wide range of Boost libraries, some of which are usually under-represented documentation-wise (looking at you, ASIO). It was originally written in German by <a href="http://www.highscore.de/">Boris Schäling</a>, but <a href="http://www.andreasmasur.com/">Andreas Masur</a> has translated it into English for those of us who aren't so culturally adapted.</p>
 <p>A brief skim of the book gives an extremely promising impression and I think it'll be one of the first resources I point newcomers to Boost to in the future.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/great-boost-documentation/#disqus_thread" data-disqus-identifer="blog/great-boost-documentation/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -236,6 +247,9 @@
 <p>This is really simple to work around: you can add some bookkeeping to keep track of that particular connection or you can use <code>disconnect()</code> where appropriate to maintain 0 or 1 connections. The new <code>Qt::UniqueConnection</code> connection type, on the other hand, lets you be sure that a connection is made only once. It's not something you always need, but when you do, it lets you keep your code a bit cleaner.</p>
 <p>One caveat is that <code>Qt::UniqueConnection</code> makes a unique <code>Qt::AutoConnection</code>, meaning you don't have the ability to explicitly specify a unique queued connection, for example. In a case like that you will have to keep track of the connections yourself, as before.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/#disqus_thread" data-disqus-identifer="blog/simplify-signals-and-slots-connections-with-unique-connections-in-qt-46/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -253,6 +267,9 @@
 <p>The <a href="http://qt.nokia.com/downloads/windows-cpp-vs2008">prebuilt binaries are downloadable from here</a>. Alternatively, you can visit the <a href="http://qt.nokia.com/downloads">Qt download page</a>, choose LGPL, and look on the right hand side of the page for the download link.</p>
 <p>I highly recommend using the prebuilt libraries, as you will save a tremendous amount of time (it takes hours to build Qt). After you finish downloading and installing the libraries, install the <a href="http://qt.nokia.com/downloads/visual-studio-add-in">Visual Studio add-in</a> to make it easier to handle the custom build steps for moc and ui files.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/qt-46-has-prebuilt-binaries-for-visual-studio/#disqus_thread" data-disqus-identifer="blog/qt-46-has-prebuilt-binaries-for-visual-studio/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -278,6 +295,9 @@
 
 <p>Deleting the first two <code>mocinclude.tmp</code> files will prevent a <code>LNK2019</code> error while building Webkit, while deleting the last two (which are new in Qt 4.6, as far as I can tell) will prevent an <code>Error: Unknown interface</code> while trying to build <code>qscriptextensionplugin.h</code>.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/qt-46-is-out-compiling-it-with-msvc/#disqus_thread" data-disqus-identifer="blog/qt-46-is-out-compiling-it-with-msvc/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -319,6 +339,9 @@
 </ol>
 <p>This simplified process removes the need to get a copy of Boost Jam, which, as trivial as it sounds, really does make a big difference to the friendliness of the entire procedure. It also reduces the number of necessary arguments to zero (or one, if you consider multi-core a necessity), although there are some situations where you may still need the older arguments (in which case I refer you to my previous <a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/">entry on the subject</a>).</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/#disqus_thread" data-disqus-identifer="blog/an-update-on-building-boost-with-msvc-still-with-dual-quad-multi-core-action/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -337,6 +360,9 @@
 <p>For my own personal projects I use <a href="http://en.wikipedia.org/wiki/Subversion_(software)">Subversion</a> (<a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> is a great piece of software) and I'm not in any particular rush to switch over to a <abbr title="distributed version control system">DVCS</abbr> just yet. It's simple, straightforward and fits well with my workflow. For larger projects, especially ones where you're collaborating with people across the Internet, I'd give some serious thought to using a <abbr title="distributed version control system">DVCS</abbr> and reading about other people's experiences is extremely helpful.</p>
 <p><em>[Edit: I ended up switching about a year after this post to Mercurial for my personal projects.]</em></p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/stevestreetingcoms-great-series-of-articles-about-distributed-version-control-systems/#disqus_thread" data-disqus-identifer="blog/stevestreetingcoms-great-series-of-articles-about-distributed-version-control-systems/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -356,6 +382,9 @@
 <p>Anyway, I bring this up because there are some gadgets on <del>The Hobby Lounge</del> which you won't find on deviantART and unfortunately exist in a plagiarized state on the Windows Live Gallery. I was in the process of updating some of my older gadgets from this site and it took me a surprisingly long time to find the website again, even though I knew exactly what I was looking for. My google-fu is usually pretty decent so I figure I'll make a note of it here for myself and maybe help them get noticed a bit more.</p>
 <p><em>[Edit: The Hobby Lounge is now unfortunately defunct.]</em></p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/windows-sidebar-gadgets/#disqus_thread" data-disqus-identifer="blog/windows-sidebar-gadgets/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -374,6 +403,9 @@
 <p>This happens when you select <code>&lt;inherit from parent or project defaults&gt;</code>. Instead, you want to explicitly set <code>Maximize Speed (/O2)</code> (it will show up in bold when explicitly set). You should also verify that the <code>/O2</code> flag is being applied by viewing the command line (<code>Configuration Properties-&gt;C/C++-&gt;Command Line</code>).</p>
 <p>There is more about this bug on <a href="http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=383764">Microsoft Connect</a>, where it's also noted that this bug will be fixed in Visual Studio 2010.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/#disqus_thread" data-disqus-identifer="blog/optimization-switches-and-visual-studio-2008/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -431,6 +463,9 @@
 </ol>
 </div>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/right-click-context-menus-with-qt/#disqus_thread" data-disqus-identifer="blog/right-click-context-menus-with-qt/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -453,6 +488,9 @@
 
 <p>which is usually enough to keep Courier (+ New) out of the way. If someone is missing all of these fonts they'll likely have a decent enough substitute.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/consolas-is-a-poor-choice-for-web-use/#disqus_thread" data-disqus-identifer="blog/consolas-is-a-poor-choice-for-web-use/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -520,6 +558,9 @@
 </li>
 </ol>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/#disqus_thread" data-disqus-identifer="blog/compile-qt-45-for-visual-studio-using-your-multi-core-processor/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -564,15 +605,28 @@
 </li>
 </ul>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/include-guidelines/#disqus_thread" data-disqus-identifer="blog/include-guidelines/">Comments</a>
+	</p>
 </section>
 
 	<p class="prev_link">
 		<a href="/page/2/">&laquo; Older</a>
 	</p>
-</section>
+
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>

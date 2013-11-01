@@ -20,7 +20,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -41,8 +40,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -59,6 +58,9 @@
 	<div class="body">
 		<p>It's specified in the <a href="http://doc.trolltech.com/4.5/qt.html#Key-enum">documentation</a>, though in a slightly subtle manner. Essentially, <code>Qt::Key_Enter</code> is the keypad Enter, while <code>Qt::Key_Return</code> is the "regular" Enter, the one which you normally use while typing.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/the-difference-between-qt-key-enter-and-qt-key-r/#disqus_thread" data-disqus-identifer="blog/the-difference-between-qt-key-enter-and-qt-key-r/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -81,6 +83,9 @@
 <li><a href="http://blogs.msdn.com/vcblog/archive/2009/06/01/c-gets-squiggles.aspx">Squiggles.</a></li>
 </ul>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/visual-studio-2010-sounds-pretty-neat-so-far/#disqus_thread" data-disqus-identifer="blog/visual-studio-2010-sounds-pretty-neat-so-far/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -102,6 +107,9 @@
 <p>What this is saying is that <code>QTreeWidgetItem</code> does not inherit from <code>QObject</code>, meaning that your own, singly-inherited class also does not inherit from <code>QObject</code>. Inheriting from <code>QObject</code> is <a href="http://doc.trolltech.com/qobject.html#Q_OBJECT">one of the prerequisites</a> to using the <code>Q_OBJECT</code> macro, which, if you're anything like me, you automatically insert into any Qt GUI related class.</p>
 <p>If you're not using any of the meta object stuff in your subclass, such as signals/slots or properties, just take out the <code>Q_OBJECT</code> macro. If you need to use signals and slots, you'll need to make your subclass multiply-inherit from <code>QObject</code> as well. If you take this route, remember that "<a href="http://doc.trolltech.com/4.5/moc.html">Multiple Inheritance Requires QObject to Be First</a>", otherwise you'll get either the same error as above, or something along the lines of "<code>YourClass</code> inherits from two QObject subclasses" from the moc.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/qt-staticmetaobject-is-not-a-member-of/#disqus_thread" data-disqus-identifer="blog/qt-staticmetaobject-is-not-a-member-of/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -134,6 +142,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 </blockquote>
 <p>Anyway, I feel that captchas are a bit of dead end in terms of anti-spam measures for small sites. Small sites are not typical targets for spammers, as the reward is not worth the effort. However, if all these small sites are protected by the same captcha, breaking that captcha gives that spammer access to <em>(small-sites &#215; millions)</em>, which <em>is</em> worth the effort.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/captchas-shouldnt-be-the-default-defense-against-b/#disqus_thread" data-disqus-identifer="blog/captchas-shouldnt-be-the-default-defense-against-b/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -159,6 +170,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 <li><a href="http://doc.trolltech.com/4.5/qtextedit.html"><code>QTextEdit</code></a> isn't particularly performant, particularly when you resize it and it has to perform lots of word wrap calculations. Use <a href="http://doc.trolltech.com/4.5/qplaintextedit.html"><code>QPlainTextEdit</code></a> if you can.</li>
 </ul>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/more-thoughts-on-qt-45/#disqus_thread" data-disqus-identifer="blog/more-thoughts-on-qt-45/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -203,6 +217,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 <span class="kt">int</span> <span class="n">aRandomNumber</span> <span class="o">=</span> <span class="n">GetRand</span><span class="p">();</span>
 </pre></div>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/a-really-quick-boost-random-guide/#disqus_thread" data-disqus-identifer="blog/a-really-quick-boost-random-guide/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -247,6 +264,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 
 <p>This is yet another area where C++0x will offer its own solution, in this case, <a href="http://en.wikipedia.org/wiki/C%2B%2B0x#Strongly_typed_enumerations">strongly typed enumerations</a>.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/namespaces-are-one-honking-great-idea/#disqus_thread" data-disqus-identifer="blog/namespaces-are-one-honking-great-idea/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -271,6 +291,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 
 <p>If you end up using a lot of these spacers you could even create a subclass.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/right-aligning-a-button-in-a-qtoolbar/#disqus_thread" data-disqus-identifer="blog/right-aligning-a-button-in-a-qtoolbar/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -290,6 +313,9 @@ A: Fluffy <em>(hello, bot!)</em>  </p>
 <p>The style of the framework itself is more traditional than the common notion of modern C++, having more of an emphasis on subclassing and overriding virtual functions than on generic algorithms. The memory management system is definitely foreign: they encourage you to allocate on the heap, yet there are very few <code>delete</code> statements. The way it works is that <code>QObject</code>s (Qt's base class) accept a pointer to a parent in their constructor, which makes that particular <code>QObject</code> a child of the parent. When the parent is deleted, it takes care of deleting all its children. It's a change from RAII, for sure.</p>
 <p>It also takes a couple of hours to compile Visual Studio compatible versions of the various components, so don't do it as a last minute thing.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/qt-45/#disqus_thread" data-disqus-identifer="blog/qt-45/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -326,6 +352,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 <p>Where <code>my_socket</code> is an appropriate file descriptor (such as the one returned by <code>socket()</code>). This works just fine in Windows too, since it ignores the <code>nfds</code> parameter.</p>
 <p>Armed with this newfound knowledge, I go and fix all the other <code>select()</code> statements in my code, which ends up fixing the weird pause as well. Effectively, without a proper <code>nfds</code> value, <code>select()</code> just acts as a timer and blocks until the specified amount of time has elapsed.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/porting-a-winsock-application-to-linuxselect2-is-n/#disqus_thread" data-disqus-identifer="blog/porting-a-winsock-application-to-linuxselect2-is-n/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -341,6 +370,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 	<div class="body">
 		<p><a href="http://www.ajaxload.info/">Ajaxload</a> is a neat little site that generates those throbbers/spinning wheels that are in vogue nowadays. Your website/application won't be complete without one, after all.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/all-ajax-sites-need-a-fancy-indeterminate-progress/#disqus_thread" data-disqus-identifer="blog/all-ajax-sites-need-a-fancy-indeterminate-progress/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -367,6 +399,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 
 <p>With an identifier like this many common forms of transfer corruption can be quickly identified, and you can spit out a simple "corrupt file" message instead of trying to read a broken file.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/png-has-a-well-designed-magic-number-or-fourcc/#disqus_thread" data-disqus-identifer="blog/png-has-a-well-designed-magic-number-or-fourcc/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -393,6 +428,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 
 <p><a href="http://groups.google.com/group/comp.lang.c++/browse_thread/thread/830d8840c2b86114">(more details here)</a></p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/#disqus_thread" data-disqus-identifer="blog/dont-forget-about-copy-constructors-and-the-copy-assignment-operator/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -410,6 +448,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 <p>When you create a document from scratch this likely won't bite you, but when you parse an existing document and neglect to supply the <code>parse_no_data_nodes</code> flag, the parser creates data nodes. If you try to update your values with the <code>value()</code> function, it works just fine (and you can even pull it back out without any problems), but when you use the <code>print()</code> function, the data node (which you haven't updated) will show up instead.</p>
 <p>What made this even more difficult to track down was how <code>value()</code> will return the first data node it finds if there isn't a value yet, so it really does seem like you have a value already. I've updated my <a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/">prior RapidXML entry</a> to include the <code>parse_no_data_nodes</code> flag, which may save someone some time down the road.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/a-rapidxml-gotcha/#disqus_thread" data-disqus-identifer="blog/a-rapidxml-gotcha/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -437,6 +478,9 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 <p><code>auto_ptr</code> is <a href="http://www.informit.com/guides/content.aspx?g=cplusplus&amp;seqNum=400">on its way to deprecation</a>, but we haven't even seen C++0x yet, so I wouldn't worry too much about it. Its replacement, <code>unique_ptr</code>, will have the same transfer-of-ownership semantics, just implemented in a much safer way, so it'd be worth the effort to get used to using the right smart pointer for the job.</p>
 <p>Speaking of which, do you know what <code>scoped_ptr</code> is?</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/#disqus_thread" data-disqus-identifer="blog/shared-ptr-is-greatbut-sometimes-auto-ptr-is-actua/">Comments</a>
+	</p>
 </section>
 
 	<p class="next_link">
@@ -445,10 +489,20 @@ Ignored. The nfds parameter is included only for compatibility with Berkeley soc
 	<p class="prev_link">
 		<a href="/page/3/">&laquo; Older</a>
 	</p>
-</section>
+
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>

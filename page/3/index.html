@@ -20,7 +20,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -41,8 +40,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -77,6 +76,9 @@
 </blockquote>
 <p>[Edit: Note that there is an IDE bug in Visual Studio 2008 which may affect whether or not optimizations are applied. <a href="http://www.setnode.com/blog/optimization-switches-and-visual-studio-2008/">I write more about it here.</a>]</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/#disqus_thread" data-disqus-identifer="blog/dont-spend-time-micromanaging-optimization-options-in-visual-c/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -107,6 +109,9 @@
 </ol>
 </div>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/several-compilation-options-i-use-with-c-project/#disqus_thread" data-disqus-identifer="blog/several-compilation-options-i-use-with-c-project/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -149,6 +154,9 @@ Value: <code>boost\:\:.*=NoStepInto</code></p>
 <p>The backslashes are necessary because <code>:</code> (colon) is a special character in <a href="http://msdn.microsoft.com/en-us/library/2k3te2cs(VS.80).aspx">Visual Studio regex</a>. You sometimes see two backslashes used in other examples, this is only necessary if you are directly editing a <code>.reg</code> file (which I don't recommend). These rules will adjust the behaviour of the <em>Step-Into</em> command and make it skip anything from the <code>std</code> or <code>boost</code> namespaces, as well as the basic <code>operator new</code>. It will still step into an overloaded <code>operator new</code>, so don't fear. There are more details on <a href="http://blogs.msdn.com/andypennell/archive/2004/02/06/69004.aspx">this blog post</a>, as well as <a href="http://groups.google.com/group/microsoft.public.vsnet.debugging/msg/26addb1b539883e8">microsoft.public.vsnet.debugging</a>.</p>
 <p>One more thing: you can combine these two approaches. Say that you've added a skip for the entire <code>boost</code> namespace, but you decide you really want to take a peek inside one particular line and see exactly what is happening to your parameters. Pause execution on that line, and then right-click and use <em>Step Into Specific</em>. This is still the same list as before and it works the same as before, regardless of any NoStepInto rules.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/stop-wasting-time-stepping-into-functions-you-dont/#disqus_thread" data-disqus-identifer="blog/stop-wasting-time-stepping-into-functions-you-dont/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -172,6 +180,9 @@ alignment changed after including header, may be due to missing
 
 <p>Some experimentation reveals that including <code>thread.hpp</code> before <code>winsock2.h</code> triggers all these warnings. The simple solution is to just move <code>#include &lt;boost/thread.hpp&gt;</code> down below <code>#include &lt;winsock2.h&gt;</code>.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/boostthread-triggers-warning-c4103-in-microsoft-vi/#disqus_thread" data-disqus-identifer="blog/boostthread-triggers-warning-c4103-in-microsoft-vi/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -225,6 +236,9 @@ alignment changed after including header, may be due to missing
 <p><code>--build-type=complete</code> : notes that you want every possible combination built (Debug/Release, Multi/Single threaded, Static/Shared).</p>
 <p><code>stage</code> : a build target which builds the compiled libraries to the stage directory (which you can set with <code>--stagedir=&lt;STAGEDIR&gt;</code>). Contrast this with the <code>install</code> target, which builds the compiled libraries, but <em>also</em> copies the header-only libraries to a particular location. This is generally an unnecessary step since you've already extracted the Boost headers somewhere already. Look inside the <code>Jamroot</code> file inside your Boost folder for more details.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/building-boost-now-with-dual-quad-multi-core-action/#disqus_thread" data-disqus-identifer="blog/building-boost-now-with-dual-quad-multi-core-action/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -349,6 +363,9 @@ Parsing and traversing an XML document like this one:</p>
 [Edit: Thanks to remo for catching a typo]</p>
 <p>Thanks for the comments everyone! I'm glad to help out where I can, but please do note that I check this blog rather infrequently at this point in time and will often not respond for days, if not weeks. If you have a question to which you need an answer within a reasonable time frame, I'd recommend using Stack Overflow. On the other hand, if you have corrections and/or suggestions, please continue to leave them here and I'll address them as they come up. Thanks again!</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/quick-notes-on-how-to-use-rapidxml/#disqus_thread" data-disqus-identifer="blog/quick-notes-on-how-to-use-rapidxml/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -378,6 +395,9 @@ Parsing and traversing an XML document like this one:</p>
 <p>A task dialog type affair (pre-Vista), on the other hand, requires separate templates for each dialog or creating an indirect dialog (on the fly, with lots of simple but tedious math). Both of these approaches take infinitely longer to write.</p>
 <p>If you really care about usability, though, perhaps it's time well spent.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/remember-that-users-do-not-read/#disqus_thread" data-disqus-identifer="blog/remember-that-users-do-not-read/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -457,6 +477,9 @@ Parsing and traversing an XML document like this one:</p>
 
 <p>If you use the regexp conditionals remember that many symbols have a special meaning. The '<code>.</code>' (period) is a common example, as it has the special meaning of "match any single character". You can <a href="http://en.wikipedia.org/wiki/Escape_character">escape</a> it by prepending a backslash: '<code>\.</code>'</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/lighttpd-tips/#disqus_thread" data-disqus-identifer="blog/lighttpd-tips/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -572,6 +595,9 @@ Screeeechhhh!
 <p>We have a <code>Pencil</code> that can <code>gas()</code>, <code>turnLeft()</code>, and <code>brake()</code>, just like a <code>Car</code>. What is the difference between them, as far as this code is concerned? None!</p>
 <p>This is what duck typing is. If a class acts like another class, it can substitute for that class. There's no need for there to be strictly defined relationships between classes.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/what-is-duck-typing/#disqus_thread" data-disqus-identifer="blog/what-is-duck-typing/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -626,6 +652,9 @@ Screeeechhhh!
 <span class="p">}</span>
 </pre></div>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/#disqus_thread" data-disqus-identifer="blog/mapvirtualkey-getkeynametext-and-a-story-of-how-to/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -695,6 +724,9 @@ Screeeechhhh!
 <p>Conclusion: if <tt class="docutils literal"><span class="pre">std::map</span></tt> is dying in <tt class="docutils literal">clear()</tt> (or ever, frankly), you may very well be doing something bad, memory wise.</p>
 
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/std-map-access-violation-or-not/#disqus_thread" data-disqus-identifer="blog/std-map-access-violation-or-not/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -729,6 +761,9 @@ Screeeechhhh!
     <td>$20</td>
 </tr></tbody></table>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/proctors-in-calgary/#disqus_thread" data-disqus-identifer="blog/proctors-in-calgary/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -748,6 +783,9 @@ Screeeechhhh!
 <p>Posting this in case it comes in handy for anyone else experiencing disconnection problems.</p>
 <p>[2008 Addendum: The only real solution to this problem is to get a better router. The BEFSR81 is at least 7 years old now.]</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/linksys-befsr81-disconnects/#disqus_thread" data-disqus-identifer="blog/linksys-befsr81-disconnects/">Comments</a>
+	</p>
 </section>
 <section class="post">
 	<header>
@@ -816,15 +854,28 @@ Loo loo loo!  </p>
 <p>One group (typically the orientation leaders) starts the cheer by yelling "Water water water!". The other group then replies with "Loo loo loo!". It continues in this fashion until the end of the cheer.</p>
 <p>There are more Math cheers in the <del>Math Handbook</del> <a href="http://www.orientation.math.uwaterloo.ca/2008/cheers/">Math Orientation 2008 guide</a>.</p>
 	</div>
+	<p class="invite_comment">
+		<a href="http://www.setnode.com/blog/university-of-waterloo-cheers/#disqus_thread" data-disqus-identifer="blog/university-of-waterloo-cheers/">Comments</a>
+	</p>
 </section>
 
 	<p class="next_link">
 		<a href="/page/2/">Newer &raquo;</a>
 	</p>
-</section>
+
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>

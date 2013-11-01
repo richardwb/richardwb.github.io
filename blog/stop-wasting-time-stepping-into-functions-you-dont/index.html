@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-		<title>setnode.com</title>
+	
+		<title>Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++) - setnode.com</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="/theme/css/main.css" />
 	<link href="http://www.setnode.com/rss/" type="application/rss+xml" rel="alternate" title="setnode.com RSS Feed" />
@@ -24,7 +25,6 @@
 			<h1>
 				<a href="/" title="Link to front page"><img id="logo" src="/theme/images/setnode_logo.png" alt="setnode.com" /></a>
 			</h1>
-			<!-- <span id="subtitle">/</span> -->
 		</header>
 		<nav id="menu">
 			<ul>
@@ -45,8 +45,8 @@
 				</li>
 			</ul>
 			<p>
-        		<a href="/rss/" title="RSS feed">RSS</a>
-        	</p>
+				<a href="/rss/" title="RSS feed">RSS</a>
+			</p>
 		</nav>
 
 <section class="post">
@@ -90,11 +90,36 @@ Value: <code>boost\:\:.*=NoStepInto</code></p>
 <p>The backslashes are necessary because <code>:</code> (colon) is a special character in <a href="http://msdn.microsoft.com/en-us/library/2k3te2cs(VS.80).aspx">Visual Studio regex</a>. You sometimes see two backslashes used in other examples, this is only necessary if you are directly editing a <code>.reg</code> file (which I don't recommend). These rules will adjust the behaviour of the <em>Step-Into</em> command and make it skip anything from the <code>std</code> or <code>boost</code> namespaces, as well as the basic <code>operator new</code>. It will still step into an overloaded <code>operator new</code>, so don't fear. There are more details on <a href="http://blogs.msdn.com/andypennell/archive/2004/02/06/69004.aspx">this blog post</a>, as well as <a href="http://groups.google.com/group/microsoft.public.vsnet.debugging/msg/26addb1b539883e8">microsoft.public.vsnet.debugging</a>.</p>
 <p>One more thing: you can combine these two approaches. Say that you've added a skip for the entire <code>boost</code> namespace, but you decide you really want to take a peek inside one particular line and see exactly what is happening to your parameters. Pause execution on that line, and then right-click and use <em>Step Into Specific</em>. This is still the same list as before and it works the same as before, regardless of any NoStepInto rules.</p>
 	</div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+var disqus_identifier = 'blog/stop-wasting-time-stepping-into-functions-you-dont/';
+var disqus_title = 'Stop wasting time stepping into functions you don't care about in Microsoft Visual Studio (C++)';
+var disqus_url = 'http://www.setnode.com/blog/stop-wasting-time-stepping-into-functions-you-dont/';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+	var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+	(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </section>
 
 		<footer id="footer">
 			<p class="credit">Copyright &#169; 2013 richardwb (www.setnode.com).</p>
 		</footer>
 	</div>
+<script type="text/javascript">
+var disqus_shortname = 'setnode';
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+	var s = document.createElement('script'); s.async = true;
+	s.type = 'text/javascript';
+	s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+	(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 </body>
 </html>
